@@ -8,7 +8,7 @@ export default class Product {
     this.favoriteCount = favoriteCount;
   }
 
-  favorite() {
-    this.favoriteCount++;
+  favorite(favoriteCount) {
+    favoriteCount += 1;
   }
 }

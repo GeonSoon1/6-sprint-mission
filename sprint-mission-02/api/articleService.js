@@ -8,11 +8,13 @@ export default class ArticleService {
     // 에러처리 - page
     if (typeof page !== 'number' || page < 1) {
       throw new Error('page에 숫자를 입력 해 주시기 바랍니다');
+      return;
     }
 
     // 에러처리 - page size
     if (typeof pageSize !== 'number' || pageSize < 1) {
       throw new Error('pageSize에 숫자를 입력 해 주시기 바랍니다');
+      return;
     }
 
     let url = `https://panda-market-api-crud.vercel.app/articles?page=${page}&pageSize=${pageSize}&orderBy=recent`;
@@ -20,6 +22,7 @@ export default class ArticleService {
     // 키워드 정보 확인 및 에러처리
     if (keyword && !keyword.trim()) {
       throw new Error('올바른 키워드를 입력 해 주시기 바랍니다.');
+      return;
     } else if (keyword) {
       url = `https://panda-market-api-crud.vercel.app/articles?page=${page}&pageSize=${pageSize}&orderBy=recent&keyword=${keyword}`;
     }
@@ -27,16 +30,14 @@ export default class ArticleService {
     // 데이터 통신 영역
     fetch(url)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('HTTP error ' + response.status);
-        }
         return response.json();
       })
       .then((data) => {
+        console.log(data);
         return data;
       })
       .catch((err) => {
-        console.error('Error:', err);
+        console.log(err);
       });
   }
 
@@ -45,6 +46,7 @@ export default class ArticleService {
     if (!id || typeof id !== 'number' || id < 1) {
       // id 숫자 크기 제한은 규정을 알지 못해 1보다 작은 수는 사용 불가하도록 작성하였습니다.
       throw new Error('올바른 숫자를 입력 해 주시기 바랍니다');
+      return;
     }
 
     const url = `https://panda-market-api-crud.vercel.app/articles/${id}`;
@@ -52,16 +54,14 @@ export default class ArticleService {
     // 데이터 통신 영역
     fetch(url)
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('HTTP error ' + response.status);
-        }
         return response.json();
       })
       .then((data) => {
+        console.log(data);
         return data;
       })
       .catch((err) => {
-        console.error('Error:', err);
+        console.log(err);
       });
   }
 
@@ -69,6 +69,7 @@ export default class ArticleService {
     // 에러처리 - 타이틀, 컨텐츠
     if (!title?.trim() || !content?.trim()) {
       throw new Error('data 입력을 확인 해 주세요');
+      return;
     } // image 값이 없는 경우 서버에서 걸러내므로 생략
 
     // 최종 객체
@@ -90,16 +91,13 @@ export default class ArticleService {
       body: JSON.stringify(articleData),
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('HTTP error ' + response.status);
-        }
         return response.json();
       })
       .then((data) => {
-        return data;
+        console.log(data);
       })
       .catch((err) => {
-        console.error('Error:', err);
+        console.log(err);
       });
   }
 
@@ -128,16 +126,13 @@ export default class ArticleService {
       body: JSON.stringify(patchArtData),
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('HTTP error ' + response.status);
-        }
         return response.json();
       })
       .then((data) => {
-        return data;
+        console.log(data);
       })
       .catch((err) => {
-        console.error('Error:', err);
+        console.log(err);
       });
   }
 
@@ -146,6 +141,7 @@ export default class ArticleService {
     if (!id || typeof id !== 'number' || id < 1) {
       // id 숫자 크기 제한은 규정을 알지 못해 1보다 작은 수는 사용 불가하도록 작성하였습니다.
       throw new Error('올바른 숫자를 입력 해 주시기 바랍니다');
+      return;
     }
 
     const url = `https://panda-market-api-crud.vercel.app/articles/${id}`;
@@ -158,16 +154,14 @@ export default class ArticleService {
       },
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('HTTP error ' + response.status);
-        }
         return response.json();
       })
       .then((data) => {
+        console.log(`삭제 성공 : ${data.id}`);
         return data;
       })
       .catch((err) => {
-        console.error('Error:', err);
+        console.log(err);
       });
   }
 }

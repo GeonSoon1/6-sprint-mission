@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'https://panda-market-api-crud.vercel.app/articles',
+  baseURL: 'https://panda-market-api-crud.vercel.app/',
   timeout: 3000,
 });
 
@@ -10,21 +10,24 @@ export default class ArticleServiceAxios {
     // 에러 처리 - page
     if (typeof queryParams.page !== 'number' || queryParams.page < 1) {
       throw new Error('page에 숫자를 입력 해 주시기 바랍니다');
+      return;
     }
 
     // 에러 처리 - page size
     if (typeof queryParams.pageSize !== 'number' || queryParams.pageSize < 1) {
       throw new Error('pageSize에 숫자를 입력 해 주시기 바랍니다');
+      return;
     }
 
     // keyword가 있는 경우 에러처리
     if (queryParams.keyword && !queryParams.keyword.trim()) {
       throw new Error('올바른 키워드를 입력 해 주시기 바랍니다.');
+      return;
     }
 
     // 데이터 통신 영역
     try {
-      const res = await instance.get('', {
+      const res = await instance.get('articles', {
         params: {
           page: queryParams.page,
           pageSize: queryParams.pageSize,
@@ -45,11 +48,12 @@ export default class ArticleServiceAxios {
     if (!id || typeof id !== 'number' || id < 1) {
       // id 숫자 크기 제한은 규정을 알지 못해 1보다 작은 수는 사용 불가하도록 작성하였습니다.
       throw new Error('올바른 숫자를 입력 해 주시기 바랍니다');
+      return;
     }
 
     // 데이터 통신 영역
     try {
-      const res = await instance.get(`${id}`);
+      const res = await instance.get(`articles/${id}`);
 
       // params 안에 들어가는 객체는 ?key=value 형태로 사용 됨
       // 따라서 해당 방식으로 query string 이 사용되지 않으면
@@ -74,11 +78,12 @@ export default class ArticleServiceAxios {
     // 타이틀과 컨텐츠 중 값이 없음이 발생하면 메서드 종료
     if (!servayData.title?.trim() || !servayData.content?.trim()) {
       throw new Error('data 입력을 확인 해 주세요');
+      return;
     } // image 값이 없는 경우 서버에서 걸러내므로 생략
 
     // 데이터 통신 영역
     try {
-      const res = await instance.post('', servayData);
+      const res = await instance.post('articles', servayData);
 
       console.log(res.data);
       return res.data;
@@ -102,7 +107,7 @@ export default class ArticleServiceAxios {
 
     // 데이터 통신 영역
     try {
-      const res = await instance.patch(`${id}`, patchArtData);
+      const res = await instance.patch(`articles/${id}`, patchArtData);
 
       console.log(res.data);
       return res.data;
@@ -116,11 +121,12 @@ export default class ArticleServiceAxios {
     if (!id || typeof id !== 'number' || id < 1) {
       // id 숫자 크기 제한은 규정을 알지 못해 1보다 작은 수는 사용 불가하도록 작성하였습니다.
       throw new Error('올바른 숫자를 입력 해 주시기 바랍니다');
+      return;
     }
 
     // 데이터 통신 영역
     try {
-      const res = await instance.delete(`${id}`);
+      const res = await instance.delete(`articles/${id}`);
 
       console.log('삭제완료', res.data);
       return res.data;

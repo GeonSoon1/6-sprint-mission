@@ -13,3 +13,4 @@ export const GetProductListParamsStruct = PageParamsStruct;
 
 export const UpdateProductBodyStruct = partial(CreateProductBodyStruct);
 
+

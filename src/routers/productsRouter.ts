@@ -27,3 +27,4 @@ productsRouter.delete('/:id/favorites', authenticate(), withAsync(deleteFavorite
 
 export default productsRouter;
 
+

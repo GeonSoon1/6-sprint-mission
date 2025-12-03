@@ -11,3 +11,4 @@ export const LoginBodyStruct = object({
   password: nonempty(string()),
 });
 
+

@@ -18,3 +18,4 @@ export const GetMyProductListParamsStruct = PageParamsStruct;
 
 export const GetMyFavoriteListParamsStruct = PageParamsStruct;
 
+

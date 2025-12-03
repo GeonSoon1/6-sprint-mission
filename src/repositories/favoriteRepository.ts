@@ -20,3 +20,4 @@ export class FavoriteRepository {
 
 export const favoriteRepository = new FavoriteRepository();
 
+

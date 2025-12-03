@@ -35,3 +35,4 @@ function authenticate(options: AuthenticateOptions = { optional: false }) {
 
 export default authenticate;
 
+

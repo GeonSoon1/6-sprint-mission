@@ -21,3 +21,4 @@ export const CursorParamsStruct = object({
   keyword: optional(nonempty(string())),
 });
 
+

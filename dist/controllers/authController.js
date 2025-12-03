@@ -1,7 +1,7 @@
 import { create } from 'superstruct';
 import { authService } from '../services/authService.js';
 import { LoginBodyStruct, RegisterBodyStruct } from '../structs/authStructs.js';
-import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME, NODE_ENV, } from '../lib/constants.js';
+import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME, NODE_ENV } from '../lib/constants.js';
 import BadRequestError from '../lib/errors/BadRequestError.js';
 export async function register(req, res) {
     const data = create(req.body, RegisterBodyStruct);

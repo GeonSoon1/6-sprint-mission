@@ -1,10 +1,7 @@
 import { prisma } from '../utils/prisma';
 import bcrypt from 'bcrypt';
 import { generateTokens, verifyRefreshToken } from '../utils/token';
-
-interface ErrorWithStatus extends Error {
-  status?: number;
-}
+import { ErrorWithStatus } from '../utils/types';
 
 async function signUp(email: string, nickname: string, password: string) {
   const existingUser = await prisma.user.findUnique({ where: { email } });

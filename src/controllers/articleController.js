@@ -1,4 +1,4 @@
-import prisma from '../lib/prismaClient.js';
+import prisma from '../libs/prismaClient.js';
 
 async function createArticle(req, res, next) {
   const data = await prisma.article.create({

@@ -1,4 +1,4 @@
-import { BadRequestError } from '../lib/error.js';
+import { BadRequestError } from '../libs/error.js';
 
 export function uploadSingleImage(req, res, next) {
   const file = req.file;

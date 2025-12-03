@@ -11,8 +11,8 @@ import {
   logOutUser,
   newRefreshToken,
   updateUserProfile,
-} from '../controller/userController.js';
-import { asyncHandler } from '../lib/asyncHandler.js';
+} from '../controllers/userController.js';
+import { asyncHandler } from '../libs/asyncHandler.js';
 import {
   authorizeUser,
   verifyAccessToken,
@@ -22,11 +22,11 @@ import {
   validateCreateUser,
   validateLoginUser,
   validateUpdateUser,
-} from '../middlewares/validate/validateUser.js';
+} from '../middlewares/validates/validateUser.js';
 import {
   validateArticleIdParam,
   validateProductIdParam,
-} from '../middlewares/validate/validateId.js';
+} from '../middlewares/validates/validateId.js';
 
 const userRouter = express.Router();
 

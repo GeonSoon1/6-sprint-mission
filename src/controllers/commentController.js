@@ -1,5 +1,5 @@
-import { NotFoundError } from '../lib/error.js';
-import prisma from '../lib/prismaClient.js';
+import { NotFoundError } from '../libs/error.js';
+import prisma from '../libs/prismaClient.js';
 
 async function createProductComment(req, res, next) {
   const { productId } = req.params;

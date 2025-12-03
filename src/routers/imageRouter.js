@@ -1,7 +1,7 @@
 import express from 'express';
 import upload from '../upload.js';
-import { uploadSingleImage } from '../controller/imageController.js';
-import { asyncHandler } from '../lib/asyncHandler.js';
+import { uploadSingleImage } from '../controllers/imageController.js';
+import { asyncHandler } from '../libs/asyncHandler.js';
 
 const imageRouter = express.Router();
 

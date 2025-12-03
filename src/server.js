@@ -1,17 +1,17 @@
 import express from 'express';
 import cors from 'cors';
-import productRouters from './router/productRouter.js';
-import articleRouters from './router/articleRouter.js';
-import commentRouters from './router/commentRouter.js';
+import productRouters from './routers/productRouter.js';
+import articleRouters from './routers/articleRouter.js';
+import commentRouters from './routers/commentRouter.js';
 import {
   globalErrorHandler,
   defaultNotFoundHandler,
 } from './middlewares/errorHandler/errorHandler.js';
-import userRouter from './router/userRouter.js';
+import userRouter from './routers/userRouter.js';
 import cookieParser from 'cookie-parser';
 import { optionalAuth } from './middlewares/auth.js';
-import { PORT } from './lib/constants.js';
-import imageRouter from './router/imageRouter.js';
+import { PORT } from './libs/constants.js';
+import imageRouter from './routers/imageRouter.js';
 
 const app = express();
 

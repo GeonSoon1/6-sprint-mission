@@ -1,5 +1,5 @@
-import { BadRequestError, SamePasswordError } from '../lib/error.js';
-import prisma from '../lib/prismaClient.js';
+import { BadRequestError, SamePasswordError } from '../libs/error.js';
+import prisma from '../libs/prismaClient.js';
 import userService from '../services/userService.js';
 
 async function createUser(req, res, next) {

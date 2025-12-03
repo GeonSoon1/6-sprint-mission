@@ -1,4 +1,4 @@
-import prisma from '../lib/prismaClient.js';
+import prisma from '../libs/prismaClient.js';
 
 async function createProduct(req, res, next) {
   const data = await prisma.product.create({

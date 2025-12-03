@@ -1,6 +1,6 @@
 import { expressjwt } from 'express-jwt';
-import prisma from '../lib/prismaClient.js';
-import { AuthorizeError, BadRequestError } from '../lib/error.js';
+import prisma from '../libs/prismaClient.js';
+import { AuthorizeError, BadRequestError } from '../libs/error.js';
 import jwt from 'jsonwebtoken';
 
 // 리퀘스트 토큰 검증 미들웨어

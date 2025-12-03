@@ -1,11 +1,11 @@
-import prisma from '../lib/prismaClient.js';
+import prisma from '../libs/prismaClient.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {
   BadRequestError,
   ForbiddenError,
   SamePasswordError,
-} from '../lib/error.js';
+} from '../libs/error.js';
 
 async function hashingPassword(password) {
   return bcrypt.hash(password, 10);

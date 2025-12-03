@@ -3,16 +3,16 @@ import {
   validateCreateArticle,
   validateGetListArticle,
   validateUpdateArticle,
-} from '../middlewares/validate/validateArticle.js';
-import { asyncHandler } from '../lib/asyncHandler.js';
-import { validateIdParam } from '../middlewares/validate/validateId.js';
+} from '../middlewares/validates/validateArticle.js';
+import { asyncHandler } from '../libs/asyncHandler.js';
+import { validateIdParam } from '../middlewares/validates/validateId.js';
 import {
   createArticle,
   deleteArticle,
   getArticleById,
   getArticles,
   updateArticle,
-} from '../controller/articleController.js';
+} from '../controllers/articleController.js';
 import {
   authorizeArticle,
   authorizeUser,

@@ -5,7 +5,7 @@ import {
   ForbiddenError,
   NotFoundError,
   SamePasswordError,
-} from '../../lib/error.js';
+} from '../../libs/error.js';
 
 function defaultNotFoundHandler(req, res, next) {
   return res.status(404).send({ message: '존재하지 않습니다' });

@@ -3,16 +3,16 @@ import {
   validateCreateProduct,
   validateGetListProduct,
   validateUpdateProduct,
-} from '../middlewares/validate/validateProduct.js';
-import { asyncHandler } from '../lib/asyncHandler.js';
-import { validateIdParam } from '../middlewares/validate/validateId.js';
+} from '../middlewares/validates/validateProduct.js';
+import { asyncHandler } from '../libs/asyncHandler.js';
+import { validateIdParam } from '../middlewares/validates/validateId.js';
 import {
   createProduct,
   deleteProduct,
   getProductById,
   getProducts,
   updateProduct,
-} from '../controller/productController.js';
+} from '../controllers/productController.js';
 import {
   authorizeProduct,
   authorizeUser,

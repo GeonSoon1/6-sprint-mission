@@ -12,13 +12,14 @@ import commentsRouter from './commentsRouter.js';
 import { authenticate } from '../middlewares/authenticate.js';
 import { validate } from '../middlewares/validate.js';
 import { CreateArticleSchema, PatchArticleSchema } from '../validations/articlesSchema.js';
+import { authMiddleware } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
 router.post('/', authenticate, validate(CreateArticleSchema, 'body'), createArticle);
-router.get('/', validatePagination, getArticles);
+router.get('/', validatePagination, authMiddleware, getArticles);
 
-router.get('/:id', getArticle);
+router.get('/:id', authMiddleware, getArticle);
 router.patch('/:id', authenticate, validate(PatchArticleSchema, 'body'), patchArticle);
 router.delete('/:id', authenticate, deleteArticle);
 

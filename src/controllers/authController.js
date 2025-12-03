@@ -15,9 +15,6 @@ function setCookie(res, accessToken, refreshToken) {
 }
 
 export const signUp = async (req, res) => {
-  //   console.log('--- 회원가입 요청 데이터 확인 ---');
-  //   console.log(req.body);
-  //   console.log('---------------------------');
   const { email, nickname, password } = req.body;
   const user = await authService.signUp(email, nickname, password);
   res.status(201).json(user);

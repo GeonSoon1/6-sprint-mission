@@ -1,5 +1,4 @@
 import { articlesService } from '../services/articlesService.js';
-import { getUserIdFromToken } from '../utils/token.js';
 
 export async function createArticle(req, res) {
   const { title, content } = req.body;
@@ -15,15 +14,15 @@ export async function createArticle(req, res) {
 
 export async function getArticles(req, res) {
   const { sort, search } = req.query;
-  const { offset: _offset, limit: _limit } = req.paginationParams;
-  const userId = getUserIdFromToken(req);
+  const { offset, limit } = req.paginationParams;
+  const userId = req.user?.id;
 
   const { articles, totalArticles } = await articlesService.findArticles(
     {
       sort,
       search,
-      offset: _offset,
-      limit: _limit,
+      offset,
+      limit,
     },
     userId,
   );
@@ -36,8 +35,8 @@ export async function getArticles(req, res) {
     });
   }
 
-  const totalPages = Math.ceil(totalArticles / _limit);
-  const currentPage = Math.floor(_offset / _limit) + 1;
+  const totalPages = Math.ceil(totalArticles / limit);
+  const currentPage = Math.floor(offset / limit) + 1;
 
   res.status(200).json({
     message: '게시판 목록을 조회했습니다.',
@@ -46,14 +45,14 @@ export async function getArticles(req, res) {
       totalItems: totalArticles,
       totalPages,
       currentPage,
-      itemsPerPage: _limit,
+      itemsPerPage: limit,
     },
   });
 }
 
 export async function getArticle(req, res) {
   const { id } = req.params;
-  const userId = getUserIdFromToken(req);
+  const userId = req.user?.id;
   const article = await articlesService.findArticleById(id, userId);
 
   res.status(200).send(article);
@@ -61,7 +60,12 @@ export async function getArticle(req, res) {
 
 export async function patchArticle(req, res) {
   const { id } = req.params;
-  const updateData = req.body;
+  const { title, content } = req.body;
+
+  const updateData = {};
+  if (title) updateData.title = title;
+  if (content) updateData.content = content;
+
   const userId = req.user.id;
 
   if (Object.keys(updateData).length === 0) {

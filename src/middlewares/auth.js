@@ -32,7 +32,8 @@ function optionalAuth(req, res, next) {
   if (!token) return next();
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     // 검증 실패시 에러, 성공시 payload 반환
-    if (!err) req.auth = decoded;
+    if (err) next(new AuthorizeError());
+    req.auth = decoded;
     next();
   });
 }

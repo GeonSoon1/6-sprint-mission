@@ -1,7 +1,9 @@
+import { REPLCommand } from 'repl';
 import { authService } from '../services/authService';
 import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants';
+import { Response, RequestHandler } from 'express';
 
-function setCookie(res, accessToken, refreshToken) {
+function setCookie(res: Response, accessToken: string, refreshToken: string) {
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -14,13 +16,13 @@ function setCookie(res, accessToken, refreshToken) {
   });
 }
 
-export const signUp = async (req, res) => {
+export const signUp: RequestHandler = async (req, res) => {
   const { email, nickname, password } = req.body;
   const user = await authService.signUp(email, nickname, password);
   res.status(201).json(user);
 };
 
-export const login = async (req, res) => {
+export const login: RequestHandler = async (req, res) => {
   const { email, password } = req.body;
   const { user, accessToken, refreshToken } = await authService.login(email, password);
 
@@ -29,9 +31,12 @@ export const login = async (req, res) => {
   res.status(200).json({ message: '로그인 성공', user: { id: user.id, email: user.email } });
 };
 
-export const refresh = async (req, res) => {
+export const refresh: RequestHandler = async (req, res) => {
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME];
-  if (!refreshToken) return res.status(401).json({ message: 'Unauthorized' });
+  if (!refreshToken) {
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
 
   try {
     const { accessToken, refreshToken: newRefreshToken } = await authService.refreshTokens(
@@ -44,7 +49,7 @@ export const refresh = async (req, res) => {
   }
 };
 
-export const logout = (req, res) => {
+export const logout: RequestHandler = (req, res) => {
   res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
   res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
   res.status(200).json({ message: '로그아웃 성공' });

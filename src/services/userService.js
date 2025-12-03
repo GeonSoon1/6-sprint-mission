@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import {
   BadRequestError,
   ForbiddenError,
-  SamePasswordError,
+  IsSamePasswordError,
 } from '../libs/error.js';
 
 async function hashingPassword(password) {
@@ -21,9 +21,9 @@ async function verifyPassword(inputPassword, savedPassword) {
   if (!isValid) throw new ForbiddenError();
 }
 
-async function samePassword(inputPassword, savedPassword) {
+async function isSamePassword(inputPassword, savedPassword) {
   const isSame = await bcrypt.compare(inputPassword, savedPassword);
-  if (isSame) throw new SamePasswordError();
+  if (isSame) throw new IsSamePasswordError();
 }
 
 async function getUser(email, password) {
@@ -54,5 +54,5 @@ export default {
   getUser,
   createToken,
   refreshToken,
-  samePassword,
+  isSamePassword,
 };

@@ -30,10 +30,10 @@ export class AuthorizeError extends Error {
   }
 }
 
-export class SamePasswordError extends Error {
+export class IsSamePasswordError extends Error {
   constructor(message = '같은 비밀번호로 변경할 수 없습니다.') {
     super(message);
-    this.name = 'samePasswordError';
+    this.name = 'IsSamePasswordError';
     this.statusCode = 403;
   }
 }

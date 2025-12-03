@@ -26,7 +26,7 @@ export class AuthorizeError extends Error {
   constructor(message = '접근할 수 없는 권한입니다.') {
     super(message);
     this.name = 'AuthorizeError';
-    this.statusCode = 403;
+    this.statusCode = 401;
   }
 }
 

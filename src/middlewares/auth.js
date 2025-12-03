@@ -17,11 +17,11 @@ const verifyAccessToken = expressjwt({
   getToken: (req) => req.cookies.accessToken,
 });
 
-// 유저 인가 미들웨어
+// 유저 인증 미들웨어
 async function authorizeUser(req, res, next) {
   const { userId } = req.auth;
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) next(new BadRequestError());
+  if (!user) next(new AuthorizeError());
   req.user = user;
   next();
 }

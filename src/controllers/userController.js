@@ -159,10 +159,18 @@ async function likeArticleButton(req, res, next) {
   });
   if (!existing) {
     await prisma.likedArticle.create({ data: { userId, articleId } });
+    await prisma.article.update({
+      where: { id: articleId },
+      data: { articleLikeCount: { increment: 1 } },
+    });
     return res.status(200).json({ message: '게시글 좋아요 등록' });
   } else {
     await prisma.likedArticle.delete({
       where: { userId_articleId: { userId, articleId } },
+    });
+    await prisma.article.update({
+      where: { id: articleId, articleLikeCount: { gt: 0 } },
+      data: { articleLikeCount: { decrement: 1 } },
     });
     return res.status(200).json({ message: '게시글 좋아요 해제' });
   }

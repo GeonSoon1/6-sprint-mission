@@ -1,7 +1,8 @@
 import { productsService } from '../services/productsService';
-import { getUserIdFromToken } from '../utils/token';
+import { RequestHandler } from 'express';
+import { ErrorWithStatus } from '../utils/types';
 
-export async function createProduct(req, res) {
+export const createProduct: RequestHandler = async (req, res) => {
   const productData = req.body;
   const userId = req.user.id;
 
@@ -11,61 +12,70 @@ export async function createProduct(req, res) {
     message: '상품이 성공적으로 등록되었습니다.',
     data: newProduct,
   });
-}
+};
 
-export async function getProducts(req, res) {
+export const getProducts: RequestHandler = async (req, res) => {
   const { sort, search } = req.query;
-  const { offset: _offset, limit: _limit } = req.paginationParams;
-
-  const userId = getUserIdFromToken(req);
+  const { offset, limit } = req.paginationParams!;
+  const userId = req.user?.id;
 
   const { products, totalProducts } = await productsService.findProducts(
     {
-      sort,
-      search,
-      offset: _offset,
-      limit: _limit,
+      sort: sort as string,
+      search: search as string,
+      offset,
+      limit,
     },
     userId,
   );
 
   if (search && totalProducts === 0) {
-    return res.status(200).json({
+    res.status(200).json({
       message: `${search}와 일치하는 상품을 찾을 수 없습니다.`,
       data: [],
       pagination: {},
     });
+    return;
   }
 
-  const totalPages = Math.ceil(totalProducts / _limit);
+  const totalPages = Math.ceil(totalProducts / limit);
+  const currentPage = Math.floor(offset / limit) + 1;
 
   res.status(200).json({
     message: '상품 목록을 조회했습니다.',
     data: products,
     pagination: {
       totalItems: totalProducts,
-      totalPages: totalPages,
-      currentPage: Math.floor(_offset / _limit) + 1,
-      itemsPerPage: _limit,
+      totalPages,
+      currentPage,
+      itemsPerPage: limit,
     },
   });
-}
+};
 
-export async function getProduct(req, res) {
+export const getProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;
-  const userId = getUserIdFromToken(req);
+  const userId = req.user?.id;
   const product = await productsService.findProductById(id, userId);
 
   res.status(200).send(product);
-}
+};
 
-export async function patchProduct(req, res) {
+export const patchProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;
-  const updateData = req.body;
+  const { name, description, price, tags } = req.body;
+
+  const updateData: { [key: string]: any } = {};
+
+  if (name !== undefined) updateData.name = name;
+  if (description !== undefined) updateData.description = description;
+  if (price !== undefined) updateData.price = price;
+  if (tags !== undefined) updateData.tags = tags;
+
   const userId = req.user.id;
 
   if (Object.keys(updateData).length === 0) {
-    const emptyBodyError = new Error('수정할 내용이 비어 있습니다.');
+    const emptyBodyError: ErrorWithStatus = new Error('수정할 내용이 비어 있습니다.');
     emptyBodyError.status = 400;
     throw emptyBodyError;
   }
@@ -76,13 +86,13 @@ export async function patchProduct(req, res) {
     message: '상품이 성공적으로 수정되었습니다.',
     data: product,
   });
-}
+};
 
-export async function deleteProduct(req, res) {
+export const deleteProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;
   const userId = req.user.id;
 
   const product = await productsService.deleteProductInDb(id, userId);
 
   res.status(204).send(product);
-}
+};

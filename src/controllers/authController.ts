@@ -1,5 +1,5 @@
-import { authService } from '../services/authService.js';
-import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants.js';
+import { authService } from '../services/authService';
+import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants';
 
 function setCookie(res, accessToken, refreshToken) {
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {

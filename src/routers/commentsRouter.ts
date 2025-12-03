@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import * as commentsController from '../controllers/commentsController.js';
-import { validateCursorPagination } from '../middlewares/validateCursorPagination.js';
-import { authenticate } from '../middlewares/authenticate.js';
-import { validate } from '../middlewares/validate.js';
-import { CreateCommentSchema, PatchCommentSchema } from '../validations/commentsSchema.js';
+import * as commentsController from '../controllers/commentsController';
+import { validateCursorPagination } from '../middlewares/validateCursorPagination';
+import { authenticate } from '../middlewares/authenticate';
+import { validate } from '../middlewares/validate';
+import { CreateCommentSchema, PatchCommentSchema } from '../validations/commentsSchema';
 
 const router = Router({ mergeParams: true });
 

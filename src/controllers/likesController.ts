@@ -1,4 +1,4 @@
-import { likesService } from '../services/likesService.js';
+import { likesService } from '../services/likesService';
 
 export async function changeProductLike(req, res) {
   const { productId } = req.params;

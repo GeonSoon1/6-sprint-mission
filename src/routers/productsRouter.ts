@@ -1,17 +1,17 @@
 import express from 'express';
-import { validatePagination } from '../middlewares/paginationValidator.js';
+import { validatePagination } from '../middlewares/paginationValidator';
 import {
   createProduct,
   deleteProduct,
   getProduct,
   getProducts,
   patchProduct,
-} from '../controllers/productsController.js';
-import * as likesController from '../controllers/likesController.js';
-import commentsRouter from './commentsRouter.js';
-import { authenticate } from '../middlewares/authenticate.js';
-import { validate } from '../middlewares/validate.js';
-import { CreateProductSchema, PatchProductSchema } from '../validations/productsSchema.js';
+} from '../controllers/productsController';
+import * as likesController from '../controllers/likesController';
+import commentsRouter from './commentsRouter';
+import { authenticate } from '../middlewares/authenticate';
+import { validate } from '../middlewares/validate';
+import { CreateProductSchema, PatchProductSchema } from '../validations/productsSchema';
 
 const router = express.Router();
 

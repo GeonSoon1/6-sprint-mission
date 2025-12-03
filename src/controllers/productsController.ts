@@ -1,5 +1,5 @@
-import { productsService } from '../services/productsService.js';
-import { getUserIdFromToken } from '../utils/token.js';
+import { productsService } from '../services/productsService';
+import { getUserIdFromToken } from '../utils/token';
 
 export async function createProduct(req, res) {
   const productData = req.body;

@@ -1,5 +1,5 @@
-import { usersService } from '../services/usersService.js';
-import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants.js';
+import { usersService } from '../services/usersService';
+import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants';
 
 export async function getMyInfo(req, res) {
   const userId = req.user.id;

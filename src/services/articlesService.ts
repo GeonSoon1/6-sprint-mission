@@ -1,4 +1,4 @@
-import { prisma } from '../utils/prisma.js';
+import { prisma } from '../utils/prisma';
 
 async function createArticleInDb(title, content, userId) {
   return prisma.article.create({

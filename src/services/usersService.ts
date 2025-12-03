@@ -1,4 +1,4 @@
-import { prisma } from '../utils/prisma.js';
+import { prisma } from '../utils/prisma';
 import bcrypt from 'bcrypt';
 
 async function getUserById(userId) {

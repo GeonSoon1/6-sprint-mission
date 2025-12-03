@@ -1,4 +1,4 @@
-import { articlesService } from '../services/articlesService.js';
+import { articlesService } from '../services/articlesService';
 
 export async function createArticle(req, res) {
   const { title, content } = req.body;

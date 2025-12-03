@@ -1,6 +1,6 @@
-import { prisma } from '../utils/prisma.js';
+import { prisma } from '../utils/prisma';
 import bcrypt from 'bcrypt';
-import { generateTokens, verifyRefreshToken } from '../utils/token.js';
+import { generateTokens, verifyRefreshToken } from '../utils/token';
 
 async function signUp(email, nickname, password) {
   const existingUser = await prisma.user.findUnique({ where: { email } });

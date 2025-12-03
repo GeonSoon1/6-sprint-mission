@@ -1,6 +1,6 @@
-import { prisma } from '../utils/prisma.js';
-import { verifyAccessToken } from '../utils/token.js';
-import { ACCESS_TOKEN_COOKIE_NAME } from '../utils/constants.js';
+import { prisma } from '../utils/prisma';
+import { verifyAccessToken } from '../utils/token';
+import { ACCESS_TOKEN_COOKIE_NAME } from '../utils/constants';
 
 export async function authenticate(req, res, next) {
   try {

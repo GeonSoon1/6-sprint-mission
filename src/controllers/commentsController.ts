@@ -1,4 +1,4 @@
-import { commentsService } from '../services/commentsService.js';
+import { commentsService } from '../services/commentsService';
 
 export async function createComment(req, res, next) {
   const { articleId, productId } = req.params;

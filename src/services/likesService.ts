@@ -1,6 +1,11 @@
 import { prisma } from '../utils/prisma';
 
-async function changeProductLike(productId, userId) {
+interface LikeResponse {
+  isLiked: boolean;
+  message: string;
+}
+
+const changeProductLike = async (productId: string, userId: string): Promise<LikeResponse> => {
   const likeCheck = await prisma.productLike.findUnique({
     where: {
       userId_productId: {
@@ -21,9 +26,9 @@ async function changeProductLike(productId, userId) {
     });
     return { isLiked: true, message: '좋아요를 눌렀습니다.' };
   }
-}
+};
 
-async function changeArticleLike(articleId, userId) {
+const changeArticleLike = async (articleId: string, userId: string): Promise<LikeResponse> => {
   const likeCheck = await prisma.articleLike.findUnique({
     where: {
       userId_articleId: {
@@ -44,7 +49,7 @@ async function changeArticleLike(articleId, userId) {
     });
     return { isLiked: true, message: '좋아요를 눌렀습니다.' };
   }
-}
+};
 
 export const likesService = {
   changeProductLike,

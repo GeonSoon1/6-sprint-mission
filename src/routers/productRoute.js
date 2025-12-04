@@ -14,7 +14,7 @@ import {
   commentUpdateValidation,
 } from '../validators/comment-validation.js';
 
-import authenticate from '../middleware/authenticate.js';
+import authenticate from '../../middleware/authenticate.js';
 
 const productRoute = express.Router();
 

@@ -3,13 +3,13 @@ import cookieParser from 'cookie-parser';
 
 import cors from 'cors';
 import errorHandler from './middleware/errorhandler.js';
-import { PORT } from './lib/constants.js';
+import { PORT } from './src/lib/constants.js';
 
-import imgRouter from './routers/imgRoute.js';
-import authRoute from './routers/authRoute.js';
-import productRoute from './routers/productRoute.js';
-import articleRoute from './routers/articleRoute.js';
-import userRoute from './routers/userRoute.js';
+import imgRouter from './src/routers/imgRoute.js';
+import authRoute from './src/routers/authRoute.js';
+import productRoute from './src/routers/productRoute.js';
+import articleRoute from './src/routers/articleRoute.js';
+import userRoute from './src/routers/userRoute.js';
 
 const app = express();
 

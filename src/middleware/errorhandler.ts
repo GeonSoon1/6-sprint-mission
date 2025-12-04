@@ -1,6 +1,7 @@
 import { Prisma } from '@prisma/client';
-
-export default function errorHandler(err, req, res, next) {
+import { ErrorRequestHandler } from 'express';
+import { string } from 'superstruct';
+const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
   if (!err) {
     // err = undefined, null 인 경우
     return res.status(500).send({ message: 'Unknown Server error' });
@@ -32,7 +33,7 @@ export default function errorHandler(err, req, res, next) {
   // 나머지 에러를 확인하는 작업
   const status = err.status || 500;
 
-  const messages = {
+  const messages: { [status: number]: string } = {
     400: 'Bad Request',
     404: 'Not Found',
     500: 'Unknown Server Error',
@@ -42,4 +43,6 @@ export default function errorHandler(err, req, res, next) {
     status,
     message: err.message || messages[status] || 'Unexpected Error',
   });
-}
+};
+
+export default errorHandler;

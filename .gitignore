@@ -2,5 +2,10 @@
 node_modules/
 **/node_modules/
 
+.github/**
+files/**
+
 .env
-__http__/**
+
+REST API test/**
+.env

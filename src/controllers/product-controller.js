@@ -47,7 +47,7 @@ export async function getProductsList(req, res) {
       orderBy = { createdAt: 'asc' };
   }
 
-  const product_list = await prisma.product.findMany({
+  const productList = await prisma.product.findMany({
     where: {
       name: { contains: name },
       description: { contains: description },
@@ -63,10 +63,10 @@ export async function getProductsList(req, res) {
     },
   });
 
-  if (!product_list)
+  if (!productList)
     return res.status(401).json({ message: 'Cannot found List' });
 
-  res.status(200).json(product_list);
+  res.status(200).json(productList);
 }
 
 export async function getProductInfo(req, res) {

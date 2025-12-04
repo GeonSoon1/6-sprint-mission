@@ -2,8 +2,9 @@ import { prisma } from '../utils/prisma';
 import bcrypt from 'bcrypt';
 import { generateTokens, verifyRefreshToken } from '../utils/token';
 import { ErrorWithStatus } from '../utils/types';
+import { Prisma } from '@prisma/client';
 
-async function signUp(email: string, nickname: string, password: string) {
+const signUp = async (email: string, nickname: string, password: string) => {
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
     const error: ErrorWithStatus = new Error('이미 존재하는 이메일입니다.');
@@ -23,9 +24,9 @@ async function signUp(email: string, nickname: string, password: string) {
 
   const { password: _, ...userWithoutPassword } = user;
   return userWithoutPassword;
-}
+};
 
-async function login(email: string, password: string) {
+const login = async (email: string, password: string) => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
     const error: ErrorWithStatus = new Error('존재하지 않는 이메일입니다.');
@@ -48,10 +49,18 @@ async function login(email: string, password: string) {
   });
 
   return { user, accessToken, refreshToken };
-}
+};
 
-async function refreshTokens(refreshToken: string) {
-  const { userId } = verifyRefreshToken(refreshToken);
+const refreshTokens = async (refreshToken: string) => {
+  const payload = verifyRefreshToken(refreshToken);
+
+  if (typeof payload === 'string' || !payload.userId) {
+    const error: ErrorWithStatus = new Error('유효하지 않은 토큰입니다.');
+    error.status = 401;
+    throw error;
+  }
+
+  const userId = payload.userId;
 
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
@@ -74,7 +83,7 @@ async function refreshTokens(refreshToken: string) {
   });
 
   return tokens;
-}
+};
 
 export const authService = {
   signUp,

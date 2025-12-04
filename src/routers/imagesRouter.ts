@@ -1,8 +1,8 @@
-import express from 'express';
+import { Router, RequestHandler } from 'express';
 import multer from 'multer';
 import path from 'path';
 
-const router = express.Router();
+const router = Router();
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -22,11 +22,18 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB 파일 크기 제한
 });
 
-router.post('/', upload.single('attachment'), (req, res) => {
-  const { filename } = req.file;
-  const path = `/files/${filename}`;
+const uploadImage: RequestHandler = (req, res) => {
+  if (!req.file) {
+    res.status(400).json({ message: '파일이 업로드되지 않았습니다.' });
+    return;
+  }
 
-  res.status(201).json({ path });
-});
+  const { filename } = req.file;
+  const filePath = `/files/${filename}`;
+
+  res.status(201).json({ path: filePath });
+};
+
+router.post('/', upload.single('attachment'), uploadImage);
 
 export default router;

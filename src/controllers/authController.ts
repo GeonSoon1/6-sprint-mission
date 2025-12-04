@@ -1,4 +1,3 @@
-import { REPLCommand } from 'repl';
 import { authService } from '../services/authService';
 import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants';
 import { Response, RequestHandler } from 'express';

@@ -1,7 +1,9 @@
 import { prisma } from '../utils/prisma';
 import bcrypt from 'bcrypt';
+import { Prisma } from '@prisma/client';
+import { ErrorWithStatus } from '../utils/types';
 
-async function getUserById(userId) {
+const getUserById = async (userId: string) => {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -15,21 +17,18 @@ async function getUserById(userId) {
   });
 
   if (!user) {
-    const error = new Error('사용자를 찾을 수 없습니다.');
+    const error: ErrorWithStatus = new Error('사용자를 찾을 수 없습니다.');
     error.status = 404;
     throw error;
   }
 
   return user;
-}
+};
 
-async function updateUser(userId, updateData) {
+const updateUser = async (userId: string, updateData: Prisma.UserUpdateInput) => {
   const user = await prisma.user.update({
     where: { id: userId },
-    data: {
-      nickname: updateData.nickname,
-      image: updateData.image,
-    },
+    data: updateData,
     select: {
       id: true,
       email: true,
@@ -40,21 +39,23 @@ async function updateUser(userId, updateData) {
     },
   });
   return user;
-}
+};
 
-async function changePassword(userId, currentPassword, newPassword) {
+const changePassword = async (userId: string, currentPassword: string, newPassword: string) => {
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
 
   const passwordCheck = await bcrypt.compare(currentPassword, user.password);
 
   if (!passwordCheck) {
-    const error = new Error('현재 비밀번호가 일치하지 않습니다.');
+    const error: ErrorWithStatus = new Error('현재 비밀번호가 일치하지 않습니다.');
     error.status = 401;
     throw error;
   }
 
   if (currentPassword === newPassword) {
-    const error = new Error('새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다.');
+    const error: ErrorWithStatus = new Error(
+      '새 비밀번호는 기존 비밀번호와 다르게 설정해야 합니다.',
+    );
     error.status = 400;
     throw error;
   }
@@ -67,9 +68,9 @@ async function changePassword(userId, currentPassword, newPassword) {
   });
 
   return { message: '비밀번호가 성공적으로 변경되었습니다.' };
-}
+};
 
-async function getUserProducts(userId) {
+const getUserProducts = async (userId: string) => {
   const products = await prisma.product.findMany({
     where: {
       userId: userId,
@@ -86,9 +87,9 @@ async function getUserProducts(userId) {
   });
 
   return products;
-}
+};
 
-async function getUserLikedProducts(userId) {
+const getUserLikedProducts = async (userId: string) => {
   const products = await prisma.product.findMany({
     where: {
       likes: {
@@ -109,7 +110,7 @@ async function getUserLikedProducts(userId) {
   });
 
   return products;
-}
+};
 
 export const usersService = {
   getUserById,

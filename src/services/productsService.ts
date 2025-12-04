@@ -1,6 +1,15 @@
 import { prisma } from '../utils/prisma';
+import { Prisma } from '@prisma/client';
+import { ErrorWithStatus } from '../utils/types';
 
-async function createProductInDb(productData, userId) {
+interface FindProductsQuery {
+  search?: string;
+  limit?: number;
+  offset?: number;
+  sort?: string;
+}
+
+const createProductInDb = async (productData: Prisma.ProductCreateInput, userId: string) => {
   return prisma.product.create({
     data: {
       name: productData.name,
@@ -10,17 +19,21 @@ async function createProductInDb(productData, userId) {
       userId,
     },
   });
-}
+};
 
-async function findProducts({ sort, search, offset, limit }, userId) {
-  const orderBy = sort === 'resent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
+const findProducts = async (
+  { sort, search, offset, limit }: FindProductsQuery,
+  userId: string | undefined,
+) => {
+  const orderBy: Prisma.ProductOrderByWithRelationInput =
+    sort === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
 
-  const where = {};
+  const where: Prisma.ProductWhereInput = {};
   if (search) {
     where.OR = [{ name: { contains: search } }, { description: { contains: search } }];
   }
 
-  const selectOption = {
+  const selectOption: Prisma.ProductSelect = {
     id: true,
     name: true,
     price: true,
@@ -46,19 +59,21 @@ async function findProducts({ sort, search, offset, limit }, userId) {
   ]);
 
   const productsLike = products.map((p) => {
-    const isLiked = p.likes ? p.likes.length > 0 : false;
-    const { likes, ...rest } = p;
+    const product = p as any;
+    const isLiked = product.likes ? product.likes.length > 0 : false;
+    const { likes, ...rest } = product;
 
     return {
       ...rest,
       isLiked,
     };
   });
-  return { products: productsLike, totalProducts };
-}
 
-async function findProductById(id, userId) {
-  const selectOption = {
+  return { products: productsLike, totalProducts };
+};
+
+const findProductById = async (id: string, userId: string | undefined) => {
+  const selectOption: Prisma.ProductSelect = {
     id: true,
     name: true,
     description: true,
@@ -86,17 +101,25 @@ async function findProductById(id, userId) {
     select: selectOption,
   });
 
-  const isLiked = product.likes ? product.likes.length > 0 : false;
-  const { likes, ...rest } = product;
+  const productData = product as any;
+  const isLiked = productData.likes ? productData.likes.length > 0 : false;
+  const { likes, ...rest } = productData;
 
   return { ...rest, isLiked };
-}
+};
 
-async function updateProductInDb(id, updateData, userId) {
-  const product = await prisma.product.findUniqueOrThrow({ where: { id } });
+const updateProductInDb = async (
+  id: string,
+  updateData: Prisma.ProductUpdateInput,
+  userId: string,
+) => {
+  const product = await prisma.product.findUniqueOrThrow({
+    where: { id },
+    select: { userId: true },
+  });
 
   if (product.userId !== userId) {
-    const error = new Error('수정 권한이 없습니다.');
+    const error: ErrorWithStatus = new Error('수정 권한이 없습니다.');
     error.status = 403;
     throw error;
   }
@@ -105,13 +128,16 @@ async function updateProductInDb(id, updateData, userId) {
     where: { id },
     data: updateData,
   });
-}
+};
 
-async function deleteProductInDb(id, userId) {
-  const product = await prisma.product.findUniqueOrThrow({ where: { id } });
+const deleteProductInDb = async (id: string, userId: string) => {
+  const product = await prisma.product.findUniqueOrThrow({
+    where: { id },
+    select: { userId: true },
+  });
 
   if (product.userId !== userId) {
-    const error = new Error('삭제 권한이 없습니다.');
+    const error: ErrorWithStatus = new Error('삭제 권한이 없습니다.');
     error.status = 403;
     throw error;
   }
@@ -119,7 +145,7 @@ async function deleteProductInDb(id, userId) {
   return prisma.product.delete({
     where: { id },
   });
-}
+};
 
 export const productsService = {
   createProductInDb,

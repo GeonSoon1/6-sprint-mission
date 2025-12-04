@@ -1,6 +1,15 @@
 import { prisma } from '../utils/prisma';
+import { Prisma } from '@prisma/client';
+import { ErrorWithStatus } from '../utils/types';
 
-async function createArticleComment(articleId, content, userId) {
+interface FindCommentsArgs {
+  articleId?: string;
+  productId?: string;
+  limit: number;
+  cursor?: string;
+}
+
+const createArticleComment = async (articleId: string, content: string, userId: string) => {
   return prisma.comment.create({
     data: {
       content,
@@ -17,9 +26,9 @@ async function createArticleComment(articleId, content, userId) {
       },
     },
   });
-}
+};
 
-async function createProductComment(productId, content, userId) {
+const createProductComment = async (productId: string, content: string, userId: string) => {
   return prisma.comment.create({
     data: {
       content: content,
@@ -36,10 +45,10 @@ async function createProductComment(productId, content, userId) {
       },
     },
   });
-}
+};
 
-async function findCommentsByArticleId({ articleId, limit, cursor }) {
-  const findOptions = {
+const findCommentsByArticleId = async ({ articleId, limit, cursor }: FindCommentsArgs) => {
+  const findOptions: Prisma.CommentFindManyArgs = {
     where: { articleId: articleId },
     orderBy: { createdAt: 'desc' },
     take: limit + 1,
@@ -47,6 +56,7 @@ async function findCommentsByArticleId({ articleId, limit, cursor }) {
       id: true,
       content: true,
       createdAt: true,
+      user: { select: { nickname: true } },
     },
   };
 
@@ -57,24 +67,27 @@ async function findCommentsByArticleId({ articleId, limit, cursor }) {
 
   const comments = await prisma.comment.findMany(findOptions);
 
-  let nextCursor = null;
+  let nextCursor: string | null = null;
   if (comments.length > limit) {
     nextCursor = comments[limit - 1].id;
     comments.pop();
   }
 
   return { comments, nextCursor };
-}
+};
 
-async function findCommentsByProductId({ productId, limit, cursor }) {
-  const findOptions = {
-    where: { productId: productId }, // 상품 ID로 필터링
+const findCommentsByProductId = async ({ productId, limit, cursor }: FindCommentsArgs) => {
+  const findOptions: Prisma.CommentFindManyArgs = {
+    where: { productId },
     orderBy: { createdAt: 'desc' },
     take: limit + 1,
     select: {
       id: true,
       content: true,
       createdAt: true,
+      user: {
+        select: { nickname: true },
+      },
     },
   };
 
@@ -85,20 +98,23 @@ async function findCommentsByProductId({ productId, limit, cursor }) {
 
   const comments = await prisma.comment.findMany(findOptions);
 
-  let nextCursor = null;
+  let nextCursor: string | null = null;
   if (comments.length > limit) {
     nextCursor = comments[limit - 1].id;
     comments.pop();
   }
 
   return { comments, nextCursor };
-}
+};
 
-async function updateCommentInDb(commentId, content, userId) {
-  const comment = await prisma.comment.findUniqueOrThrow({ where: { id: commentId } });
+const updateCommentInDb = async (commentId: string, content: string, userId: string) => {
+  const comment = await prisma.comment.findUniqueOrThrow({
+    where: { id: commentId },
+    select: { userId: true },
+  });
 
   if (comment.userId !== userId) {
-    const error = new Error('수정 권한이 없습니다.');
+    const error: ErrorWithStatus = new Error('수정 권한이 없습니다.');
     error.status = 403;
     throw error;
   }
@@ -107,13 +123,16 @@ async function updateCommentInDb(commentId, content, userId) {
     where: { id: commentId },
     data: { content },
   });
-}
+};
 
-async function deleteCommentInDb(commentId, userId) {
-  const comment = await prisma.comment.findUniqueOrThrow({ where: { id: commentId } });
+const deleteCommentInDb = async (commentId: string, userId: string) => {
+  const comment = await prisma.comment.findUniqueOrThrow({
+    where: { id: commentId },
+    select: { userId: true },
+  });
 
   if (comment.userId !== userId) {
-    const error = new Error('삭제 권한이 없습니다.');
+    const error: ErrorWithStatus = new Error('삭제 권한이 없습니다.');
     error.status = 403;
     throw error;
   }
@@ -121,7 +140,7 @@ async function deleteCommentInDb(commentId, userId) {
   return prisma.comment.delete({
     where: { id: commentId },
   });
-}
+};
 
 export const commentsService = {
   createArticleComment,

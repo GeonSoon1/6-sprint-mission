@@ -1,9 +1,11 @@
 import { commentsService } from '../services/commentsService';
+import { RequestHandler } from 'express';
+import { ErrorWithStatus } from '../utils/types';
 
-export async function createComment(req, res, next) {
+export const createComment: RequestHandler = async (req, res, next) => {
   const { articleId, productId } = req.params;
   const { content } = req.body;
-  const userId = req.user.id;
+  const userId = req.user!.id;
 
   let newComment;
   if (articleId) {
@@ -11,17 +13,17 @@ export async function createComment(req, res, next) {
   } else if (productId) {
     newComment = await commentsService.createProductComment(productId, content, userId);
   } else {
-    const err = new Error('게시글 또는 상품 ID가 필요합니다.');
+    const err: ErrorWithStatus = new Error('게시글 또는 상품 ID가 필요합니다.');
     err.status = 400;
     throw err;
   }
 
   res.status(201).send(newComment);
-}
+};
 
-export async function getComments(req, res, next) {
+export const getComments: RequestHandler = async (req, res, next) => {
   const { articleId, productId } = req.params;
-  const { cursor, limit } = req.paginationParams;
+  const { cursor, limit } = req.paginationParams!;
 
   let result;
   if (articleId) {
@@ -37,7 +39,7 @@ export async function getComments(req, res, next) {
       limit,
     });
   } else {
-    const err = new Error('게시글 또는 상품 ID가 필요합니다.');
+    const err: ErrorWithStatus = new Error('게시글 또는 상품 ID가 필요합니다.');
     err.status = 400;
     throw err;
   }
@@ -49,15 +51,15 @@ export async function getComments(req, res, next) {
       nextCursor: result.nextCursor,
     },
   });
-}
+};
 
-export async function patchComment(req, res, next) {
+export const patchComment: RequestHandler = async (req, res, next) => {
   const { commentId } = req.params;
   const { content } = req.body;
-  const userId = req.user.id;
+  const userId = req.user!.id;
 
   if (!content) {
-    const err = new Error('수정할 내용이 비어 있습니다.');
+    const err: ErrorWithStatus = new Error('수정할 내용이 비어 있습니다.');
     err.status = 400;
     throw err;
   }
@@ -68,11 +70,11 @@ export async function patchComment(req, res, next) {
     message: '댓글이 성공적으로 수정되었습니다.',
     data: updatedComment,
   });
-}
+};
 
-export async function deleteComment(req, res, next) {
+export const deleteComment: RequestHandler = async (req, res, next) => {
   const { commentId } = req.params;
-  const userId = req.user.id;
+  const userId = req.user!.id;
 
   const deletedComment = await commentsService.deleteCommentInDb(commentId, userId);
 
@@ -80,4 +82,4 @@ export async function deleteComment(req, res, next) {
     message: '댓글이 성공적으로 삭제되었습니다.',
     data: deletedComment,
   });
-}
+};

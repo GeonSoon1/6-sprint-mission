@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import { RequestHandler } from 'express';
 import { ErrorWithStatus } from '../utils/types';
 
 const DEFAULT_LIMIT = 10;
 const DEFAULT_OFFSET = 0;
 
-export const validatePagination = (req: Request, res: Response, next: NextFunction) => {
+export const validatePagination: RequestHandler = async (req, res, next) => {
   const { offset = DEFAULT_OFFSET.toString(), limit = DEFAULT_LIMIT.toString() } = req.query;
   const _offset = parseInt(offset as string, 10);
   const _limit = parseInt(limit as string, 10);

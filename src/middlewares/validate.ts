@@ -1,7 +1,10 @@
-import { assert } from 'superstruct';
+import { RequestHandler } from 'express';
+import { assert, Struct } from 'superstruct';
+
+type ValidationTarget = 'body' | 'query' | 'params';
 
 export const validate =
-  (schema, type = 'body') =>
+  (schema: Struct<any>, type: ValidationTarget = 'body'): RequestHandler =>
   (req, res, next) => {
     assert(req[type], schema);
     next();

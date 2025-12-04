@@ -6,6 +6,10 @@ interface LikeResponse {
 }
 
 const changeProductLike = async (productId: string, userId: string): Promise<LikeResponse> => {
+  await prisma.product.findUniqueOrThrow({
+    where: { id: productId },
+  });
+
   const likeCheck = await prisma.productLike.findUnique({
     where: {
       userId_productId: {
@@ -29,6 +33,10 @@ const changeProductLike = async (productId: string, userId: string): Promise<Lik
 };
 
 const changeArticleLike = async (articleId: string, userId: string): Promise<LikeResponse> => {
+  await prisma.article.findUniqueOrThrow({
+    where: { id: articleId },
+  });
+
   const likeCheck = await prisma.articleLike.findUnique({
     where: {
       userId_articleId: {

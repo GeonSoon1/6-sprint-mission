@@ -1,6 +1,15 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../utils/prisma';
+import { ErrorWithStatus } from '../utils/types';
 
-async function createArticleInDb(title, content, userId) {
+interface FindArticlesQuery {
+  sort?: string;
+  search?: string;
+  offset?: number;
+  limit?: number;
+}
+
+const createArticleInDb = async (title: string, content: string, userId: string) => {
   return prisma.article.create({
     data: {
       title: title,
@@ -8,17 +17,21 @@ async function createArticleInDb(title, content, userId) {
       userId,
     },
   });
-}
+};
 
-async function findArticles({ sort, search, offset, limit }, userId) {
-  const orderBy = sort === 'resent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
+const findArticles = async (
+  { sort, search, offset, limit }: FindArticlesQuery,
+  userId: string | undefined,
+) => {
+  const orderBy: Prisma.ArticleOrderByWithRelationInput =
+    sort === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
 
-  const where = {};
+  const where: Prisma.ArticleWhereInput = {};
   if (search) {
     where.OR = [{ title: { contains: search } }, { content: { contains: search } }];
   }
 
-  const selectOption = {
+  const selectOption: Prisma.ArticleSelect = {
     id: true,
     title: true,
     content: true,
@@ -46,8 +59,10 @@ async function findArticles({ sort, search, offset, limit }, userId) {
   ]);
 
   const articlesWithLike = articles.map((article) => {
-    const isLiked = article.likes ? article.likes.length > 0 : false;
-    const { likes, ...rest } = article;
+    const articleData = article as any;
+    const isLiked = articleData.likes ? articleData.likes.length > 0 : false;
+    const { likes, ...rest } = articleData;
+
     return {
       ...rest,
       isLiked,
@@ -55,10 +70,10 @@ async function findArticles({ sort, search, offset, limit }, userId) {
   });
 
   return { articles: articlesWithLike, totalArticles };
-}
+};
 
-async function findArticleById(id, userId) {
-  const selectOption = {
+const findArticleById = async (id: string, userId: string | undefined) => {
+  const selectOption: Prisma.ArticleSelect = {
     id: true,
     title: true,
     content: true,
@@ -84,17 +99,25 @@ async function findArticleById(id, userId) {
     select: selectOption,
   });
 
-  const isLiked = article.likes ? article.likes.length > 0 : false;
-  const { likes, ...rest } = article;
+  const articleData = article as any;
+  const isLiked = articleData.likes ? articleData.likes.length > 0 : false;
+  const { likes, ...rest } = articleData;
 
   return { ...rest, isLiked };
-}
+};
 
-async function updateArticleInDb(id, updateData, userId) {
-  const article = await prisma.article.findUniqueOrThrow({ where: { id } });
+const updateArticleInDb = async (
+  id: string,
+  updateData: Prisma.ArticleUpdateInput,
+  userId: string,
+) => {
+  const article = await prisma.article.findUniqueOrThrow({
+    where: { id },
+    select: { userId: true },
+  });
 
   if (article.userId !== userId) {
-    const error = new Error('수정 권한이 없습니다.');
+    const error: ErrorWithStatus = new Error('수정 권한이 없습니다.');
     error.status = 403;
     throw error;
   }
@@ -103,13 +126,16 @@ async function updateArticleInDb(id, updateData, userId) {
     where: { id },
     data: updateData,
   });
-}
+};
 
-async function deleteArticleInDb(id, userId) {
-  const article = await prisma.article.findUniqueOrThrow({ where: { id } });
+const deleteArticleInDb = async (id: string, userId: string) => {
+  const article = await prisma.article.findUniqueOrThrow({
+    where: { id },
+    select: { userId: true },
+  });
 
   if (article.userId !== userId) {
-    const error = new Error('삭제 권한이 없습니다.');
+    const error: ErrorWithStatus = new Error('삭제 권한이 없습니다.');
     error.status = 403;
     throw error;
   }
@@ -117,7 +143,7 @@ async function deleteArticleInDb(id, userId) {
   return prisma.article.delete({
     where: { id },
   });
-}
+};
 
 export const articlesService = {
   createArticleInDb,

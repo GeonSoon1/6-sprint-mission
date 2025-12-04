@@ -1,8 +1,11 @@
+import { RequestHandler } from 'express';
 import { articlesService } from '../services/articlesService';
+import { Prisma } from '@prisma/client';
+import { ErrorWithStatus } from '../utils/types';
 
-export async function createArticle(req, res) {
-  const { title, content } = req.body;
-  const userId = req.user.id;
+export const createArticle: RequestHandler = async (req, res) => {
+  const { title, content }: Prisma.ArticleCreateInput = req.body;
+  const userId = req.user!.id;
 
   const newArticle = await articlesService.createArticleInDb(title, content, userId);
 
@@ -10,17 +13,17 @@ export async function createArticle(req, res) {
     message: '게시글이 성공적으로 등록되었습니다.',
     data: newArticle,
   });
-}
+};
 
-export async function getArticles(req, res) {
+export const getArticles: RequestHandler = async (req, res) => {
   const { sort, search } = req.query;
-  const { offset, limit } = req.paginationParams;
+  const { offset = 0, limit } = req.paginationParams!;
   const userId = req.user?.id;
 
   const { articles, totalArticles } = await articlesService.findArticles(
     {
-      sort,
-      search,
+      sort: sort as string,
+      search: search as string,
       offset,
       limit,
     },
@@ -48,28 +51,30 @@ export async function getArticles(req, res) {
       itemsPerPage: limit,
     },
   });
-}
+};
 
-export async function getArticle(req, res) {
+export const getArticle: RequestHandler = async (req, res) => {
   const { id } = req.params;
   const userId = req.user?.id;
   const article = await articlesService.findArticleById(id, userId);
 
   res.status(200).send(article);
-}
+};
 
-export async function patchArticle(req, res) {
+export const patchArticle: RequestHandler = async (req, res) => {
   const { id } = req.params;
   const { title, content } = req.body;
+  const userId = req.user!.id;
 
-  const updateData = {};
-  if (title) updateData.title = title;
-  if (content) updateData.content = content;
+  const updateData: Prisma.ArticleUpdateInput = {
+    title,
+    content,
+  };
 
-  const userId = req.user.id;
+  const hasUpdateValues = Object.values(updateData).some((value) => value !== undefined);
 
-  if (Object.keys(updateData).length === 0) {
-    const emptyBodyError = new Error('수정할 내용이 비어 있습니다.');
+  if (!hasUpdateValues) {
+    const emptyBodyError: ErrorWithStatus = new Error('수정할 내용이 비어 있습니다.');
     emptyBodyError.status = 400;
     throw emptyBodyError;
   }
@@ -80,13 +85,16 @@ export async function patchArticle(req, res) {
     message: '게시글이 성공적으로 수정되었습니다.',
     data: article,
   });
-}
+};
 
-export async function deleteArticle(req, res) {
+export const deleteArticle: RequestHandler = async (req, res) => {
   const { id } = req.params;
-  const userId = req.user.id;
+  const userId = req.user!.id;
 
   const article = await articlesService.deleteArticleInDb(id, userId);
 
-  res.status(200).send(article);
-}
+  res.status(200).json({
+    message: '게시글이 성공적으로 삭제되었습니다.',
+    data: article,
+  });
+};

@@ -7,7 +7,7 @@ declare global {
   namespace Express {
     interface Request {
       userId?: number;
-      user?: User | object;
+      user?: User;
       file?: MulterFile;
     }
   }

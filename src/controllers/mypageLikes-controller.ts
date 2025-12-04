@@ -1,6 +1,8 @@
+import { Request, Response } from 'express';
 import prisma from '../lib/prismaclient.js';
 
-export async function getUserlikedProductsList(req, res) {
+export async function getUserlikedProductsList(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
   const user = await prisma.user.findUnique({ where: { id: userId } });
 
@@ -27,7 +29,8 @@ export async function getUserlikedProductsList(req, res) {
   return res.status(200).json(likeProductList);
 }
 
-export async function getUserlikedArticlesList(req, res) {
+export async function getUserlikedArticlesList(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
   const user = await prisma.user.findUnique({ where: { id: userId } });
 

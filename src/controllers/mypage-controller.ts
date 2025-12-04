@@ -1,7 +1,10 @@
+import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import prisma from '../lib/prismaclient.js';
 
-export async function userInfo(req, res) {
+export async function userInfo(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
   const userId = req.user.id;
 
   const user = await prisma.user.findUnique({
@@ -14,7 +17,8 @@ export async function userInfo(req, res) {
   res.status(200).json(userInfo);
 }
 
-export async function updateUserInfo(req, res) {
+export async function updateUserInfo(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
   const { email, nickname, image, ...secret } = req.body;
   // 변경 가능한 정보를 제외 한 나머지 정보는 secret에 담아둠
@@ -39,7 +43,9 @@ export async function updateUserInfo(req, res) {
   res.status(200).json(updateUserInfo);
 }
 
-export async function updatePassword(req, res) {
+export async function updatePassword(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+
   const userId = req.user.id;
 
   // user 검증

@@ -1,18 +1,23 @@
-import prisma from '../lib/prismaclient.js';
+import { Response } from 'express';
+import prisma from '../lib/prismaclient';
 import {
   NODE_ENV,
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
-} from '../lib/constants.js';
+} from '../lib/constants';
 
-export async function checkUserEmail(email) {
+export async function checkUserEmail(email: string) {
   const findEmail = await prisma.user.findUnique({ where: { email } });
-  if (findEmail) throw new Error({ message: 'Email already exists is DB' });
+  if (findEmail) throw new Error('Email already exists is DB');
 
   return email;
 }
 
-export async function createTokenCookies(res, accessToken, refreshToken) {
+export async function createTokenCookies(
+  res: Response,
+  accessToken: string,
+  refreshToken: string
+) {
   // access token cookie 생성
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
@@ -29,6 +34,6 @@ export async function createTokenCookies(res, accessToken, refreshToken) {
   });
 }
 
-export function clearTokenCookies(res) {
+export function clearTokenCookies(res: Response) {
   res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
 }

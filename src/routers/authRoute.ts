@@ -1,7 +1,7 @@
 import express from 'express';
-import asyncHandler from '../lib/asyncHandler.js';
-import * as a from '../controllers/auth-controllers.js';
-import { userCreateValidation } from '../validators/user-validation.js';
+import asyncHandler from '../lib/asyncHandler';
+import * as a from '../controllers/auth-controller';
+import { userCreateValidation } from '../validators/user-validation';
 
 const authRoute = express.Router();
 

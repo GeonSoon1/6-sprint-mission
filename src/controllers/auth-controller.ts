@@ -1,15 +1,16 @@
+import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import prisma from '../lib/prismaclient.js';
+import prisma from '../lib/prismaclient';
 import {
   checkUserEmail,
   clearTokenCookies,
   createTokenCookies,
-} from '../server/authService.js';
-import { createTokens, verifyRefreshToken } from '../lib/token.js';
-import { REFRESH_TOKEN_COOKIE_NAME } from '../lib/constants.js';
+} from '../server/authService';
+import { createTokens, verifyRefreshToken } from '../lib/token';
+import { REFRESH_TOKEN_COOKIE_NAME } from '../lib/constants';
 
 // 1. 회원가입
-export async function register(req, res) {
+export async function register(req: Request, res: Response) {
   const { nickname, password, email } = req.body;
 
   // email 중복 체크
@@ -34,7 +35,7 @@ export async function register(req, res) {
 }
 
 // 2. 로그인
-export async function login(req, res) {
+export async function login(req: Request, res: Response) {
   const { email, password } = req.body;
 
   // 사용자 유무 확인
@@ -57,13 +58,13 @@ export async function login(req, res) {
 }
 
 // 3. 로그아웃
-export async function logout(req, res) {
+export async function logout(req: Request, res: Response) {
   clearTokenCookies(res);
   res.status(200).json({ message: 'log out!' });
 }
 
 // 4. Refresh Token 재발급
-export async function refreshToken(req, res) {
+export async function refreshToken(req: Request, res: Response) {
   // 기존 refresh 토큰 받아온 뒤 검증
   const refreshToken = req.cookies[REFRESH_TOKEN_COOKIE_NAME];
 

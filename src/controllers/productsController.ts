@@ -1,10 +1,11 @@
 import { productsService } from '../services/productsService';
 import { RequestHandler } from 'express';
 import { ErrorWithStatus } from '../utils/types';
+import { Prisma } from '@prisma/client';
 
 export const createProduct: RequestHandler = async (req, res) => {
-  const productData = req.body;
-  const userId = req.user.id;
+  const productData: Prisma.ProductCreateInput = req.body;
+  const userId = req.user!.id;
 
   const newProduct = await productsService.createProductInDb(productData, userId);
 
@@ -16,7 +17,7 @@ export const createProduct: RequestHandler = async (req, res) => {
 
 export const getProducts: RequestHandler = async (req, res) => {
   const { sort, search } = req.query;
-  const { offset, limit } = req.paginationParams!;
+  const { offset = 0, limit } = req.paginationParams!;
   const userId = req.user?.id;
 
   const { products, totalProducts } = await productsService.findProducts(
@@ -63,21 +64,23 @@ export const getProduct: RequestHandler = async (req, res) => {
 
 export const patchProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;
+  const userId = req.user!.id;
+
   const { name, description, price, tags } = req.body;
 
-  const updateData: { [key: string]: any } = {};
+  const updateData: Prisma.ProductUpdateInput = {
+    name,
+    description,
+    price,
+    tags,
+  };
 
-  if (name !== undefined) updateData.name = name;
-  if (description !== undefined) updateData.description = description;
-  if (price !== undefined) updateData.price = price;
-  if (tags !== undefined) updateData.tags = tags;
+  const hasUpdateValues = Object.values(updateData).some((value) => value !== undefined);
 
-  const userId = req.user.id;
-
-  if (Object.keys(updateData).length === 0) {
-    const emptyBodyError: ErrorWithStatus = new Error('수정할 내용이 비어 있습니다.');
-    emptyBodyError.status = 400;
-    throw emptyBodyError;
+  if (!hasUpdateValues) {
+    const err: ErrorWithStatus = new Error('수정할 내용이 비어 있습니다.');
+    err.status = 400;
+    throw err;
   }
 
   const product = await productsService.updateProductInDb(id, updateData, userId);
@@ -90,9 +93,12 @@ export const patchProduct: RequestHandler = async (req, res) => {
 
 export const deleteProduct: RequestHandler = async (req, res) => {
   const { id } = req.params;
-  const userId = req.user.id;
+  const userId = req.user!.id;
 
-  const product = await productsService.deleteProductInDb(id, userId);
+  const deletedProduct = await productsService.deleteProductInDb(id, userId);
 
-  res.status(204).send(product);
+  res.status(200).json({
+    message: '상품이 성공적으로 삭제되었습니다.',
+    data: deletedProduct,
+  });
 };

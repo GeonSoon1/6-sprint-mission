@@ -32,4 +32,4 @@ app.use('/users', usersRouter);
 app.use(defaultNotFoundHandler);
 app.use(errorHandlerMiddleware);
 
-app.listen(PORT, () => console.log('서버 시작'));
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));

@@ -3,7 +3,7 @@ import { authService } from '../services/authService';
 import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants';
 import { Response, RequestHandler } from 'express';
 
-function setCookie(res: Response, accessToken: string, refreshToken: string) {
+const setCookie = (res: Response, accessToken: string, refreshToken: string) => {
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
@@ -14,7 +14,7 @@ function setCookie(res: Response, accessToken: string, refreshToken: string) {
     secure: process.env.NODE_ENV === 'production',
     maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
   });
-}
+};
 
 export const signUp: RequestHandler = async (req, res) => {
   const { email, nickname, password } = req.body;

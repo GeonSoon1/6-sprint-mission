@@ -1,4 +1,6 @@
-import { prisma } from '../utils/prisma';
+import { likesRepository } from '../repositories/likesRepository';
+import { productsRepository } from '../repositories/productsRepository';
+import { articlesRepository } from '../repositories/articlesRepository';
 
 interface LikeResponse {
   isLiked: boolean;
@@ -6,55 +8,29 @@ interface LikeResponse {
 }
 
 const changeProductLike = async (productId: string, userId: string): Promise<LikeResponse> => {
-  await prisma.product.findUniqueOrThrow({
-    where: { id: productId },
-  });
+  await productsRepository.findProductById(productId);
 
-  const likeCheck = await prisma.productLike.findUnique({
-    where: {
-      userId_productId: {
-        userId,
-        productId,
-      },
-    },
-  });
+  const likeCheck = await likesRepository.findProductLike(userId, productId);
 
   if (likeCheck) {
-    await prisma.productLike.delete({
-      where: { id: likeCheck.id },
-    });
+    await likesRepository.deleteProductLike(likeCheck.id);
     return { isLiked: false, message: '좋아요를 취소했습니다.' };
   } else {
-    await prisma.productLike.create({
-      data: { userId, productId },
-    });
+    await likesRepository.createProductLike(userId, productId);
     return { isLiked: true, message: '좋아요를 눌렀습니다.' };
   }
 };
 
 const changeArticleLike = async (articleId: string, userId: string): Promise<LikeResponse> => {
-  await prisma.article.findUniqueOrThrow({
-    where: { id: articleId },
-  });
+  await articlesRepository.findArticleById(articleId);
 
-  const likeCheck = await prisma.articleLike.findUnique({
-    where: {
-      userId_articleId: {
-        userId,
-        articleId,
-      },
-    },
-  });
+  const likeCheck = await likesRepository.findArticleLike(userId, articleId);
 
   if (likeCheck) {
-    await prisma.articleLike.delete({
-      where: { id: likeCheck.id },
-    });
+    await likesRepository.deleteArticleLike(likeCheck.id);
     return { isLiked: false, message: '좋아요를 취소했습니다.' };
   } else {
-    await prisma.articleLike.create({
-      data: { userId, articleId },
-    });
+    await likesRepository.createArticleLike(userId, articleId);
     return { isLiked: true, message: '좋아요를 눌렀습니다.' };
   }
 };

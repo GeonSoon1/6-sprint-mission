@@ -1,19 +1,16 @@
-import { prisma } from '../utils/prisma';
+import { usersRepository } from '../repositories/usersRepository';
 import bcrypt from 'bcrypt';
 import { Prisma } from '@prisma/client';
 import { ErrorWithStatus } from '../utils/types';
 
 const getUserById = async (userId: string) => {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      email: true,
-      nickname: true,
-      image: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+  const user = await usersRepository.findUserById(userId, {
+    id: true,
+    email: true,
+    nickname: true,
+    image: true,
+    createdAt: true,
+    updatedAt: true,
   });
 
   if (!user) {
@@ -26,23 +23,19 @@ const getUserById = async (userId: string) => {
 };
 
 const updateUser = async (userId: string, updateData: Prisma.UserUpdateInput) => {
-  const user = await prisma.user.update({
-    where: { id: userId },
-    data: updateData,
-    select: {
-      id: true,
-      email: true,
-      nickname: true,
-      image: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+  const user = await usersRepository.updateUser(userId, updateData, {
+    id: true,
+    email: true,
+    nickname: true,
+    image: true,
+    createdAt: true,
+    updatedAt: true,
   });
   return user;
 };
 
 const changePassword = async (userId: string, currentPassword: string, newPassword: string) => {
-  const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
+  const user = await usersRepository.findUserByIdOrThrow(userId);
 
   const passwordCheck = await bcrypt.compare(currentPassword, user.password);
 
@@ -62,51 +55,28 @@ const changePassword = async (userId: string, currentPassword: string, newPasswo
 
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { password: hashedPassword },
-  });
+  await usersRepository.updateUser(userId, { password: hashedPassword });
 
   return { message: '비밀번호가 성공적으로 변경되었습니다.' };
 };
 
 const getUserProducts = async (userId: string) => {
-  const products = await prisma.product.findMany({
-    where: {
-      userId: userId,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    select: {
-      id: true,
-      name: true,
-      price: true,
-      createdAt: true,
-    },
+  const products = await usersRepository.findProductsByUserId(userId, {
+    id: true,
+    name: true,
+    price: true,
+    createdAt: true,
   });
 
   return products;
 };
 
 const getUserLikedProducts = async (userId: string) => {
-  const products = await prisma.product.findMany({
-    where: {
-      likes: {
-        some: {
-          userId,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-    select: {
-      id: true,
-      name: true,
-      price: true,
-      createdAt: true,
-    },
+  const products = await usersRepository.findLikedProductsByUserId(userId, {
+    id: true,
+    name: true,
+    price: true,
+    createdAt: true,
   });
 
   return products;

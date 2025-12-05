@@ -1,4 +1,4 @@
-import { prisma } from '../utils/prisma';
+import { productsRepository } from '../repositories/productsRepository';
 import { Prisma } from '@prisma/client';
 import { ErrorWithStatus } from '../utils/types';
 
@@ -10,13 +10,10 @@ interface FindProductsQuery {
 }
 
 const createProductInDb = async (productData: Prisma.ProductCreateInput, userId: string) => {
-  return prisma.product.create({
-    data: {
-      name: productData.name,
-      description: productData.description,
-      price: productData.price,
-      tags: productData.tags,
-      userId,
+  return productsRepository.createProduct({
+    ...productData,
+    user: {
+      connect: { id: userId },
     },
   });
 };
@@ -48,14 +45,14 @@ const findProducts = async (
   }
 
   const [products, totalProducts] = await Promise.all([
-    prisma.product.findMany({
+    productsRepository.findProducts({
       where,
       orderBy,
       skip: offset,
       take: limit,
       select: selectOption,
     }),
-    prisma.product.count({ where }),
+    productsRepository.countProducts(where),
   ]);
 
   const productsLike = products.map((p) => {
@@ -96,10 +93,7 @@ const findProductById = async (id: string, userId: string | undefined) => {
     };
   }
 
-  const product = await prisma.product.findUniqueOrThrow({
-    where: { id },
-    select: selectOption,
-  });
+  const product = await productsRepository.findProductById(id, selectOption);
 
   const productData = product as any;
   const isLiked = productData.likes ? productData.likes.length > 0 : false;
@@ -113,10 +107,7 @@ const updateProductInDb = async (
   updateData: Prisma.ProductUpdateInput,
   userId: string,
 ) => {
-  const product = await prisma.product.findUniqueOrThrow({
-    where: { id },
-    select: { userId: true },
-  });
+  const product = await productsRepository.findProductById(id, { userId: true });
 
   if (product.userId !== userId) {
     const error: ErrorWithStatus = new Error('수정 권한이 없습니다.');
@@ -124,17 +115,11 @@ const updateProductInDb = async (
     throw error;
   }
 
-  return prisma.product.update({
-    where: { id },
-    data: updateData,
-  });
+  return productsRepository.updateProduct(id, updateData);
 };
 
 const deleteProductInDb = async (id: string, userId: string) => {
-  const product = await prisma.product.findUniqueOrThrow({
-    where: { id },
-    select: { userId: true },
-  });
+  const product = await productsRepository.findProductById(id, { userId: true });
 
   if (product.userId !== userId) {
     const error: ErrorWithStatus = new Error('삭제 권한이 없습니다.');
@@ -142,9 +127,7 @@ const deleteProductInDb = async (id: string, userId: string) => {
     throw error;
   }
 
-  return prisma.product.delete({
-    where: { id },
-  });
+  return productsRepository.deleteProduct(id);
 };
 
 export const productsService = {

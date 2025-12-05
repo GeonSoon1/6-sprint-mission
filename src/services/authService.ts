@@ -1,11 +1,10 @@
-import { prisma } from '../utils/prisma';
+import { authRepository } from '../repositories/authRepository';
 import bcrypt from 'bcrypt';
 import { generateTokens, verifyRefreshToken } from '../utils/token';
 import { ErrorWithStatus } from '../utils/types';
-import { Prisma } from '@prisma/client';
 
 const signUp = async (email: string, nickname: string, password: string) => {
-  const existingUser = await prisma.user.findUnique({ where: { email } });
+  const existingUser = await authRepository.findUserByEmail(email);
   if (existingUser) {
     const error: ErrorWithStatus = new Error('이미 존재하는 이메일입니다.');
     error.status = 409;
@@ -14,12 +13,10 @@ const signUp = async (email: string, nickname: string, password: string) => {
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const user = await prisma.user.create({
-    data: {
-      email,
-      nickname,
-      password: hashedPassword,
-    },
+  const user = await authRepository.createUser({
+    email,
+    nickname,
+    password: hashedPassword,
   });
 
   const { password: _, ...userWithoutPassword } = user;
@@ -27,7 +24,7 @@ const signUp = async (email: string, nickname: string, password: string) => {
 };
 
 const login = async (email: string, password: string) => {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await authRepository.findUserByEmail(email);
   if (!user) {
     const error: ErrorWithStatus = new Error('존재하지 않는 이메일입니다.');
     error.status = 401;
@@ -43,10 +40,7 @@ const login = async (email: string, password: string) => {
 
   const { accessToken, refreshToken } = generateTokens(user.id);
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { refreshToken },
-  });
+  await authRepository.updateUserToken(user.id, refreshToken);
 
   return { user, accessToken, refreshToken };
 };
@@ -62,7 +56,7 @@ const refreshTokens = async (refreshToken: string) => {
 
   const userId = payload.userId;
 
-  const user = await prisma.user.findUnique({ where: { id: userId } });
+  const user = await authRepository.findUserById(userId);
   if (!user) {
     const error: ErrorWithStatus = new Error('사용자를 찾을 수 없습니다.');
     error.status = 404;
@@ -77,10 +71,7 @@ const refreshTokens = async (refreshToken: string) => {
 
   const tokens = generateTokens(user.id);
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { refreshToken: tokens.refreshToken },
-  });
+  await authRepository.updateUserToken(user.id, tokens.refreshToken);
 
   return tokens;
 };

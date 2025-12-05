@@ -1,5 +1,5 @@
+import { articlesRepository } from '../repositories/articlesRepository';
 import { Prisma } from '@prisma/client';
-import { prisma } from '../utils/prisma';
 import { ErrorWithStatus } from '../utils/types';
 
 interface FindArticlesQuery {
@@ -10,11 +10,11 @@ interface FindArticlesQuery {
 }
 
 const createArticleInDb = async (title: string, content: string, userId: string) => {
-  return prisma.article.create({
-    data: {
-      title: title,
-      content: content,
-      userId,
+  return articlesRepository.createArticle({
+    title,
+    content,
+    user: {
+      connect: { id: userId },
     },
   });
 };
@@ -46,16 +46,14 @@ const findArticles = async (
   }
 
   const [articles, totalArticles] = await Promise.all([
-    prisma.article.findMany({
+    articlesRepository.findArticles({
       select: selectOption,
       where,
       orderBy,
       skip: offset,
       take: limit,
     }),
-    prisma.article.count({
-      where,
-    }),
+    articlesRepository.countArticles(where),
   ]);
 
   const articlesWithLike = articles.map((article) => {
@@ -94,10 +92,7 @@ const findArticleById = async (id: string, userId: string | undefined) => {
     };
   }
 
-  const article = await prisma.article.findUniqueOrThrow({
-    where: { id },
-    select: selectOption,
-  });
+  const article = await articlesRepository.findArticleById(id, selectOption);
 
   const articleData = article as any;
   const isLiked = articleData.likes ? articleData.likes.length > 0 : false;
@@ -111,10 +106,7 @@ const updateArticleInDb = async (
   updateData: Prisma.ArticleUpdateInput,
   userId: string,
 ) => {
-  const article = await prisma.article.findUniqueOrThrow({
-    where: { id },
-    select: { userId: true },
-  });
+  const article = await articlesRepository.findArticleById(id, { userId: true });
 
   if (article.userId !== userId) {
     const error: ErrorWithStatus = new Error('수정 권한이 없습니다.');
@@ -122,17 +114,11 @@ const updateArticleInDb = async (
     throw error;
   }
 
-  return prisma.article.update({
-    where: { id },
-    data: updateData,
-  });
+  return articlesRepository.updateArticle(id, updateData);
 };
 
 const deleteArticleInDb = async (id: string, userId: string) => {
-  const article = await prisma.article.findUniqueOrThrow({
-    where: { id },
-    select: { userId: true },
-  });
+  const article = await articlesRepository.findArticleById(id, { userId: true });
 
   if (article.userId !== userId) {
     const error: ErrorWithStatus = new Error('삭제 권한이 없습니다.');
@@ -140,9 +126,7 @@ const deleteArticleInDb = async (id: string, userId: string) => {
     throw error;
   }
 
-  return prisma.article.delete({
-    where: { id },
-  });
+  return articlesRepository.deleteArticle(id);
 };
 
 export const articlesService = {

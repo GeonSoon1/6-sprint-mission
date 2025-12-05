@@ -5,11 +5,11 @@ import cors from 'cors';
 import errorHandler from './middleware/errorhandler';
 import { PORT } from './lib/constants';
 
-// import imgRouter from './routers/imgRoute.js';
+import imgRouter from './routers/imgRoute';
 import authRoute from './routers/authRoute';
 // import productRoute from './routers/productRoute.js';
 // import articleRoute from './routers/articleRoute.js';
-// import userRoute from './routers/userRoute.js';
+import userRoute from './routers/userRoute';
 
 const app = express();
 
@@ -20,14 +20,14 @@ app.use(express.json());
 app.use(cookieParser());
 
 // 이미지 Multer 먼저 실행
-// app.use('/files', imgRouter);
+app.use('/files', imgRouter);
 // app.use('/files', express.static('files'));
 
 // 각각 route 작업
 app.use('/auth', authRoute);
 // app.use('/products', productRoute);
 // app.use('/articles', articleRoute);
-// app.use('/mypage', userRoute);
+app.use('/mypage', userRoute);
 
 app.use(errorHandler);
 

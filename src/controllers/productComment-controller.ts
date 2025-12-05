@@ -1,8 +1,10 @@
-import prisma from '../lib/prismaclient.js';
+import { Request, Response } from 'express';
+import prisma from '../lib/prismaclient';
 
-export async function createProductComment(req, res) {
-  const productId = Number(req.params.productId);
+export async function createProductComment(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
+  const productId = Number(req.params.productId);
 
   // product가 DB에 있는지 확인
   const product = await prisma.product.findUnique({ where: { id: productId } });
@@ -30,7 +32,7 @@ export async function createProductComment(req, res) {
   res.status(201).json(commentCreate);
 }
 
-export async function getProductCommentList(req, res) {
+export async function getProductCommentList(req: Request, res: Response) {
   const productId = Number(req.params.productId);
   const product = await prisma.product.findUnique({
     where: { id: productId },
@@ -58,9 +60,10 @@ export async function getProductCommentList(req, res) {
   res.status(200).json(productComments.comments);
 }
 
-export async function updateProductComment(req, res) {
-  const productId = Number(req.params.productId);
+export async function updateProductComment(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
+  const productId = Number(req.params.productId);
 
   // product가 DB에 있는지 확인
   const product = await prisma.product.findUnique({ where: { id: productId } });
@@ -93,9 +96,10 @@ export async function updateProductComment(req, res) {
   res.status(201).json(commentUpdate);
 }
 
-export async function deleteProductComment(req, res) {
-  const productId = Number(req.params.productId);
+export async function deleteProductComment(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
+  const productId = Number(req.params.productId);
 
   // product가 DB에 있는지 확인
   const product = await prisma.product.findUnique({ where: { id: productId } });

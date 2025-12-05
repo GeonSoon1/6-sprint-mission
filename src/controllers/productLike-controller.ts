@@ -1,8 +1,10 @@
-import prisma from '../lib/prismaclient.js';
+import { Request, Response } from 'express';
+import prisma from '../lib/prismaclient';
 
-export async function likeCountUp(req, res) {
-  const productId = Number(req.params.id);
+export async function likeCountUp(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
+  const productId = Number(req.params.id);
 
   // 제품 검증
   const product = await prisma.product.findUnique({ where: { id: productId } });
@@ -56,9 +58,10 @@ export async function likeCountUp(req, res) {
   res.status(200).json({ updateProductLikesCount, updateProductLikesDB });
 }
 
-export async function likeCountDown(req, res) {
-  const productId = Number(req.params.id);
+export async function likeCountDown(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
+  const productId = Number(req.params.id);
 
   // 제품 검증
   const product = await prisma.product.findUnique({ where: { id: productId } });
@@ -75,7 +78,7 @@ export async function likeCountDown(req, res) {
 
   if (!user) return res.status(401).json({ message: 'Unauthorized' });
 
-  // 이미 likeCount 감소 했다면 작업 종료
+  // 이미 likeCount 감소(삭제) 했다면 작업 종료
   const readProductLikeCount = await prisma.productLikes.findUnique({
     where: {
       userId_productId: {
@@ -85,10 +88,8 @@ export async function likeCountDown(req, res) {
     },
   });
 
-  const productLikeCount = readProductLikeCount.likeCountBool;
-
-  if (!readProductLikeCount || !productLikeCount)
-    return res.status(401).json({ message: '작업을 진행 할 수 없습니다' });
+  if (!readProductLikeCount)
+    return res.status(401).json({ message: '이미 취소 하였습니다' });
 
   // likeCount 감소 작업
   const downProductLikeCount = product.likeCount - 1;
@@ -98,11 +99,10 @@ export async function likeCountDown(req, res) {
     data: { likeCount: Number(downProductLikeCount) },
   });
 
-  // productLikes DB에 기록
-  const updateProductLikesDB = await prisma.productLikes.update({
+  // productLikes DB에서 삭제
+  await prisma.productLikes.delete({
     where: { id: readProductLikeCount.id },
-    data: { likeCountBool: false },
   });
 
-  res.status(200).json({ updateProductLikeCount, updateProductLikesDB });
+  res.status(200).json({ updateProductLikeCount });
 }

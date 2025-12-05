@@ -1,8 +1,8 @@
 import express from 'express';
-import asyncHandler from '../lib/asyncHandler.js';
-import * as p from '../controllers/product-controllers.js';
-import * as pc from '../controllers/productComment-controllers.js';
-import * as pl from '../controllers/productLike-controllers.js';
+import asyncHandler from '../lib/asyncHandler';
+import * as p from '../controllers/product-controller';
+import * as pc from '../controllers/productComment-controller';
+import * as pl from '../controllers/productLike-controller';
 
 import {
   productCreateValidation,
@@ -14,7 +14,7 @@ import {
   commentUpdateValidation,
 } from '../validators/comment-validation.js';
 
-import authenticate from '../../middleware/authenticate.js';
+import authenticate from '../middleware/authenticate';
 
 const productRoute = express.Router();
 

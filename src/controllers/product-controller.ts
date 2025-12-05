@@ -1,7 +1,9 @@
-import prisma from '../lib/prismaclient.js';
+import { Request, Response } from 'express';
+import prisma from '../lib/prismaclient';
 
-export async function createProduct(req, res) {
+export async function createProduct(req: Request, res: Response) {
   // user가 DB에 존재 하는지 확인
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
   const findUser = await prisma.user.findUnique({ where: { id: userId } });
 
@@ -26,16 +28,14 @@ export async function createProduct(req, res) {
   res.status(201).json(productCreate);
 }
 
-export async function getProductsList(req, res) {
-  const {
-    offset = 0,
-    limit = 10,
-    order = 'newest',
-    name = '',
-    description = '',
-  } = req.query;
+export async function getProductsList(req: Request, res: Response) {
+  const offset = Number(req.query.offset ?? 0);
+  const limit = Number(req.query.limit ?? 10);
+  const name = String(req.query.name ?? '');
+  const description = String(req.query.description ?? '');
+  const order = String(req.query.order ?? 'newest');
 
-  let orderBy;
+  let orderBy: { createdAt: 'asc' | 'desc' };
   switch (order) {
     case 'oldest':
       orderBy = { createdAt: 'asc' };
@@ -52,8 +52,8 @@ export async function getProductsList(req, res) {
       name: { contains: name },
       description: { contains: description },
     },
-    skip: parseInt(offset),
-    take: parseInt(limit),
+    skip: offset,
+    take: limit,
     orderBy,
     select: {
       id: true,
@@ -69,7 +69,7 @@ export async function getProductsList(req, res) {
   res.status(200).json(productList);
 }
 
-export async function getProductInfo(req, res) {
+export async function getProductInfo(req: Request, res: Response) {
   const id = Number(req.params.id);
   const product = await prisma.product.findUniqueOrThrow({
     where: { id },
@@ -86,6 +86,7 @@ export async function getProductInfo(req, res) {
   if (!product) return res.status(401).json({ message: `Cannot found ${id}` });
 
   // 현재 User가 좋아요 했는지 확인하기
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
 
   const checkLiked = await prisma.productLikes.findUnique({
@@ -105,9 +106,10 @@ export async function getProductInfo(req, res) {
   res.status(200).json({ product, isLiked });
 }
 
-export async function updateProduct(req, res) {
-  const productId = Number(req.params.id);
+export async function updateProduct(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
+  const productId = Number(req.params.id);
 
   // product가 DB에 있는지 확인
   const product = await prisma.product.findUnique({
@@ -135,9 +137,11 @@ export async function updateProduct(req, res) {
   res.status(200).json(productUpdate);
 }
 
-export async function deleteProduct(req, res) {
-  const productId = Number(req.params.id);
+export async function deleteProduct(req: Request, res: Response) {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
+
+  const productId = Number(req.params.id);
 
   // product가 DB에 있는지 확인
   const product = await prisma.product.findUnique({

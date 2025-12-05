@@ -1,8 +1,8 @@
 import express from 'express';
-import asyncHandler from '../lib/asyncHandler.js';
-import * as a from '../controllers/article-controllers.js';
-import * as ac from '../controllers/articleComment-controllers.js';
-import * as al from '../controllers/articleLike-controllers.js';
+import asyncHandler from '../lib/asyncHandler';
+import * as a from '../controllers/article-controller';
+import * as ac from '../controllers/articleComment-controller';
+import * as al from '../controllers/articleLike-controller';
 
 import {
   articleCreateValidation,
@@ -14,7 +14,7 @@ import {
   commentUpdateValidation,
 } from '../validators/comment-validation.js';
 
-import authenticate from '../../middleware/authenticate.js';
+import authenticate from '../middleware/authenticate';
 
 const articleRoute = express.Router();
 

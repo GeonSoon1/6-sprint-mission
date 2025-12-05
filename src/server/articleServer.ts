@@ -1,6 +1,6 @@
-import prisma from '../lib/prismaclient.js';
+import prisma from '../lib/prismaclient';
 
-export async function articleUserCheck(userId, articleId) {
+export async function articleUserCheck(userId: number, articleId: number) {
   const article = await prisma.article.findUnique({ where: { id: articleId } });
   const findUser = await prisma.user.findUnique({ where: { id: userId } });
 

@@ -7,12 +7,12 @@ import * as al from '../controllers/articleLike-controller';
 import {
   articleCreateValidation,
   articleUpdateValidation,
-} from '../validators/article-validation.js';
+} from '../validators/article-validation';
 
 import {
   commentCreateValidation,
   commentUpdateValidation,
-} from '../validators/comment-validation.js';
+} from '../validators/comment-validation';
 
 import authenticate from '../middleware/authenticate';
 

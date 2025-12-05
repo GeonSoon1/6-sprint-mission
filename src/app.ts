@@ -7,8 +7,8 @@ import { PORT } from './lib/constants';
 
 import imgRouter from './routers/imgRoute';
 import authRoute from './routers/authRoute';
-// import productRoute from './routers/productRoute.js';
-// import articleRoute from './routers/articleRoute.js';
+import productRoute from './routers/productRoute';
+import articleRoute from './routers/articleRoute';
 import userRoute from './routers/userRoute';
 
 const app = express();
@@ -25,8 +25,8 @@ app.use('/files', imgRouter);
 
 // 각각 route 작업
 app.use('/auth', authRoute);
-// app.use('/products', productRoute);
-// app.use('/articles', articleRoute);
+app.use('/products', productRoute);
+app.use('/articles', articleRoute);
 app.use('/mypage', userRoute);
 
 app.use(errorHandler);

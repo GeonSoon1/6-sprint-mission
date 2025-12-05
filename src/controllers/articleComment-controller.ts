@@ -1,6 +1,7 @@
+import { Request, Response } from 'express';
 import prisma from '../lib/prismaclient.js';
 
-export async function createArticleComment(req, res) {
+export async function createArticleComment(req: Request, res: Response) {
   // article이 DB에 있는지 확인
   const articleId = Number(req.params.articleId);
   const article = await prisma.article.findUnique({ where: { id: articleId } });
@@ -9,6 +10,7 @@ export async function createArticleComment(req, res) {
     return res.status(404).json({ message: 'Cannot found article' });
 
   // user가 DB에 존재 하는지 확인
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
   const findUser = await prisma.user.findUnique({ where: { id: userId } });
 
@@ -29,7 +31,7 @@ export async function createArticleComment(req, res) {
   res.status(201).json(commentCreate);
 }
 
-export async function getArticleCommentsList(req, res) {
+export async function getArticleCommentsList(req: Request, res: Response) {
   const articleId = Number(req.params.articleId);
   const article = await prisma.article.findUnique({ where: { id: articleId } });
 
@@ -55,7 +57,7 @@ export async function getArticleCommentsList(req, res) {
   res.status(200).json(articleComments.comments);
 }
 
-export async function updateArticleComment(req, res) {
+export async function updateArticleComment(req: Request, res: Response) {
   // article이 DB에 있는지 확인
   const articleId = Number(req.params.articleId);
   const article = await prisma.article.findUnique({ where: { id: articleId } });
@@ -64,6 +66,7 @@ export async function updateArticleComment(req, res) {
     return res.status(404).json({ message: 'Cannot found article' });
 
   // user가 DB에 존재 하는지 확인
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
   const findUser = await prisma.user.findUnique({ where: { id: userId } });
 
@@ -90,7 +93,7 @@ export async function updateArticleComment(req, res) {
   res.status(201).json(commentUpdate);
 }
 
-export async function deleteArticleComment(req, res) {
+export async function deleteArticleComment(req: Request, res: Response) {
   // article이 DB에 있는지 확인
   const articleId = Number(req.params.articleId);
   const article = await prisma.article.findUnique({ where: { id: articleId } });
@@ -99,6 +102,7 @@ export async function deleteArticleComment(req, res) {
     return res.status(404).json({ message: 'Cannot found article' });
 
   // user가 DB에 존재 하는지 확인
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
   const findUser = await prisma.user.findUnique({ where: { id: userId } });
 

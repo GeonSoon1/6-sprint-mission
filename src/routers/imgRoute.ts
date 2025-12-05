@@ -1,5 +1,5 @@
 import express from 'express';
-import asyncHandler from '../lib/asyncHandler.js';
+import asyncHandler from '../lib/asyncHandler';
 import multer from 'multer';
 import { imgNew } from '../controllers/img-controller';
 

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { assert } from 'superstruct';
-import { CreateUser } from '../structs/userStructs.js';
+import { CreateUser } from '../structs/userStructs';
 
 export function userCreateValidation(
   req: Request,

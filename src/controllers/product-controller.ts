@@ -2,9 +2,10 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prismaclient';
 
 export async function createProduct(req: Request, res: Response) {
-  // user가 DB에 존재 하는지 확인
+  // user 정보가 존재 하는지 확인
   if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
+
   const findUser = await prisma.user.findUnique({ where: { id: userId } });
 
   if (!findUser) return res.status(401).json({ message: 'Unauthorized' });

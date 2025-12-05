@@ -7,12 +7,12 @@ import * as pl from '../controllers/productLike-controller';
 import {
   productCreateValidation,
   productUpdateValidation,
-} from '../validators/product-validation.js';
+} from '../validators/product-validation';
 
 import {
   commentCreateValidation,
   commentUpdateValidation,
-} from '../validators/comment-validation.js';
+} from '../validators/comment-validation';
 
 import authenticate from '../middleware/authenticate';
 

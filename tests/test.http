@@ -236,7 +236,7 @@ POST {{baseUrl}}/auth/register
 Content-Type: {{contentType}}
 
 {
-  "email": "testuser@example.com",
+    "email": "testuser@example.com",
   "nickname": "duplicate",
   "password": "password123"
 }

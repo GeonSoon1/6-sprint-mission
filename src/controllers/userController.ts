@@ -1,9 +1,11 @@
-import { BadRequestError, IsSamePasswordError } from '../libs/error.js';
-import prisma from '../libs/prismaClient.js';
-import userService from '../services/userService.js';
+import { User } from '@prisma/client';
+import { BadRequestError, IsSamePasswordError } from '../libs/error';
+import prisma from '../libs/prismaClient';
+import userService from '../services/userService';
+import { Request, Response, NextFunction } from 'express';
 
-async function createUser(req, res, next) {
-  const { email, password, ...rest } = req.body;
+async function createUser(req: Request, res: Response, next: NextFunction) {
+  const { email, password, ...rest } = req.validatedUserCreate!;
   const existedUser = await prisma.user.findUnique({
     where: { email },
   });
@@ -22,8 +24,8 @@ async function createUser(req, res, next) {
   return res.status(200).json(data);
 }
 
-async function loginUser(req, res, next) {
-  const { email, password } = req.body;
+async function loginUser(req: Request, res: Response, next: NextFunction) {
+  const { email, password } = req.validatedUserLogin!;
   const user = await userService.getUser(email, password);
   const accessToken = await userService.createToken(user);
   const refreshToken = await userService.createToken(user, 'refresh');
@@ -31,19 +33,23 @@ async function loginUser(req, res, next) {
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
     secure: false,
-    sameSite: 'Lax',
+    sameSite: 'lax',
   });
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: false,
-    sameSite: 'Lax',
+    sameSite: 'lax',
   });
   return res.status(200).json({ message: '로그인 성공' });
 }
 
-async function newRefreshToken(req, res, next) {
+async function newRefreshToken(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const { refreshToken } = req.cookies;
-  const { userId } = req.auth;
+  const { userId } = req.auth!;
   const { accessToken, newRefreshToken } = await userService.refreshToken(
     userId,
     refreshToken
@@ -55,18 +61,18 @@ async function newRefreshToken(req, res, next) {
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
     secure: false,
-    sameSite: 'Lax',
+    sameSite: 'lax',
   });
   res.cookie('refreshToken', newRefreshToken, {
     httpOnly: true,
     secure: false,
-    sameSite: 'Lax',
+    sameSite: 'lax',
   });
   return res.status(200).json({ message: 'Refresh 성공' });
 }
 
-async function logOutUser(req, res, next) {
-  const { userId } = req.auth;
+async function logOutUser(req: Request, res: Response, next: NextFunction) {
+  const { userId } = req.auth!;
   res.clearCookie('accessToken');
   res.clearCookie('refreshToken');
   await prisma.user.update({
@@ -78,55 +84,98 @@ async function logOutUser(req, res, next) {
   return res.status(200).json({ message: '로그아웃 성공' });
 }
 
-async function getUserProfile(req, res, next) {
-  const { id } = req.user;
-  const data = await prisma.user.findUnique({ where: { id } });
+async function getUserProfile(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.user!;
+  const data = await prisma.user.findUniqueOrThrow({ where: { id } });
   const formattedData = await userService.filterSensitiveUserData(data);
   return res.status(200).json(formattedData);
 }
 
-async function updateUserProfile(req, res, next) {
-  const { id } = req.user;
-  const { nickname, image, password, newPassword } = req.body;
-  const { email, password: savedPassword } = await prisma.user.findUnique({
-    where: { id },
-  });
-  const user = await userService.getUser(email, password);
-  await userService.isSamePassword(newPassword, savedPassword);
-  const hashingNewPassword = await userService.hashingPassword(newPassword);
-  const updatedUser = await prisma.user.update({
-    where: { id },
-    data: { nickname, image, password: hashingNewPassword },
-  });
-  const newAccessToken = await userService.createToken(updatedUser);
-  const newRefreshToken = await userService.createToken(updatedUser, 'refresh');
-  const newUser = await prisma.user.update({
-    where: { id },
-    data: { refreshToken: newRefreshToken },
-  });
-  res.cookie('accessToken', newAccessToken, {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'Lax',
-  });
-  res.cookie('refreshToken', newRefreshToken, {
-    httpOnly: true,
-    secure: false,
-    sameSite: 'Lax',
-  });
-  const formattedData = await userService.filterSensitiveUserData(newUser);
-  return res.status(200).json(formattedData);
+async function updateUserProfile(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id } = req.user!;
+  const { nickname, image, password, newPassword } = req.validatedUserUpdate!;
+  const { email, password: savedPassword } =
+    await prisma.user.findUniqueOrThrow({
+      where: { id },
+    });
+  await userService.getUser(email, password);
+  if (newPassword) {
+    await userService.isSamePassword(newPassword, savedPassword);
+    const hashingNewPassword = await userService.hashingPassword(newPassword);
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        ...Object.fromEntries(
+          Object.entries(req.validatedUserUpdate!).filter(
+            ([k, v]) =>
+              k !== 'password' && k !== 'newPassword' && v !== undefined
+          )
+        ),
+        password: hashingNewPassword,
+      },
+    });
+    const newAccessToken = await userService.createToken(updatedUser);
+    const newRefreshToken = await userService.createToken(
+      updatedUser,
+      'refresh'
+    );
+    const newUser = await prisma.user.update({
+      where: { id },
+      data: { refreshToken: newRefreshToken },
+    });
+    res.cookie('accessToken', newAccessToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    });
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: 'lax',
+    });
+    const formattedData = await userService.filterSensitiveUserData(newUser);
+    return res.status(200).json(formattedData);
+  } else {
+    const updatedUser = await prisma.user.update({
+      where: { id },
+      data: {
+        ...Object.fromEntries(
+          Object.entries(req.validatedUserUpdate!).filter(
+            ([k, v]) =>
+              k !== 'password' && k !== 'newPassword' && v !== undefined
+          )
+        ),
+      },
+    });
+    const formattedData = await userService.filterSensitiveUserData(
+      updatedUser
+    );
+    return res.status(200).json(formattedData);
+  }
 }
 
-async function getUserProducts(req, res, next) {
-  const { id } = req.user;
+async function getUserProducts(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const { id } = req.user!;
   const products = await prisma.product.findMany({ where: { userId: id } });
   return res.status(200).json(products);
 }
 
-async function likeProductButton(req, res, next) {
-  const userId = req.user.id;
-  const { productId } = req.params;
+async function likeProductButton(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.user!.id;
+  const { productId } = req.validatedProductId!;
+  if (!productId) throw new BadRequestError();
   await prisma.product.findUniqueOrThrow({ where: { id: productId } });
   const existing = await prisma.likedProduct.findUnique({
     where: { userId_productId: { userId, productId } },
@@ -150,9 +199,14 @@ async function likeProductButton(req, res, next) {
   }
 }
 
-async function likeArticleButton(req, res, next) {
-  const userId = req.user.id;
-  const { articleId } = req.params;
+async function likeArticleButton(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.user!.id;
+  const { articleId } = req.validatedArticleId!;
+  if (!articleId) throw new BadRequestError();
   await prisma.article.findUniqueOrThrow({ where: { id: articleId } });
   const existing = await prisma.likedArticle.findUnique({
     where: { userId_articleId: { userId, articleId } },
@@ -176,15 +230,20 @@ async function likeArticleButton(req, res, next) {
   }
 }
 
-async function likeProductList(req, res, next) {
-  const userId = req.user.id;
-  const likedProduct = await prisma.user.findUnique({
+async function likeProductList(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.user!.id;
+  const likedProduct = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
     select: {
       likedProducts: {
         select: {
           product: true,
         },
+        orderBy: { createdAt: 'desc' },
       },
     },
   });
@@ -192,15 +251,20 @@ async function likeProductList(req, res, next) {
   res.status(200).json(likedProduct.likedProducts);
 }
 
-async function likeArticleList(req, res, next) {
-  const userId = req.user.id;
-  const likedArticle = await prisma.user.findUnique({
+async function likeArticleList(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const userId = req.user!.id;
+  const likedArticle = await prisma.user.findUniqueOrThrow({
     where: { id: userId },
     select: {
       likedArticles: {
         select: {
           article: true,
         },
+        orderBy: { createdAt: 'desc' },
       },
     },
   });

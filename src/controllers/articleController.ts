@@ -1,23 +1,27 @@
-import prisma from '../libs/prismaClient.js';
+import { Prisma } from '@prisma/client';
+import prisma from '../libs/prismaClient';
+import { NextFunction, RequestHandler, Request, Response } from 'express';
 
-async function createArticle(req, res, next) {
+async function createArticle(req: Request, res: Response, next: NextFunction) {
   const data = await prisma.article.create({
     data: {
-      ...req.body,
-      userId: req.user.id,
+      ...req.validatedArticleCreate!,
+      userId: req.user!.id,
     },
   });
   res.status(201).json(data);
 }
 
-async function getArticles(req, res, next) {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const search = req.query.search || '';
+async function getArticles(req: Request, res: Response, next: NextFunction) {
+  const {
+    page = 1,
+    limit = 10,
+    search = '',
+    sort = 'recent',
+  } = req.validatedArticleQuery!;
   const skip = (page - 1) * limit;
-  const sort = req.query.sort || 'recent';
 
-  const where = search
+  const where: Prisma.ArticleWhereInput = search
     ? {
         OR: [
           { title: { contains: search, mode: 'insensitive' } },
@@ -26,7 +30,9 @@ async function getArticles(req, res, next) {
       }
     : {};
 
-  const orderBy = { createdAt: sort === 'recent' ? 'desc' : 'asc' };
+  const orderBy: Prisma.ArticleOrderByWithRelationInput = {
+    createdAt: !sort || sort === 'recent' ? 'desc' : 'asc',
+  };
 
   const data = await prisma.article.findMany({
     where,
@@ -44,7 +50,7 @@ async function getArticles(req, res, next) {
 
   const userId = req.auth?.userId;
   if (userId) {
-    const likedUser = await prisma.user.findUnique({
+    const likedUser = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
       include: { likedArticles: true },
     });
@@ -66,7 +72,7 @@ async function getArticles(req, res, next) {
       .status(200)
       .json(
         userData.sort((a, b) =>
-          sort === 'recent'
+          !sort || sort === 'recent'
             ? b.createdAt.getTime() - a.createdAt.getTime()
             : a.createdAt.getTime() - b.createdAt.getTime()
         )
@@ -76,10 +82,10 @@ async function getArticles(req, res, next) {
   }
 }
 
-async function getArticleById(req, res, next) {
-  const { id } = req.params;
+async function getArticleById(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.validatedId!;
   const data = await prisma.article.findUniqueOrThrow({
-    where: { id },
+    where: { id: id! },
     select: {
       id: true,
       title: true,
@@ -92,34 +98,45 @@ async function getArticleById(req, res, next) {
   const userId = req.auth?.userId;
   if (userId) {
     const likedArticle = await prisma.likedArticle.findUnique({
-      where: { userId_articleId: { userId, articleId: id } },
+      where: { userId_articleId: { userId, articleId: id! } },
     });
     if (likedArticle) {
-      data.isLiked = true;
+      return res.status(200).json({
+        ...data,
+        isLiked: true,
+      });
     } else {
-      data.isLiked = false;
+      return res.status(200).json({
+        ...data,
+        isLiked: false,
+      });
     }
   }
 
   res.status(200).json(data);
 }
 
-async function updateArticle(req, res, next) {
-  const { id } = req.params;
+async function updateArticle(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.validatedId!;
   const data = await prisma.article.update({
-    where: { id },
+    where: { id: id! },
     data: {
-      ...req.body,
-      userId: req.user.id,
+      ...Object.fromEntries(
+        // 객체를 배열로 바꿔서 배열메서드 사용 후 다시 객체로 변환
+        Object.entries(req.validatedArticleUpdate!).filter(
+          ([_, v]) => v !== undefined
+        )
+      ),
+      userId: req.user!.id,
     },
   });
   res.status(200).json(data);
 }
 
-async function deleteArticle(req, res, next) {
-  const { id } = req.params;
+async function deleteArticle(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.validatedId!;
   const data = await prisma.article.delete({
-    where: { id },
+    where: { id: id! },
   });
   res.status(204).json(data);
 }

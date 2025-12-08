@@ -4,14 +4,30 @@ import {
   BadRequestError,
   ForbiddenError,
   NotFoundError,
-  SamePasswordError,
-} from '../../libs/error.js';
+  IsSamePasswordError,
+} from '../../libs/error';
+import { Request, Response, NextFunction } from 'express';
 
-function defaultNotFoundHandler(req, res, next) {
+function defaultNotFoundHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   return res.status(404).send({ message: '존재하지 않습니다' });
 }
 
-function globalErrorHandler(err, req, res, next) {
+interface CustomError extends Error {
+  // 커스텀 에러를 만들고 Error 내장 객체 타입 상속
+  code?: string;
+  path?: string[];
+}
+
+function globalErrorHandler(
+  err: CustomError,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   console.log(err);
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
@@ -39,11 +55,12 @@ function globalErrorHandler(err, req, res, next) {
   if (err instanceof AuthorizeError) {
     return res.status(403).send({ message: err.message });
   }
-  if (err instanceof SamePasswordError) {
+  if (err instanceof IsSamePasswordError) {
     return res.status(403).send({ message: err.message });
   }
   if (err.name === 'StructError') {
-    if (err.path[0] === 'password') {
+    if (err.path?.[0] === 'password') {
+      // 옵셔널 체이닝 : 값이 있으면 접근하고, 없으면 undefined 반환
       return res
         .status(400)
         .json({ message: '비밀번호는 8자 이상 20자 이하로 입력해야 합니다.' });

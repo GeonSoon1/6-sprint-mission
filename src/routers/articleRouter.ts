@@ -3,21 +3,21 @@ import {
   validateCreateArticle,
   validateGetListArticle,
   validateUpdateArticle,
-} from '../middlewares/validates/validateArticle.js';
-import { asyncHandler } from '../libs/asyncHandler.js';
-import { validateIdParam } from '../middlewares/validates/validateId.js';
+} from '../middlewares/validates/validateArticle';
+import { asyncHandler } from '../libs/asyncHandler';
+import { validateIdParam } from '../middlewares/validates/validateId';
 import {
   createArticle,
   deleteArticle,
   getArticleById,
   getArticles,
   updateArticle,
-} from '../controllers/articleController.js';
+} from '../controllers/articleController';
 import {
   authorizeArticle,
   authorizeUser,
   verifyAccessToken,
-} from '../middlewares/auth.js';
+} from '../middlewares/auth';
 
 const articleRouter = express.Router();
 

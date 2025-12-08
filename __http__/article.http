@@ -18,7 +18,7 @@ GET http://localhost:4000/articles/97feeee8-b482-47b5-bf96-272751fdaa66
 
 // 게시글 수정
 ###
-PATCH http://localhost:4000/articles/5abd0f06-f058-4c82-a913-a9c68c248ff6
+PATCH http://localhost:4000/articles/97feeee8-b482-47b5-bf96-272751fdaa66
 Content-Type: application/json
 
 {

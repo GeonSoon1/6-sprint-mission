@@ -1,4 +1,5 @@
 import * as s from 'superstruct';
+import { Request, Response, NextFunction } from 'express';
 
 // 유저 회원 가입 유효성 스키마
 const createUserSchema = s.object({
@@ -7,12 +8,17 @@ const createUserSchema = s.object({
   password: s.size(s.nonempty(s.string()), 8, 20),
 });
 
-async function validateCreateUser(req, res, next) {
+async function validateCreateUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    s.assert(req.body, createUserSchema);
+    req.validatedUserCreate = s.create(req.body, createUserSchema);
     next();
-  } catch (e) {
-    return next(e);
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
+    next(e);
   }
 }
 
@@ -22,12 +28,17 @@ const loginUserSchema = s.object({
   password: s.size(s.nonempty(s.string()), 8, 20),
 });
 
-async function validateLoginUser(req, res, next) {
+async function validateLoginUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    s.assert(req.body, loginUserSchema);
+    req.validatedUserLogin = s.create(req.body, loginUserSchema);
     next();
-  } catch (e) {
-    return next(e);
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
+    next(e);
   }
 }
 
@@ -39,12 +50,17 @@ const updateUserProfileSchema = s.object({
   newPassword: s.optional(s.size(s.nonempty(s.string()), 8, 20)),
 });
 
-async function validateUpdateUser(req, res, next) {
+async function validateUpdateUser(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    s.assert(req.body, updateUserProfileSchema);
+    req.validatedUserUpdate = s.create(req.body, updateUserProfileSchema);
     next();
-  } catch (e) {
-    return next(e);
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
+    next(e);
   }
 }
 
@@ -52,4 +68,11 @@ async function validateUpdateUser(req, res, next) {
 // 게시글 좋아요, 해제 버튼
 // validateId.js 사용
 
-export { validateCreateUser, validateLoginUser, validateUpdateUser };
+export {
+  validateCreateUser,
+  validateLoginUser,
+  validateUpdateUser,
+  createUserSchema,
+  loginUserSchema,
+  updateUserProfileSchema,
+};

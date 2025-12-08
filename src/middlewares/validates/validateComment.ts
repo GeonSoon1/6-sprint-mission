@@ -1,26 +1,37 @@
 import * as s from 'superstruct';
 import isUuid from 'is-uuid';
+import { Request, Response, NextFunction } from 'express';
 
 const createCommentSchema = s.object({
   content: s.size(s.string(), 1, 500),
 });
 
-function validateCreateComment(req, res, next) {
+function validateCreateComment(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    s.assert(req.body, createCommentSchema);
+    req.validatedCommentCreate = s.create(req.body, createCommentSchema);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 }
 
 const updateCommentSchema = s.partial(createCommentSchema);
 
-function validateUpdateComment(req, res, next) {
+function validateUpdateComment(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    s.assert(req.body, updateCommentSchema);
+    req.validatedCommentUpdate = s.create(req.body, updateCommentSchema);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 }
@@ -43,13 +54,25 @@ const getListCommentSchema = s.object({
   ),
 });
 
-function validateGetListComment(req, res, next) {
+function validateGetListComment(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const _ = s.create(req.query, getListCommentSchema);
+    req.validatedCommentGetList = s.create(req.query, getListCommentSchema);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 }
 
-export { validateCreateComment, validateUpdateComment, validateGetListComment };
+export {
+  validateCreateComment,
+  validateUpdateComment,
+  validateGetListComment,
+  createCommentSchema,
+  updateCommentSchema,
+  getListCommentSchema,
+};

@@ -1,4 +1,5 @@
 import * as s from 'superstruct';
+import { Request, Response, NextFunction } from 'express';
 
 const createProductSchema = s.object({
   name: s.size(s.string(), 1, 30),
@@ -7,22 +8,32 @@ const createProductSchema = s.object({
   tags: s.array(s.string()),
 });
 
-function validateCreateProduct(req, res, next) {
+function validateCreateProduct(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    s.assert(req.body, createProductSchema);
+    req.validatedProductCreate = s.create(req.body, createProductSchema);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 }
 
 const updateProductSchema = s.partial(createProductSchema);
 
-function validateUpdateProduct(req, res, next) {
+function validateUpdateProduct(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    s.assert(req.body, updateProductSchema);
+    req.validatedProductUpdate = s.create(req.body, updateProductSchema);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 }
@@ -50,13 +61,25 @@ const getProductQuerySchema = s.object({
   sort: s.optional(s.union([s.enums(['recent', 'oldest']), s.literal('')])),
 });
 
-function validateGetListProduct(req, res, next) {
+function validateGetListProduct(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const _ = s.create(req.query, getProductQuerySchema);
+    req.validatedProductQuery = s.create(req.query, getProductQuerySchema);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 }
 
-export { validateCreateProduct, validateGetListProduct, validateUpdateProduct };
+export {
+  validateCreateProduct,
+  validateGetListProduct,
+  validateUpdateProduct,
+  createProductSchema,
+  updateProductSchema,
+  getProductQuerySchema,
+};

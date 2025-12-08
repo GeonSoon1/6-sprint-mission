@@ -3,21 +3,21 @@ import {
   validateCreateProduct,
   validateGetListProduct,
   validateUpdateProduct,
-} from '../middlewares/validates/validateProduct.js';
-import { asyncHandler } from '../libs/asyncHandler.js';
-import { validateIdParam } from '../middlewares/validates/validateId.js';
+} from '../middlewares/validates/validateProduct';
+import { asyncHandler } from '../libs/asyncHandler';
+import { validateIdParam } from '../middlewares/validates/validateId';
 import {
   createProduct,
   deleteProduct,
   getProductById,
   getProducts,
   updateProduct,
-} from '../controllers/productController.js';
+} from '../controllers/productController';
 import {
   authorizeProduct,
   authorizeUser,
   verifyAccessToken,
-} from '../middlewares/auth.js';
+} from '../middlewares/auth';
 
 const productRouter = express.Router();
 

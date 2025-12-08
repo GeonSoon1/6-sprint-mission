@@ -1,6 +1,11 @@
-import { BadRequestError } from '../libs/error.js';
+import { BadRequestError } from '../libs/error';
+import { Request, Response, NextFunction } from 'express';
 
-export function uploadSingleImage(req, res, next) {
+export function uploadSingleImage(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   const file = req.file;
 
   if (!file) {

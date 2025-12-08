@@ -1,41 +1,67 @@
 import * as s from 'superstruct';
 import isUuid from 'is-uuid';
+import { Request, Response, NextFunction } from 'express';
 
-const validateId = s.object({
-  id: s.define('UUID', (value) => isUuid.v4(value)),
+export const validateId = s.object({
+  id: s.define('UUID', (value: unknown) => {
+    // value 파라미터 unknown 주고 string이 아닐 경우 false 맞을 경우 검사를 직접 지정해줌
+    if (typeof value !== 'string') return false;
+    return isUuid.v4(value);
+  }),
 });
 
-const validateProductId = s.object({
-  productId: s.define('UUID', (value) => isUuid.v4(value)),
+export const validateProductId = s.object({
+  productId: s.define('UUID', (value: unknown) => {
+    if (typeof value !== 'string') return false;
+    return isUuid.v4(value);
+  }),
 });
 
-const validateArticleId = s.object({
-  articleId: s.define('UUID', (value) => isUuid.v4(value)),
+export const validateArticleId = s.object({
+  articleId: s.define('UUID', (value: unknown) => {
+    if (typeof value !== 'string') return false;
+    return isUuid.v4(value);
+  }),
 });
 
-export const validateIdParam = (req, res, next) => {
+export const validateIdParam = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const _ = s.create(req.params, validateId);
+    req.validatedId = s.create(req.params, validateId);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 };
 
-export const validateProductIdParam = (req, res, next) => {
+export const validateProductIdParam = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const _ = s.create(req.params, validateProductId);
+    req.validatedProductId = s.create(req.params, validateProductId);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 };
 
-export const validateArticleIdParam = (req, res, next) => {
+export const validateArticleIdParam = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
-    const _ = s.create(req.params, validateArticleId);
+    req.validatedArticleId = s.create(req.params, validateArticleId);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 };

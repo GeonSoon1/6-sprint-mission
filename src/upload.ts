@@ -21,7 +21,8 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (req, file, cb) => {
+// 최신 @type/express 에서는 Request가 generic이 아님 아래와 같게 import 하면 Multer가 요구하는 타입을 그대로 따라가면서 TS가 타입 체크 해줌
+const fileFilter: import('multer').Options['fileFilter'] = (req, file, cb) => {
   // 확장자를 정할 수 있음
   const allowedMimeTypes = [
     'image/jpeg',

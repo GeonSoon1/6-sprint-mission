@@ -1,23 +1,27 @@
-import prisma from '../libs/prismaClient.js';
+import { Prisma } from '@prisma/client';
+import prisma from '../libs/prismaClient';
+import { Request, Response, NextFunction } from 'express';
 
-async function createProduct(req, res, next) {
+async function createProduct(req: Request, res: Response, next: NextFunction) {
   const data = await prisma.product.create({
     data: {
-      ...req.body,
-      userId: req.user.id,
+      ...req.validatedProductCreate!,
+      userId: req.user!.id,
     },
   });
   res.status(201).json(data);
 }
 
-async function getProducts(req, res, next) {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const search = req.query.search || '';
-  const sort = req.query.sort || 'recent';
+async function getProducts(req: Request, res: Response, next: NextFunction) {
+  const {
+    page = 1,
+    limit = 10,
+    search = '',
+    sort = 'recent',
+  } = req.validatedProductQuery!;
   const skip = (page - 1) * limit;
 
-  const where = search
+  const where: Prisma.ProductWhereInput = search
     ? {
         OR: [
           { name: { contains: search, mode: 'insensitive' } },
@@ -26,7 +30,9 @@ async function getProducts(req, res, next) {
       }
     : {};
 
-  const orderBy = { createdAt: sort === 'recent' ? 'desc' : 'asc' };
+  const orderBy: Prisma.ProductOrderByWithRelationInput = {
+    createdAt: !sort || sort === 'recent' ? 'desc' : 'asc',
+  };
 
   const data = await prisma.product.findMany({
     where,
@@ -42,9 +48,9 @@ async function getProducts(req, res, next) {
     },
   });
 
-  const userId = req.auth?.userId; // 옵셔널체이닝이 없으면 오류가 나는 이유가 뭘까?
+  const userId = req.auth?.userId;
   if (userId) {
-    const likedUser = await prisma.user.findUnique({
+    const likedUser = await prisma.user.findUniqueOrThrow({
       where: { id: userId },
       include: { likedProducts: true },
     });
@@ -66,7 +72,7 @@ async function getProducts(req, res, next) {
       .status(200)
       .json(
         userData.sort((a, b) =>
-          sort === 'recent'
+          !sort || sort === 'recent'
             ? b.createdAt.getTime() - a.createdAt.getTime()
             : a.createdAt.getTime() - b.createdAt.getTime()
         )
@@ -76,10 +82,10 @@ async function getProducts(req, res, next) {
   }
 }
 
-async function getProductById(req, res, next) {
-  const { id } = req.params;
+async function getProductById(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.validatedId!;
   const data = await prisma.product.findUniqueOrThrow({
-    where: { id },
+    where: { id: id! },
     select: {
       id: true,
       name: true,
@@ -94,34 +100,44 @@ async function getProductById(req, res, next) {
   const userId = req.auth?.userId;
   if (userId) {
     const likedProduct = await prisma.likedProduct.findUnique({
-      where: { userId_productId: { userId, productId: id } },
+      where: { userId_productId: { userId, productId: id! } },
     });
     if (likedProduct) {
-      data.isLiked = true;
+      res.status(200).json({
+        ...data,
+        isLiked: true,
+      });
     } else {
-      data.isLiked = false;
+      res.status(200).json({
+        ...data,
+        isLiked: false,
+      });
     }
   }
 
   res.status(200).json(data);
 }
 
-async function updateProduct(req, res, next) {
-  const { id } = req.params;
+async function updateProduct(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.validatedId!;
   const data = await prisma.product.update({
-    where: { id },
+    where: { id: id! },
     data: {
-      ...req.body,
-      userId: req.user.id,
+      ...Object.fromEntries(
+        Object.entries(req.validatedProductUpdate!).filter(
+          ([_, v]) => v !== undefined
+        )
+      ),
+      userId: req.user!.id,
     },
   });
   res.status(200).json(data);
 }
 
-async function deleteProduct(req, res, next) {
-  const { id } = req.params;
+async function deleteProduct(req: Request, res: Response, next: NextFunction) {
+  const { id } = req.validatedId!;
   const data = await prisma.product.delete({
-    where: { id },
+    where: { id: id! },
   });
   res.status(204).json(data);
 }

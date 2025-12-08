@@ -1,26 +1,38 @@
 import * as s from 'superstruct';
+import { Request, Response, NextFunction } from 'express';
+import { BadRequestError } from '../../libs/error';
 
 const createArticleSchema = s.object({
   title: s.size(s.string(), 1, 30),
   content: s.size(s.string(), 1, 500),
 });
 
-function validateCreateArticle(req, res, next) {
+function validateCreateArticle(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const _ = s.create(req.body, createArticleSchema);
+    req.validatedArticleCreate = s.create(req.body, createArticleSchema);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 }
 
 const updateArticleSchema = s.partial(createArticleSchema);
 
-function validateUpdateArticle(req, res, next) {
+function validateUpdateArticle(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const _ = s.create(req.body, updateArticleSchema);
+    req.validatedArticleUpdate = s.create(req.body, updateArticleSchema);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 }
@@ -48,13 +60,25 @@ const getArticleQuerySchema = s.object({
   sort: s.optional(s.union([s.enums(['recent', 'oldest']), s.literal('')])),
 });
 
-function validateGetListArticle(req, res, next) {
+function validateGetListArticle( // req = 재할당
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
-    const _ = s.create(req.query, getArticleQuerySchema);
+    req.validatedArticleQuery = s.create(req.query, getArticleQuerySchema);
     next();
-  } catch (e) {
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
     next(e);
   }
 }
 
-export { validateCreateArticle, validateUpdateArticle, validateGetListArticle };
+export {
+  validateCreateArticle,
+  validateUpdateArticle,
+  validateGetListArticle,
+  getArticleQuerySchema,
+  updateArticleSchema,
+  createArticleSchema,
+};

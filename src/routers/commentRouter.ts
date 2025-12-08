@@ -3,13 +3,13 @@ import {
   validateCreateComment,
   validateGetListComment,
   validateUpdateComment,
-} from '../middlewares/validates/validateComment.js';
-import { asyncHandler } from '../libs/asyncHandler.js';
+} from '../middlewares/validates/validateComment';
+import { asyncHandler } from '../libs/asyncHandler';
 import {
   validateProductIdParam,
   validateArticleIdParam,
   validateIdParam,
-} from '../middlewares/validates/validateId.js';
+} from '../middlewares/validates/validateId';
 import {
   createArticleComment,
   createProductComment,
@@ -17,12 +17,12 @@ import {
   getCommentsByArticleId,
   getCommentsByProductId,
   updateComment,
-} from '../controllers/commentController.js';
+} from '../controllers/commentController';
 import {
   authorizeComment,
   authorizeUser,
   verifyAccessToken,
-} from '../middlewares/auth.js';
+} from '../middlewares/auth';
 
 const commentRouter = express.Router();
 

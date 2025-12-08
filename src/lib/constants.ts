@@ -12,6 +12,9 @@ const JWT_REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_TOKEN_SECRET || '';
 const ACCESS_TOKEN_COOKIE_NAME = 'access-token';
 const REFRESH_TOKEN_COOKIE_NAME = 'refresh-token';
 
+const PUBLIC_PATH = './files';
+const STATIC_PATH = '/files';
+
 export {
   PORT,
   NODE_ENV,
@@ -19,4 +22,6 @@ export {
   JWT_REFRESH_TOKEN_SECRET,
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
+  PUBLIC_PATH,
+  STATIC_PATH,
 };

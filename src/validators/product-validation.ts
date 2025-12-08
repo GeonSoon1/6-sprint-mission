@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { assert } from 'superstruct';
-import { CreateProduct, PatchProduct } from '../structs/productStructs.js';
+import { CreateProduct, PatchProduct } from '../structs/productStructs';
 
 export function productCreateValidation(
   req: Request,

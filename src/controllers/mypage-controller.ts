@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import prisma from '../lib/prismaclient.js';
+import prisma from '../lib/prismaclient';
 
 export async function userInfo(req: Request, res: Response) {
   if (!req.user) return res.status(401).json({ message: 'Unauthorized' });

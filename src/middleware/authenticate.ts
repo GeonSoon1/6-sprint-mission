@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import prisma from '../lib/prismaclient.js';
-import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants.js';
-import { verifyAccessToken } from '../lib/token.js';
+import prisma from '../lib/prismaclient';
+import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants';
+import { verifyAccessToken } from '../lib/token';
 
 export default async function authenticate(
   req: Request,
@@ -21,7 +21,7 @@ export default async function authenticate(
     });
 
     if (!user) return res.status(400).json({ message: 'Cannot found User' });
-    
+
     req.user = user;
   } catch (err) {
     return res.status(401).json({ message: 'Unauthorized' });

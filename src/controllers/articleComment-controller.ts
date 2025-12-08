@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '../lib/prismaclient.js';
+import prisma from '../lib/prismaclient';
 
 export async function createArticleComment(req: Request, res: Response) {
   // article이 DB에 있는지 확인

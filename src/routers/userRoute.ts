@@ -1,9 +1,9 @@
 import express from 'express';
-import asyncHandler from '../lib/asyncHandler.js';
+import asyncHandler from '../lib/asyncHandler';
 import * as u from '../controllers/mypage-controller';
 import * as ul from '../controllers/mypageList-controller';
 import * as ulk from '../controllers/mypageLikes-controller';
-import authenticate from '../middleware/authenticate.js';
+import authenticate from '../middleware/authenticate';
 
 const userRoute = express.Router();
 

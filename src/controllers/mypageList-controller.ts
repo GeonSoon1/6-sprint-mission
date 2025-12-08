@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '../lib/prismaclient.js';
+import prisma from '../lib/prismaclient';
 
 //user가 생성한 product list 확인
 export async function getUserCreatedProductsList(req: Request, res: Response) {

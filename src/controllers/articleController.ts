@@ -55,7 +55,7 @@ export class ArticleController {
   async delete(req: Request, res: Response) {
     const id = req.validatedId!.id;
     await this.service.delete(id);
-    res.status(204).json({ message: '게시글 삭제 완료' });
+    res.status(204).json();
   }
 }
 

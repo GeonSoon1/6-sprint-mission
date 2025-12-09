@@ -6,13 +6,7 @@ import {
 } from '../middlewares/validates/validateProduct';
 import { asyncHandler } from '../libs/asyncHandler';
 import { validateIdParam } from '../middlewares/validates/validateId';
-import {
-  createProduct,
-  deleteProduct,
-  getProductById,
-  getProducts,
-  updateProduct,
-} from '../controllers/productController';
+import { productController } from '../controllers/productController';
 import {
   authorizeProduct,
   authorizeUser,
@@ -27,26 +21,32 @@ productRouter
     verifyAccessToken,
     authorizeUser,
     validateCreateProduct,
-    asyncHandler(createProduct)
+    asyncHandler(productController.create.bind(productController))
   )
-  .get(validateGetListProduct, asyncHandler(getProducts));
+  .get(
+    validateGetListProduct,
+    asyncHandler(productController.getProducts.bind(productController))
+  );
 productRouter
   .route('/:id')
-  .get(validateIdParam, asyncHandler(getProductById))
+  .get(
+    validateIdParam,
+    asyncHandler(productController.getById.bind(productController))
+  )
   .patch(
     verifyAccessToken,
     authorizeUser,
     validateIdParam,
     validateUpdateProduct,
     authorizeProduct,
-    asyncHandler(updateProduct)
+    asyncHandler(productController.update.bind(productController))
   )
   .delete(
     verifyAccessToken,
     authorizeUser,
     validateIdParam,
     authorizeProduct,
-    asyncHandler(deleteProduct)
+    asyncHandler(productController.delete.bind(productController))
   );
 
 export default productRouter;

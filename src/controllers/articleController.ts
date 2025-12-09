@@ -1,150 +1,65 @@
-import { Prisma } from '@prisma/client';
-import prisma from '../libs/prismaClient';
-import { NextFunction, RequestHandler, Request, Response } from 'express';
+import { Request, Response } from 'express';
+import { ArticleService } from '../services/articleService';
+import { ArticleCreateDto, ArticleQueryDto } from '../dto/articleDto';
+import { ArticleRepogitory } from '../repogitories/articleRepogitory';
 
-async function createArticle(req: Request, res: Response, next: NextFunction) {
-  const data = await prisma.article.create({
-    data: {
+export class ArticleController {
+  constructor(private service: ArticleService) {}
+  // 게시글 생성
+  async create(req: Request, res: Response) {
+    const dto: ArticleCreateDto = {
       ...req.validatedArticleCreate!,
       userId: req.user!.id,
-    },
-  });
-  res.status(201).json(data);
-}
-
-async function getArticles(req: Request, res: Response, next: NextFunction) {
-  const {
-    page = 1,
-    limit = 10,
-    search = '',
-    sort = 'recent',
-  } = req.validatedArticleQuery!;
-  const skip = (page - 1) * limit;
-
-  const where: Prisma.ArticleWhereInput = search
-    ? {
-        OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { content: { contains: search, mode: 'insensitive' } },
-        ],
-      }
-    : {};
-
-  const orderBy: Prisma.ArticleOrderByWithRelationInput = {
-    createdAt: !sort || sort === 'recent' ? 'desc' : 'asc',
-  };
-
-  const data = await prisma.article.findMany({
-    where,
-    orderBy,
-    skip,
-    take: limit,
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      createdAt: true,
-      articleLikeCount: true,
-    },
-  });
-
-  const userId = req.auth?.userId;
-  if (userId) {
-    const likedUser = await prisma.user.findUniqueOrThrow({
-      where: { id: userId },
-      include: { likedArticles: true },
-    });
-    const likedArticles = likedUser.likedArticles.map((aid) => aid.articleId);
-    const filterlikedArticles = data
-      .filter((d) => likedArticles.includes(d.id))
-      .map((d) => {
-        const liked = { ...d, isLiked: true };
-        return liked;
-      });
-    const filterArticles = data
-      .filter((d) => !likedArticles.includes(d.id))
-      .map((d) => {
-        const notLiked = { ...d, isLiked: false };
-        return notLiked;
-      });
-    const userData = [...filterlikedArticles, ...filterArticles];
-    return res
-      .status(200)
-      .json(
-        userData.sort((a, b) =>
-          !sort || sort === 'recent'
-            ? b.createdAt.getTime() - a.createdAt.getTime()
-            : a.createdAt.getTime() - b.createdAt.getTime()
-        )
-      );
-  } else {
-    return res.status(200).json(data);
+    };
+    const data = await this.service.create(dto);
+    res.status(201).json(data);
   }
-}
+  // 게시글 목록 조회
+  async getArticles(req: Request, res: Response) {
+    const dto: ArticleQueryDto = {
+      page: req.validatedArticleQuery!.page || 1,
+      limit: req.validatedArticleQuery!.limit || 10,
+      search: req.validatedArticleQuery!.search || '',
+      sort: req.validatedArticleQuery!.sort || 'recent',
+      userId: req.auth?.userId ?? null,
+    };
 
-async function getArticleById(req: Request, res: Response, next: NextFunction) {
-  const { id } = req.validatedId!;
-  const data = await prisma.article.findUniqueOrThrow({
-    where: { id: id! },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      createdAt: true,
-      articleLikeCount: true,
-    },
-  });
+    const data = await this.service.getArticles(dto);
+    res.status(200).json(data);
+  }
+  // 게시글 상세 조회
+  async getById(req: Request, res: Response) {
+    const id = req.validatedId!.id;
+    const userId = req.auth?.userId ?? null;
 
-  const userId = req.auth?.userId;
-  if (userId) {
-    const likedArticle = await prisma.likedArticle.findUnique({
-      where: { userId_articleId: { userId, articleId: id! } },
-    });
-    if (likedArticle) {
-      return res.status(200).json({
-        ...data,
-        isLiked: true,
-      });
-    } else {
-      return res.status(200).json({
-        ...data,
-        isLiked: false,
-      });
-    }
+    const data = await this.service.getById(id, userId);
+    res.status(200).json(data);
   }
 
-  res.status(200).json(data);
-}
-
-async function updateArticle(req: Request, res: Response, next: NextFunction) {
-  const { id } = req.validatedId!;
-  const data = await prisma.article.update({
-    where: { id: id! },
-    data: {
+  // 게시글 수정
+  async update(req: Request, res: Response) {
+    const id = req.validatedId!.id;
+    const dto = {
       ...Object.fromEntries(
-        // 객체를 배열로 바꿔서 배열메서드 사용 후 다시 객체로 변환
         Object.entries(req.validatedArticleUpdate!).filter(
           ([_, v]) => v !== undefined
         )
       ),
       userId: req.user!.id,
-    },
-  });
-  res.status(200).json(data);
+    };
+    const updated = await this.service.update(id, dto);
+    res.status(200).json(updated);
+  }
+
+  // 게시글 삭제
+  async delete(req: Request, res: Response) {
+    const id = req.validatedId!.id;
+    await this.service.delete(id);
+    res.status(204).json({ message: '게시글 삭제 완료' });
+  }
 }
 
-async function deleteArticle(req: Request, res: Response, next: NextFunction) {
-  const { id } = req.validatedId!;
-  const data = await prisma.article.delete({
-    where: { id: id! },
-  });
-  res.status(204).json(data);
-}
-
-export {
-  createArticle,
-  getArticles,
-  getArticleById,
-  updateArticle,
-  deleteArticle,
-};
+// router에서 사용할 수 있도록 조립
+const articleRepository = new ArticleRepogitory();
+const articleService = new ArticleService(articleRepository);
+export const articleController = new ArticleController(articleService);

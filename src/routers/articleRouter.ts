@@ -6,13 +6,7 @@ import {
 } from '../middlewares/validates/validateArticle';
 import { asyncHandler } from '../libs/asyncHandler';
 import { validateIdParam } from '../middlewares/validates/validateId';
-import {
-  createArticle,
-  deleteArticle,
-  getArticleById,
-  getArticles,
-  updateArticle,
-} from '../controllers/articleController';
+import { articleController } from '../controllers/articleController';
 import {
   authorizeArticle,
   authorizeUser,
@@ -27,26 +21,32 @@ articleRouter
     verifyAccessToken,
     authorizeUser,
     validateCreateArticle,
-    asyncHandler(createArticle)
+    asyncHandler(articleController.create.bind(articleController)) // bind: this고정 : 클래스 메서드를 라우터에 바로 넣으면 this가 사라짐
   )
-  .get(validateGetListArticle, asyncHandler(getArticles));
+  .get(
+    validateGetListArticle,
+    asyncHandler(articleController.getArticles.bind(articleController))
+  );
 articleRouter
   .route('/:id')
-  .get(validateIdParam, asyncHandler(getArticleById))
+  .get(
+    validateIdParam,
+    asyncHandler(articleController.getById.bind(articleController))
+  )
   .patch(
     verifyAccessToken,
     authorizeUser,
     validateIdParam,
     validateUpdateArticle,
     authorizeArticle,
-    asyncHandler(updateArticle)
+    asyncHandler(articleController.update.bind(articleController))
   )
   .delete(
     verifyAccessToken,
     authorizeUser,
     validateIdParam,
     authorizeArticle,
-    asyncHandler(deleteArticle)
+    asyncHandler(articleController.delete.bind(articleController))
   );
 
 export default articleRouter;

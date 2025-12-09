@@ -1,3 +1,4 @@
+import { Product } from '@prisma/client';
 import {
   ProductCreateDto,
   ProductQueryDto,
@@ -43,5 +44,9 @@ export class ProductService {
 
   async delete(id: string) {
     return this.repo.delete(id);
+  }
+
+  async getUserProducts(userId: string): Promise<Product[]> {
+    return this.repo.findByUserId(userId);
   }
 }

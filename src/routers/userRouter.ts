@@ -1,17 +1,5 @@
 import express from 'express';
-import {
-  createUser,
-  getUserProducts,
-  getUserProfile,
-  likeArticleButton,
-  likeArticleList,
-  likeProductButton,
-  likeProductList,
-  loginUser,
-  logOutUser,
-  newRefreshToken,
-  updateUserProfile,
-} from '../controllers/userController';
+import { userController } from '../controllers/userController';
 import { asyncHandler } from '../libs/asyncHandler';
 import {
   authorizeUser,
@@ -30,57 +18,75 @@ import {
 
 const userRouter = express.Router();
 
-userRouter.post('/registration', validateCreateUser, asyncHandler(createUser));
-userRouter.post('/login', validateLoginUser, asyncHandler(loginUser));
+userRouter.post(
+  '/registration',
+  validateCreateUser,
+  asyncHandler(userController.createUser.bind(userController))
+);
+userRouter.post(
+  '/login',
+  validateLoginUser,
+  asyncHandler(userController.loginUser.bind(userController))
+);
 userRouter.post(
   '/token/refresh',
   verifyRefreshToken,
-  asyncHandler(newRefreshToken)
+  asyncHandler(userController.newRefreshToken.bind(userController))
 );
-userRouter.post('/logout', verifyAccessToken, asyncHandler(logOutUser));
+userRouter.post(
+  '/logout',
+  verifyAccessToken,
+  asyncHandler(userController.logOutUser.bind(userController))
+);
 userRouter.get(
   '/user/profile',
   verifyAccessToken,
   authorizeUser,
-  asyncHandler(getUserProfile)
+  asyncHandler(userController.getUserProfile.bind(userController))
 );
 userRouter.patch(
   '/user/update',
   verifyAccessToken,
   authorizeUser,
   validateUpdateUser,
-  asyncHandler(updateUserProfile)
+  asyncHandler(userController.updateUserProfile.bind(userController))
 );
 userRouter.get(
   '/user/products',
   verifyAccessToken,
   authorizeUser,
-  asyncHandler(getUserProducts)
+  asyncHandler(userController.getUserProducts.bind(userController))
+);
+userRouter.get(
+  '/user/articles',
+  verifyAccessToken,
+  authorizeUser,
+  asyncHandler(userController.getUserArticles.bind(userController))
 );
 userRouter.post(
   '/products/:productId/',
   verifyAccessToken,
   authorizeUser,
   validateProductIdParam,
-  asyncHandler(likeProductButton)
+  asyncHandler(userController.likeProductButton.bind(userController))
 );
 userRouter.post(
   '/articles/:articleId/',
   verifyAccessToken,
   authorizeUser,
   validateArticleIdParam,
-  asyncHandler(likeArticleButton)
+  asyncHandler(userController.likeArticleButton.bind(userController))
 );
 userRouter.get(
   '/products/like',
   verifyAccessToken,
   authorizeUser,
-  asyncHandler(likeProductList)
+  asyncHandler(userController.likeProductList.bind(userController))
 );
 userRouter.get(
   '/articles/like',
   verifyAccessToken,
   authorizeUser,
-  asyncHandler(likeArticleList)
+  asyncHandler(userController.likeArticleList.bind(userController))
 );
 export default userRouter;

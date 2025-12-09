@@ -26,7 +26,7 @@ Content-Type: application/json
 
 // 댓글 수정
 ###
-PATCH http://localhost:4000/comments/f88f49fd-e0c6-4e8a-b8e0-089772655f7c
+PATCH http://localhost:4000/comments/39580c34-4b8e-4883-82f2-8b87230b2c24
 Content-Type: application/json
 
 {
@@ -35,4 +35,4 @@ Content-Type: application/json
 
 // 댓글 삭제
 ###
-DELETE http://localhost:4000/comments/f88f49fd-e0c6-4e8a-b8e0-089772655f7c
+DELETE http://localhost:4000/comments/39580c34-4b8e-4883-82f2-8b87230b2c24

@@ -4,7 +4,7 @@ POST http://localhost:4000/users/registration
 Content-Type: application/json
 
 {
-    "email": "c@a.com",
+    "email": "d@a.com",
     "nickname": "nickname",
     "password": "password"
 }

@@ -16,11 +16,11 @@ Content-Type: application/json
 
 // 상품 상세 조회
 ###
-GET http://localhost:4000/products/ee5c8186-9e86-4e96-ae6a-f703c2503b5e
+GET http://localhost:4000/products/4aedc5e3-ac16-4e2a-8803-65e72d81b74e
 
 // 상품 수정
 ###
-PATCH http://localhost:4000/products/ee5c8186-9e86-4e96-ae6a-f703c2503b5e
+PATCH http://localhost:4000/products/4aedc5e3-ac16-4e2a-8803-65e72d81b74e
 Content-Type: application/json
 
 {
@@ -32,5 +32,5 @@ Content-Type: application/json
 
 // 상품 삭제
 ###
-DELETE http://localhost:4000/products/513cdaac-0455-4eb7-97f3-8f513b1538bc
+DELETE http://localhost:4000/products/4aedc5e3-ac16-4e2a-8803-65e72d81b74e
 

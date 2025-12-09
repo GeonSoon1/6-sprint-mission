@@ -69,4 +69,9 @@ export class ArticleRepogitory {
   async delete(id: string) {
     return prisma.article.delete({ where: { id } });
   }
+
+  // 유저가 생성한 게시글 목록 조회
+  async findByUserId(userId: string) {
+    return prisma.article.findMany({ where: { userId } });
+  }
 }

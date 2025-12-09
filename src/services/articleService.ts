@@ -78,4 +78,9 @@ export class ArticleService {
   async delete(id: string) {
     return this.repo.delete(id);
   }
+
+  // 유저가 생성한 게시글 목록 조회
+  async getUserArticles(userId: string) {
+    return this.repo.findByUserId(userId);
+  }
 }

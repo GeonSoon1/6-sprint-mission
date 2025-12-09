@@ -1,60 +1,113 @@
-import prisma from '../libs/prismaClient';
 import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import {
   BadRequestError,
   ForbiddenError,
   IsSamePasswordError,
+  NotFoundError,
 } from '../libs/error';
-import { Prisma, User } from '@prisma/client';
+import { User } from '@prisma/client';
+import { UserRepository } from '../repogitories/userRepogitory';
+import { UserCreateDto } from '../dto/userDto';
 
-async function hashingPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, 10);
+export class UserService {
+  constructor(private repo: UserRepository) {}
+
+  async createUser(dto: UserCreateDto) {
+    const { email, password, ...rest } = dto;
+
+    const existedUser = await this.repo.findByEmail(email);
+    if (existedUser) throw new BadRequestError('이미 존재하는 사용자');
+
+    const hashedPassword = await this.hashingPassword(password);
+    const createdUser = await this.repo.create({
+      ...rest,
+      email,
+      password: hashedPassword,
+    });
+
+    return this.filterSensitiveUserData(createdUser);
+  }
+
+  async hashingPassword(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
+  }
+
+  async filterSensitiveUserData(user: User) {
+    const { password, refreshToken, ...rest } = user;
+    return rest;
+  }
+
+  async verifyPassword(inputPassword: string, savedPassword: string) {
+    const isValid = await bcrypt.compare(inputPassword, savedPassword);
+    if (!isValid) throw new ForbiddenError();
+  }
+
+  async isSamePassword(inputPassword: string, savedPassword: string) {
+    const isSame = await bcrypt.compare(inputPassword, savedPassword);
+    if (isSame) throw new IsSamePasswordError();
+  }
+
+  async getUser(email: string, password: string) {
+    const user = await this.repo.findByEmail(email);
+    if (!user) throw new BadRequestError('사용자 없음');
+    await this.verifyPassword(password, user.password);
+    return this.filterSensitiveUserData(user);
+  }
+
+  async createToken(user: { id: string }, type?: 'access' | 'refresh') {
+    const payload = { userId: user.id };
+    const options: SignOptions = {
+      expiresIn: type === 'refresh' ? '2w' : '1h',
+    };
+    return jwt.sign(payload, process.env.JWT_SECRET!, options);
+  }
+
+  //JWT 슬라이딩 세션
+  async refreshToken(userId: string, refreshToken: string) {
+    const user = await this.repo.findById(userId);
+    if (!user || user.refreshToken !== refreshToken)
+      throw new BadRequestError();
+    const accessToken = await this.createToken(user);
+    const newRefreshToken = await this.createToken(user, 'refresh');
+    await this.repo.updateRefreshToken(userId, newRefreshToken);
+    return { accessToken, newRefreshToken };
+  }
+
+  async updateRefreshToken(email: string, refreshToken: string) {
+    return this.repo.updateRefreshTokenByEmail(email, refreshToken);
+  }
+
+  async logOutUser(userId: string) {
+    await this.repo.clearRefreshToken(userId);
+  }
+
+  async getUserProfile(id: string) {
+    const user = await this.repo.findById(id);
+    if (!user) throw new NotFoundError();
+    return this.filterSensitiveUserData(user);
+  }
+
+  async updateUserProfile(
+    id: string,
+    updateData: Partial<User>,
+    passwordChange?: { oldPassword: string; newPassword: string }
+  ): Promise<User> {
+    const user = await this.repo.findById(id);
+    if (!user) throw new NotFoundError();
+
+    if (passwordChange) {
+      await this.verifyPassword(passwordChange.oldPassword, user.password);
+      await this.isSamePassword(passwordChange.newPassword, user.password);
+      updateData.password = await this.hashingPassword(
+        passwordChange.newPassword
+      );
+    }
+
+    return this.repo.update(id, updateData);
+  }
+
+  async updateUserRefreshToken(userId: string, refreshToken: string) {
+    return this.repo.updateRefreshToken(userId, refreshToken);
+  }
 }
-
-async function filterSensitiveUserData(user: User) {
-  const { password, refreshToken, ...rest } = user;
-  return rest;
-}
-
-async function verifyPassword(inputPassword: string, savedPassword: string) {
-  const isValid = await bcrypt.compare(inputPassword, savedPassword);
-  if (!isValid) throw new ForbiddenError();
-}
-
-async function isSamePassword(inputPassword: string, savedPassword: string) {
-  const isSame = await bcrypt.compare(inputPassword, savedPassword);
-  if (isSame) throw new IsSamePasswordError();
-}
-
-// : Promise<Partial<User>>
-async function getUser(email: string, password: string) {
-  const user = await prisma.user.findUnique({ where: { email } });
-  if (!user) throw new BadRequestError();
-  await verifyPassword(password, user.password);
-  return filterSensitiveUserData(user);
-}
-
-async function createToken(user: { id: string }, type?: string) {
-  const payload = { userId: user.id };
-  const options: SignOptions = { expiresIn: type === 'refresh' ? '2w' : '1h' };
-  return jwt.sign(payload, process.env.JWT_SECRET!, options);
-}
-
-async function refreshToken(userId: string, refreshToken: string) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user || user.refreshToken !== refreshToken) throw new BadRequestError();
-  const accessToken = await createToken(user);
-  const newRefreshToken = await createToken(user, 'refresh');
-  return { accessToken, newRefreshToken };
-}
-
-export default {
-  hashingPassword,
-  filterSensitiveUserData,
-  verifyPassword,
-  getUser,
-  createToken,
-  refreshToken,
-  isSamePassword,
-};

@@ -1,7 +1,6 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, Product } from '@prisma/client';
 import { ProductCreateDto, ProductQueryDto } from '../dto/productDto';
 import prisma from '../libs/prismaClient';
-import { string } from 'superstruct';
 
 export class ProductRepository {
   async create(data: ProductCreateDto) {
@@ -75,5 +74,9 @@ export class ProductRepository {
 
   async delete(id: string) {
     return prisma.product.delete({ where: { id } });
+  }
+
+  async findByUserId(userId: string): Promise<Product[]> {
+    return prisma.product.findMany({ where: { userId } });
   }
 }

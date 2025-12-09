@@ -9,7 +9,7 @@ import {
   userInfo,
   userInfoPatch,
   userUploadProducts,
-} from '../controllers/usersController.js';
+} from '../controllers/usersController';
 import authenticate from '../middleware/authenticate';
 
 const usersRouter = express.Router();

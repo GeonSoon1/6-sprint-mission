@@ -1,6 +1,6 @@
-import { prismaClient } from '../lib/prismaClient.js';
-import { verifyAccessToken } from '../lib/token.js';
-import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants.js';
+import { prismaClient } from '../lib/prismaClient';
+import { verifyAccessToken } from '../lib/token';
+import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants';
 import { NextFunction, Request, Response } from 'express';
 
 async function authenticate(req: Request, res: Response, next: NextFunction) {

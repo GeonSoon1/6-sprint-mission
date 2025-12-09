@@ -10,14 +10,7 @@ import {
   validateArticleIdParam,
   validateIdParam,
 } from '../middlewares/validates/validateId';
-import {
-  createArticleComment,
-  createProductComment,
-  deleteComment,
-  getCommentsByArticleId,
-  getCommentsByProductId,
-  updateComment,
-} from '../controllers/commentController';
+import { commentController } from '../controllers/commentController';
 import {
   authorizeComment,
   authorizeUser,
@@ -33,12 +26,14 @@ commentRouter
     authorizeUser,
     validateProductIdParam,
     validateCreateComment,
-    asyncHandler(createProductComment)
+    asyncHandler(commentController.createProductComment.bind(commentController))
   )
   .get(
     validateProductIdParam,
     validateGetListComment,
-    asyncHandler(getCommentsByProductId)
+    asyncHandler(
+      commentController.getCommentsByProductId.bind(commentController)
+    )
   );
 
 commentRouter
@@ -48,12 +43,12 @@ commentRouter
     authorizeUser,
     validateArticleIdParam,
     validateCreateComment,
-    asyncHandler(createArticleComment)
+    asyncHandler(commentController.createArticleComment.bind(commentController))
   )
   .get(
     validateArticleIdParam,
     validateGetListComment,
-    asyncHandler(getCommentsByArticleId)
+    asyncHandler(commentController.getCommentsByArticle.bind(commentController))
   );
 
 commentRouter
@@ -64,14 +59,14 @@ commentRouter
     validateIdParam,
     validateUpdateComment,
     authorizeComment,
-    asyncHandler(updateComment)
+    asyncHandler(commentController.update.bind(commentController))
   )
   .delete(
     verifyAccessToken,
     authorizeUser,
     validateIdParam,
     authorizeComment,
-    asyncHandler(deleteComment)
+    asyncHandler(commentController.delete.bind(commentController))
   );
 
 export default commentRouter;

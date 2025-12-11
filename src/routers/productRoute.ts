@@ -5,6 +5,19 @@ import * as pc from '../controllers/productComment-controller';
 import * as pl from '../controllers/productLike-controller';
 
 import {
+  userDataValidation,
+  productDataValidation,
+  productCommentDataValidation,
+} from '../validators/common-dbcheck-validation';
+
+import {
+  productUserCheckValidation,
+  proCommentUserCheckValidation,
+} from '../validators/common-permission-validation';
+
+import { getQueryValidation } from '../validators/common-query-validation';
+
+import {
   productCreateValidation,
   productUpdateValidation,
 } from '../validators/product-validation';
@@ -12,7 +25,12 @@ import {
 import {
   commentCreateValidation,
   commentUpdateValidation,
-} from '../validators/comment-validation';
+} from '../validators/productComment-validation';
+
+import {
+  productLikeUpValidation,
+  productLikeDownValidation,
+} from '../validators/userLike-validation';
 
 import authenticate from '../middleware/authenticate';
 
@@ -25,21 +43,38 @@ const productRoute = express.Router();
 productRoute.post(
   '/',
   authenticate,
+  userDataValidation,
   productCreateValidation,
   asyncHandler(p.createProduct)
 );
-productRoute.get('/', asyncHandler(p.getProductsList));
+productRoute.get('/', getQueryValidation, asyncHandler(p.getProductsList));
 
-productRoute.get('/:id', authenticate, asyncHandler(p.getProductInfo));
+productRoute.get(
+  '/:id',
+  authenticate,
+  userDataValidation,
+  productDataValidation,
+  asyncHandler(p.getProductInfo)
+);
 
 productRoute.patch(
   '/:id',
   authenticate,
   productUpdateValidation,
+  userDataValidation,
+  productDataValidation,
+  productUserCheckValidation,
   asyncHandler(p.updateProduct)
 );
 
-productRoute.delete('/:id', authenticate, asyncHandler(p.deleteProduct));
+productRoute.delete(
+  '/:id',
+  authenticate,
+  userDataValidation,
+  productDataValidation,
+  productUserCheckValidation,
+  asyncHandler(p.deleteProduct)
+);
 
 // ======= ======= ======= ======= =======
 // ======= product에 연결 된 comment =======
@@ -48,12 +83,15 @@ productRoute.delete('/:id', authenticate, asyncHandler(p.deleteProduct));
 productRoute.post(
   '/:productId/comments',
   authenticate,
+  userDataValidation,
+  productDataValidation,
   commentCreateValidation,
   asyncHandler(pc.createProductComment)
 );
 
 productRoute.get(
   '/:productId/comments',
+  productDataValidation,
   asyncHandler(pc.getProductCommentList)
 );
 
@@ -61,12 +99,20 @@ productRoute.patch(
   '/:productId/comments/:commentId',
   authenticate,
   commentUpdateValidation,
+  userDataValidation,
+  productDataValidation,
+  productCommentDataValidation,
+  proCommentUserCheckValidation,
   asyncHandler(pc.updateProductComment)
 );
 
 productRoute.delete(
   '/:productId/comments/:commentId',
   authenticate,
+  userDataValidation,
+  productDataValidation,
+  productCommentDataValidation,
+  proCommentUserCheckValidation,
   asyncHandler(pc.deleteProductComment)
 );
 
@@ -74,10 +120,20 @@ productRoute.delete(
 // ====== product에 연결 된 likeCount ======
 // ======= ======= ======= ======= =======
 
-productRoute.post('/:id/likeCount', authenticate, asyncHandler(pl.likeCountUp));
+productRoute.post(
+  '/:id/likeCount',
+  authenticate,
+  userDataValidation,
+  productDataValidation,
+  productLikeUpValidation,
+  asyncHandler(pl.likeCountUp)
+);
 productRoute.delete(
   '/:id/likeCount',
   authenticate,
+  userDataValidation,
+  productDataValidation,
+  productLikeDownValidation,
   asyncHandler(pl.likeCountDown)
 );
 

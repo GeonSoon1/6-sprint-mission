@@ -20,14 +20,7 @@ exports.deleteProduct = deleteProduct;
 const prismaclient_1 = __importDefault(require("../lib/prismaclient"));
 function createProduct(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        // user가 DB에 존재 하는지 확인
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
         const userId = req.user.id;
-        const findUser = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!findUser)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // product 저장하기
         const { name, description, price, tags } = req.body;
         const productCreate = yield prismaclient_1.default.product.create({
             data: {
@@ -46,23 +39,7 @@ function createProduct(req, res) {
 }
 function getProductsList(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e;
-        const offset = Number((_a = req.query.offset) !== null && _a !== void 0 ? _a : 0);
-        const limit = Number((_b = req.query.limit) !== null && _b !== void 0 ? _b : 10);
-        const name = String((_c = req.query.name) !== null && _c !== void 0 ? _c : '');
-        const description = String((_d = req.query.description) !== null && _d !== void 0 ? _d : '');
-        const order = String((_e = req.query.order) !== null && _e !== void 0 ? _e : 'newest');
-        let orderBy;
-        switch (order) {
-            case 'oldest':
-                orderBy = { createdAt: 'asc' };
-                break;
-            case 'newest':
-                orderBy = { createdAt: 'desc' };
-                break;
-            default:
-                orderBy = { createdAt: 'asc' };
-        }
+        const { offset, limit, name, description, orderBy } = req.validated;
         const productList = yield prismaclient_1.default.product.findMany({
             where: {
                 name: { contains: name },
@@ -85,6 +62,7 @@ function getProductsList(req, res) {
 }
 function getProductInfo(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
+        // id가 0 넘는 숫자가 맞는지
         const id = Number(req.params.id);
         const product = yield prismaclient_1.default.product.findUniqueOrThrow({
             where: { id },
@@ -120,23 +98,8 @@ function getProductInfo(req, res) {
 }
 function updateProduct(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
         const productId = Number(req.params.id);
-        // product가 DB에 있는지 확인
-        const product = yield prismaclient_1.default.product.findUnique({
-            where: { id: productId },
-        });
-        if (!product)
-            return res.status(401).json({ message: 'Cannot found product' });
-        // user가 DB에 존재 하는지 확인
-        const findUser = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!findUser)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // DB에 있는 product의 user정보가 로그인 한 user 인지 확인
-        if (product.userId !== userId)
-            return res.status(401).json({ message: 'Unauthorized' });
+        console.log(productId);
         // 업데이트 작업 진행
         const productUpdate = yield prismaclient_1.default.product.update({
             where: { id: productId },
@@ -147,23 +110,7 @@ function updateProduct(req, res) {
 }
 function deleteProduct(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
         const productId = Number(req.params.id);
-        // product가 DB에 있는지 확인
-        const product = yield prismaclient_1.default.product.findUnique({
-            where: { id: productId },
-        });
-        if (!product)
-            return res.status(401).json({ message: 'Cannot found product' });
-        // user가 DB에 존재 하는지 확인
-        const findUser = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!findUser)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // 동일한 user 인지 확인
-        if (product.userId !== userId)
-            return res.status(401).json({ message: 'Unauthorized' });
         yield prismaclient_1.default.product.delete({
             where: { id: productId },
         });

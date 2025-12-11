@@ -49,10 +49,10 @@ const productRoute = express_1.default.Router();
 // =======  product 자체 API 명령어  =======
 // ======= ======= ======= ======= =======
 productRoute.post('/', authenticate_1.default, product_validation_1.productCreateValidation, (0, asyncHandler_1.default)(p.createProduct));
-productRoute.get('/', (0, asyncHandler_1.default)(p.getProductsList));
-productRoute.get('/:id', authenticate_1.default, (0, asyncHandler_1.default)(p.getProductInfo));
-productRoute.patch('/:id', authenticate_1.default, product_validation_1.productUpdateValidation, (0, asyncHandler_1.default)(p.updateProduct));
-productRoute.delete('/:id', authenticate_1.default, (0, asyncHandler_1.default)(p.deleteProduct));
+productRoute.get('/', product_validation_1.productListValidation, (0, asyncHandler_1.default)(p.getProductsList));
+productRoute.get('/:id', authenticate_1.default, product_validation_1.productInfoValidation, (0, asyncHandler_1.default)(p.getProductInfo));
+productRoute.patch('/:id', authenticate_1.default, product_validation_1.productUpdateValidation, product_validation_1.productUserCheckValidation, (0, asyncHandler_1.default)(p.updateProduct));
+productRoute.delete('/:id', authenticate_1.default, product_validation_1.productUserCheckValidation, (0, asyncHandler_1.default)(p.deleteProduct));
 // ======= ======= ======= ======= =======
 // ======= product에 연결 된 comment =======
 // ======= ======= ======= ======= =======

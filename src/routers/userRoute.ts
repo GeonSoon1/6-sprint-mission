@@ -7,13 +7,39 @@ import authenticate from '../middleware/authenticate';
 
 const userRoute = express.Router();
 
+import { userDataValidation } from '../validators/common-dbcheck-validation';
+
+import { getQueryValidation } from '../validators/common-query-validation';
+
+import {
+  userUpdateValidation,
+  userUpdatePasswordValidation,
+} from '../validators/user-validation';
+
+import {
+  productLikeListValidation,
+  articleLikeListValidation,
+} from '../validators/userLike-validation';
+
 // ======= ======= ======= ======= =======
 // =======  User 정보 확인/수정 기능  =======
 // ======= ======= ======= ======= =======
 
-userRoute.get('/', authenticate, asyncHandler(u.userInfo));
-userRoute.patch('/', authenticate, asyncHandler(u.updateUserInfo));
-userRoute.patch('/password', authenticate, asyncHandler(u.updatePassword));
+userRoute.get('/', authenticate, userDataValidation, asyncHandler(u.userInfo));
+userRoute.patch(
+  '/',
+  authenticate,
+  userDataValidation,
+  userUpdateValidation,
+  asyncHandler(u.updateUserInfo)
+);
+userRoute.patch(
+  '/password',
+  authenticate,
+  userDataValidation,
+  userUpdatePasswordValidation,
+  asyncHandler(u.updatePassword)
+);
 
 // ======= ======= ======= ======= =======
 // === User 작성 product, article list  ===
@@ -22,12 +48,16 @@ userRoute.patch('/password', authenticate, asyncHandler(u.updatePassword));
 userRoute.get(
   '/products',
   authenticate,
+  userDataValidation,
+  getQueryValidation,
   asyncHandler(ul.getUserCreatedProductsList)
 );
 
 userRoute.get(
   '/articles',
   authenticate,
+  userDataValidation,
+  getQueryValidation,
   asyncHandler(ul.getUserCreatedArticlesList)
 );
 
@@ -39,12 +69,16 @@ userRoute.get(
 userRoute.get(
   '/products/like',
   authenticate,
+  userDataValidation,
+  productLikeListValidation,
   asyncHandler(ulk.getUserlikedProductsList)
 );
 
 userRoute.get(
   '/articles/like',
   authenticate,
+  userDataValidation,
+  articleLikeListValidation,
   asyncHandler(ulk.getUserlikedArticlesList)
 );
 

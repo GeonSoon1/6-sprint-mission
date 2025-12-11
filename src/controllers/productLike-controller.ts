@@ -2,33 +2,9 @@ import { Request, Response } from 'express';
 import prisma from '../lib/prismaclient';
 
 export async function likeCountUp(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
-  const productId = Number(req.params.id);
-
-  // 제품 검증
-  const product = await prisma.product.findUnique({ where: { id: productId } });
-
-  if (!product)
-    return res.status(401).json({ message: 'Cannot found product' });
-
-  // user 검증
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-
-  if (!user) return res.status(401).json({ message: 'Unauthorized' });
-
-  // 이미 likeCount 증가 했다면 작업 종료
-  const readProductLikeCount = await prisma.productLikes.findUnique({
-    where: {
-      userId_productId: {
-        userId,
-        productId,
-      },
-    },
-  });
-
-  if (readProductLikeCount && readProductLikeCount.likeCountBool)
-    return res.status(401).json({ message: '이미 좋아요를 눌렀습니다' });
+  const product = req.product;
+  const productId = product.id;
 
   // likeCount 증가 작업
   const upProductLikeCount = product.likeCount + 1;
@@ -39,57 +15,20 @@ export async function likeCountUp(req: Request, res: Response) {
   });
 
   // productLikes DB에 기록
-  let updateProductLikesDB;
-
-  if (readProductLikeCount && !readProductLikeCount.likeCountBool) {
-    updateProductLikesDB = await prisma.productLikes.update({
-      where: { id: readProductLikeCount.id },
-      data: { likeCountBool: true },
-    });
-  } else {
-    updateProductLikesDB = await prisma.productLikes.create({
-      data: {
-        userId,
-        productId,
-      },
-    });
-  }
+  const updateProductLikesDB = await prisma.productLikes.create({
+    data: {
+      userId,
+      productId,
+    },
+  });
 
   res.status(200).json({ updateProductLikesCount, updateProductLikesDB });
 }
 
 export async function likeCountDown(req: Request, res: Response) {
-  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
-  const productId = Number(req.params.id);
-
-  // 제품 검증
-  const product = await prisma.product.findUnique({ where: { id: productId } });
-
-  if (!product)
-    return res.status(401).json({ message: 'Cannot found product' });
-
-  // likeCount가 0 이하일 경우
-  if (product.likeCount < 1)
-    return res.status(401).json({ message: '더 이상 감소할 수 없습니다' });
-
-  // user 검증
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-
-  if (!user) return res.status(401).json({ message: 'Unauthorized' });
-
-  // 이미 likeCount 감소(삭제) 했다면 작업 종료
-  const readProductLikeCount = await prisma.productLikes.findUnique({
-    where: {
-      userId_productId: {
-        userId,
-        productId,
-      },
-    },
-  });
-
-  if (!readProductLikeCount)
-    return res.status(401).json({ message: '이미 취소 하였습니다' });
+  const product = req.product;
+  const productId = product.id;
 
   // likeCount 감소 작업
   const downProductLikeCount = product.likeCount - 1;
@@ -99,9 +38,11 @@ export async function likeCountDown(req: Request, res: Response) {
     data: { likeCount: Number(downProductLikeCount) },
   });
 
+  const deleteProLikeId = req.proLikeId;
+
   // productLikes DB에서 삭제
   await prisma.productLikes.delete({
-    where: { id: readProductLikeCount.id },
+    where: { id: deleteProLikeId },
   });
 
   res.status(200).json({ updateProductLikeCount });

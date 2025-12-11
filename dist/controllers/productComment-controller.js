@@ -19,18 +19,8 @@ exports.deleteProductComment = deleteProductComment;
 const prismaclient_1 = __importDefault(require("../lib/prismaclient"));
 function createProductComment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
+        const userId = Number(req.user.id);
         const productId = Number(req.params.productId);
-        // product가 DB에 있는지 확인
-        const product = yield prismaclient_1.default.product.findUnique({ where: { id: productId } });
-        if (!product)
-            return res.status(401).json({ message: 'Cannot found product' });
-        // user가 DB에 존재 하는지 확인
-        const findUser = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!findUser)
-            return res.status(401).json({ message: 'Unauthorized' });
         const { content } = req.body;
         const commentCreate = yield prismaclient_1.default.commentProduct.create({
             data: {

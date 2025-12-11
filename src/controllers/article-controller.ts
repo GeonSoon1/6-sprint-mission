@@ -1,13 +1,9 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prismaclient';
+import { QueryList } from '../types/express/query.types';
 
 export async function createArticle(req: Request, res: Response) {
-  // user가 DB에 존재 하는지 확인
-  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
-  const userId = req.user.id;
-  const findUser = await prisma.user.findUnique({ where: { id: userId } });
-
-  if (!findUser) return res.status(401).json({ message: 'Unauthorized' });
+  const userId = req.userId;
 
   // article 저장하기
   const { title, content } = req.body;
@@ -24,24 +20,7 @@ export async function createArticle(req: Request, res: Response) {
 }
 
 export async function getArticlesList(req: Request, res: Response) {
-  const offset = Number(req.query.offset ?? 0);
-  const limit = Number(req.query.limit ?? 10);
-  const title = String(req.query.name ?? '');
-  const content = String(req.query.description ?? '');
-  const order = String(req.query.order ?? 'newest');
-
-  let orderBy: { createdAt: 'asc' | 'desc' };
-
-  switch (order) {
-    case 'oldest':
-      orderBy = { createdAt: 'asc' };
-      break;
-    case 'newest':
-      orderBy = { createdAt: 'desc' };
-      break;
-    default:
-      orderBy = { createdAt: 'desc' };
-  }
+  const { offset, limit, title, content, orderBy } = req.validated as QueryList;
 
   const articles = await prisma.article.findMany({
     where: {
@@ -63,15 +42,16 @@ export async function getArticlesList(req: Request, res: Response) {
     },
   });
 
-  if (!articles) return res.status(401).json({ message: 'Cannot found List' });
+  if (!articles)
+    return res.status(401).json({ message: '게시글 목록을 찾을 수 없습니다' });
 
   res.status(200).json(articles);
 }
 
 export async function getArticleInfo(req: Request, res: Response) {
-  const id = Number(req.params.id);
+  const articleId = req.article.id;
   const article = await prisma.article.findUniqueOrThrow({
-    where: { id },
+    where: { id: articleId },
     select: {
       id: true,
       title: true,
@@ -80,17 +60,14 @@ export async function getArticleInfo(req: Request, res: Response) {
     },
   });
 
-  if (!article) return res.status(401).json({ message: `Cannot found ${id}` });
-
   // 현재 User가 좋아요 했는지 확인하기
-  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
   const userId = req.user.id;
 
   const checkLiked = await prisma.articleLikes.findUnique({
     where: {
       userId_articleId: {
         userId,
-        articleId: id,
+        articleId,
       },
     },
   });
@@ -104,24 +81,7 @@ export async function getArticleInfo(req: Request, res: Response) {
 }
 
 export async function updateArticle(req: Request, res: Response) {
-  const articleId = Number(req.params.id);
-  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
-  const userId = req.user.id;
-
-  // article이 DB에 있는지 확인
-  const article = await prisma.article.findUnique({ where: { id: articleId } });
-
-  if (!article)
-    return res.status(401).json({ message: 'Cannot found article' });
-
-  // User가 DB에 존재 하는지 확인
-  const findUser = await prisma.user.findUnique({ where: { id: userId } });
-
-  if (!findUser) return res.status(401).json({ message: 'Unauthorized' });
-
-  // DB에 있는 article userID 정보와 로그인 한 User 정보가 같은지 확인
-  if (article.userId !== userId)
-    return res.status(401).json({ message: 'Unauthorized' });
+  const articleId = req.article.id;
 
   const articleUpdate = await prisma.article.update({
     where: { id: articleId },
@@ -132,24 +92,7 @@ export async function updateArticle(req: Request, res: Response) {
 }
 
 export async function deleteArticle(req: Request, res: Response) {
-  const articleId = Number(req.params.id);
-  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
-  const userId = req.user.id;
-
-  // Article이 DB에 있는지 확인
-  const article = await prisma.article.findUnique({ where: { id: articleId } });
-
-  if (!article)
-    return res.status(401).json({ message: 'Cannot found article' });
-
-  // User가 DB에 존재 하는지 확인
-  const findUser = await prisma.user.findUnique({ where: { id: userId } });
-
-  if (!findUser) return res.status(401).json({ message: 'Unauthorized' });
-
-  // DB에 있는 article userID 정보와 로그인 한 User 정보가 같은지 확인
-  if (article.userId !== userId)
-    return res.status(401).json({ message: 'Unauthorized' });
+  const articleId = req.article.id;
 
   await prisma.article.delete({
     where: { id: articleId },

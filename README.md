@@ -22,7 +22,9 @@
 - [x] 고급 문제 5
 
 ## 스크린샷
+ERD
+<img width="963" height="861" alt="image" src="https://github.com/user-attachments/assets/91224e6c-b029-4b96-be0b-14691895a870" />
 
-![ERD](image-1.png)
+데이터베이스 생성 & 데이터 추가
+<img width="963" height="861" alt="image" src="https://github.com/user-attachments/assets/e05df196-afb0-49a6-94a1-378de5cf8a00" />
 
-![데이터베이스 생성 & 데이터 추가](image.png)

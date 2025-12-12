@@ -1,5 +1,5 @@
 import express from 'express';
-import { asyncHandler } from '../middleware/asyncHandler.js';
+import { asyncHandler } from '../middleware/asyncHandler';
 import {
   register,
   login,
@@ -8,14 +8,14 @@ import {
   getMe,
   updateProfile,
   changePassword,
-} from '../controllers/authController.js';
-import authenticate from '../middleware/authenticate.js';
+} from '../controllers/authController';
+import authenticate from '../middleware/authenticate';
 import {
   validateRegister,
   validateLogin,
   validatePatchProfile,
   validateChangePassword,
-} from '../middleware/validation.js';
+} from '../middleware/validation';
 const router = express.Router();
 
 router.post('/register', validateRegister, asyncHandler(register));

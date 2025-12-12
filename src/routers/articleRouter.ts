@@ -1,5 +1,5 @@
 import express from 'express';
-import { asyncHandler } from '../middleware/asyncHandler.js';
+import { asyncHandler } from '../middleware/asyncHandler';
 import {
   getArticles,
   getArticleById,
@@ -8,9 +8,9 @@ import {
   deleteArticle,
   getMyArticles,
   toggleArticleLike,
-} from '../controllers/articleController.js';
-import { validateArticle } from '../middleware/validation.js';
-import authenticate from '../middleware/authenticate.js';
+} from '../controllers/articleController';
+import { validateArticle } from '../middleware/validation';
+import authenticate from '../middleware/authenticate';
 
 const router = express.Router();
 

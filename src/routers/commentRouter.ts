@@ -1,5 +1,5 @@
 import express from 'express';
-import { asyncHandler } from '../middleware/asyncHandler.js';
+import { asyncHandler } from '../middleware/asyncHandler';
 import {
   createProductComment,
   createArticleComment,
@@ -7,9 +7,9 @@ import {
   getArticleComments,
   updateComment,
   deleteComment,
-} from '../controllers/commentController.js';
-import authenticate from '../middleware/authenticate.js';
-import { validateComment } from '../middleware/validation.js';
+} from '../controllers/commentController';
+import authenticate from '../middleware/authenticate';
+import { validateComment } from '../middleware/validation';
 
 const router = express.Router();
 

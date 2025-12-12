@@ -1,5 +1,5 @@
 import express from 'express';
-import { asyncHandler } from '../middleware/asyncHandler.js';
+import { asyncHandler } from '../middleware/asyncHandler';
 import {
   getProducts,
   getProductById,
@@ -9,9 +9,9 @@ import {
   getMyProducts,
   toggleProductLike,
   getLikedProducts,
-} from '../controllers/productController.js';
-import { validateProduct } from '../middleware/validation.js';
-import authenticate from '../middleware/authenticate.js';
+} from '../controllers/productController';
+import { validateProduct } from '../middleware/validation';
+import authenticate from '../middleware/authenticate';
 
 const router = express.Router();
 

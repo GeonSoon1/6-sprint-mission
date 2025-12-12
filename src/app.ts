@@ -1,12 +1,12 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import productRouter from './routers/productRouter.js';
-import articleRouter from './routers/articleRouter.js';
-import commentRouter from './routers/commentRouter.js';
-import uploadRouter from './routers/uploadRouter.js';
-import { errorHandler } from './middleware/errorHandler.js';
-import authRouter from './routers/authRouter.js';
+import productRouter from './routers/productRouter';
+import articleRouter from './routers/articleRouter';
+import commentRouter from './routers/commentRouter';
+import uploadRouter from './routers/uploadRouter';
+import { errorHandler } from './middleware/errorHandler';
+import authRouter from './routers/authRouter';
 import cookieParser from 'cookie-parser';
 
 dotenv.config();
@@ -26,5 +26,5 @@ app.use('/auth', authRouter);
 
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

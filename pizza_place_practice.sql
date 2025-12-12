@@ -57,7 +57,8 @@ group by o.date;
 -- # 고급 문제
 
 /*
-    1. 피자별(`pizzas.id` 기준) 판매 수량 순위에서 피자별 판매 수량 상위에 드는 베스트 피자를 10개를 조회해 주세요. `pizzas`의 모든 컬럼을 조회하면서 각 피자에 해당하는 판매량을 `total_quantity`라는 이름으로 함께 조회합니다.
+    1. 피자별(`pizzas.id` 기준) 판매 수량 순위에서 피자별 판매 수량 상위에 드는 베스트 피자를 10개를 조회해 주세요. 
+    `pizzas`의 모든 컬럼을 조회하면서 각 피자에 해당하는 판매량을 `total_quantity`라는 이름으로 함께 조회합니다.
         
         출력 예시:
 
@@ -74,10 +75,16 @@ group by o.date;
             bbq_ckn_m     | bbq_ckn     | M    | 16.75 |            956
         ```
 */
-
+select p.*, sum(od.quantity) total_quantity 
+from pizzas p 
+join order_details od on p.id = od.pizza_id 
+group by p.id 
+order by total_quantity desc 
+limit 10;
 
 /*
-    2. `orders` 테이블에서 2025년 3월의 일별 주문 수량을 `total_orders`라는 이름으로, 일별 총 주문 금액을 `total_amount`라는 이름으로 포함해서 조회하세요.
+    2. `orders` 테이블에서 2025년 3월의 일별 주문 수량을 `total_orders`라는 이름으로, 
+    일별 총 주문 금액을 `total_amount`라는 이름으로 포함해서 조회하세요.
         
         출력 예시:
         
@@ -89,10 +96,21 @@ group by o.date;
         2025-03-05 |           64 |  2350.650005340576
         ```
 */
-    
-
+select 
+    o.date, 
+    count(distinct o.id) total_orders, 
+    sum(p.price*od.quantity) total_amount 
+from orders o 
+    join order_details od on o.id = od.order_id 
+    join pizzas p on od.pizza_id = p.id 
+where o.date >= '2025-03-01' and date <= '2025-03-31' 
+group by o.date 
+order by o.date asc;
 /*
-    3. `order`의 `id`가 78에 해당하는 주문 내역들을 조회합니다. 주문 내역에서 각각 주문한 피자의 이름을 `pizza_name`, 피자의 크기를 `pizza_size`, 피자 가격을 `pizza_price`, 수량을 `quantity`, 각 주문 내역의 총 금액을 `total_amount` 라는 이름으로 조회해 주세요.
+    3. `order`의 `id`가 78에 해당하는 주문 내역들을 조회합니다. 
+    주문 내역에서 각각 주문한 피자의 이름을 `pizza_name`, 피자의 크기를 `pizza_size`, 
+    피자 가격을 `pizza_price`, 수량을 `quantity`, 각 주문 내역의 총 금액을 `total_amount` 
+    라는 이름으로 조회해 주세요.
         
         출력 예시:
         
@@ -105,10 +123,23 @@ group by o.date;
         The Four Cheese Pizza       | L          |       17.95 |        1 | 17.950000762939453
         ```
 */
-
+select
+    pt.name pizza_name, 
+    p.size pizza_size, 
+    p.price pizza_price, 
+    od.quantity quantity, 
+    sum(p.price * od.quantity) total_amount 
+from 
+    order_details od 
+    join pizzas p on od.pizza_id = p.id 
+    join pizza_types pt on p.type_id = pt.id 
+    where od.order_id = 78 
+group by pt.name, p.size, p.price, od.quantity 
+order by pizza_size asc, pizza_price desc;
 
 /*    
-    4. `order_details`와 `pizzas` 테이블을 JOIN해서 피자 크기별(S, M, L) 총 수익을 계산하고, 크기별 수익을 출력하세요.
+    4. `order_details`와 `pizzas` 테이블을 JOIN해서 피자 크기별(S, M, L) 총 수익을 계산하고, 
+    크기별 수익을 출력하세요.
         
         출력 예시:
         
@@ -120,10 +151,18 @@ group by o.date;
         XXL  | 1006.6000213623047
         ```
 */
-
+select 
+    p.size pizza_size, 
+    sum(p.price * od.quantity) total_amount 
+from 
+    order_details od 
+    join pizzas p on od.pizza_id = p.id 
+group by p.size 
+order by total_amount desc;
 
 /*    
-    5. `order_details`, `pizzas`, `pizza_types` 테이블을 JOIN해서 각 피자 종류의 총 수익을 계산하고, 수익이 높은 순서대로 출력하세요.
+    5. `order_details`, `pizzas`, `pizza_types` 테이블을 JOIN해서 각 피자 종류의 총 수익을 계산하고, 
+    수익이 높은 순서대로 출력하세요.
         
         출력 예시:
         
@@ -137,4 +176,12 @@ group by o.date;
         The Italian Supreme Pizza                  |           33476.75
         ```
 */
-
+select 
+    pt.name name, 
+    sum(p.price * od.quantity) total_amount 
+from 
+    order_details od 
+    join pizzas p on od.pizza_id = p.id 
+    join pizza_types pt on p.type_id = pt.id 
+group by pt.name 
+order by total_amount desc;

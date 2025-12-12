@@ -43,21 +43,25 @@ const ul = __importStar(require("../controllers/mypageList-controller"));
 const ulk = __importStar(require("../controllers/mypageLikes-controller"));
 const authenticate_1 = __importDefault(require("../middleware/authenticate"));
 const userRoute = express_1.default.Router();
+const common_dbcheck_validation_1 = require("../validators/common-dbcheck-validation");
+const common_query_validation_1 = require("../validators/common-query-validation");
+const user_validation_1 = require("../validators/user-validation");
+const userLike_validation_1 = require("../validators/userLike-validation");
 // ======= ======= ======= ======= =======
 // =======  User 정보 확인/수정 기능  =======
 // ======= ======= ======= ======= =======
-userRoute.get('/', authenticate_1.default, (0, asyncHandler_1.default)(u.userInfo));
-userRoute.patch('/', authenticate_1.default, (0, asyncHandler_1.default)(u.updateUserInfo));
-userRoute.patch('/password', authenticate_1.default, (0, asyncHandler_1.default)(u.updatePassword));
+userRoute.get('/', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, (0, asyncHandler_1.default)(u.userInfo));
+userRoute.patch('/', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, user_validation_1.userUpdateValidation, (0, asyncHandler_1.default)(u.updateUserInfo));
+userRoute.patch('/password', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, user_validation_1.userUpdatePasswordValidation, (0, asyncHandler_1.default)(u.updatePassword));
 // ======= ======= ======= ======= =======
 // === User 작성 product, article list  ===
 // ======= ======= ======= ======= =======
-userRoute.get('/products', authenticate_1.default, (0, asyncHandler_1.default)(ul.getUserCreatedProductsList));
-userRoute.get('/articles', authenticate_1.default, (0, asyncHandler_1.default)(ul.getUserCreatedArticlesList));
+userRoute.get('/products', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, common_query_validation_1.getQueryValidation, (0, asyncHandler_1.default)(ul.getUserCreatedProductsList));
+userRoute.get('/articles', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, common_query_validation_1.getQueryValidation, (0, asyncHandler_1.default)(ul.getUserCreatedArticlesList));
 // 댓글 보기는 시간 남으면 작업 하겠습니다..
 // ======= ======= ======= ======= =======
 // === User product, article like list ===
 // ======= ======= ======= ======= =======
-userRoute.get('/products/like', authenticate_1.default, (0, asyncHandler_1.default)(ulk.getUserlikedProductsList));
-userRoute.get('/articles/like', authenticate_1.default, (0, asyncHandler_1.default)(ulk.getUserlikedArticlesList));
+userRoute.get('/products/like', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, userLike_validation_1.productLikeListValidation, (0, asyncHandler_1.default)(ulk.getUserlikedProductsList));
+userRoute.get('/articles/like', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, userLike_validation_1.articleLikeListValidation, (0, asyncHandler_1.default)(ulk.getUserlikedArticlesList));
 exports.default = userRoute;

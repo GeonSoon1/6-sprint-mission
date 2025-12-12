@@ -20,7 +20,7 @@ exports.deleteProduct = deleteProduct;
 const prismaclient_1 = __importDefault(require("../lib/prismaclient"));
 function createProduct(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = req.user.id;
+        const userId = req.userId;
         const { name, description, price, tags } = req.body;
         const productCreate = yield prismaclient_1.default.product.create({
             data: {
@@ -56,16 +56,15 @@ function getProductsList(req, res) {
             },
         });
         if (!productList)
-            return res.status(401).json({ message: 'Cannot found List' });
+            return res.status(401).json({ message: '제품 목록을 찾을 수 없습니다' });
         res.status(200).json(productList);
     });
 }
 function getProductInfo(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        // id가 0 넘는 숫자가 맞는지
-        const id = Number(req.params.id);
+        const productId = req.product.id;
         const product = yield prismaclient_1.default.product.findUniqueOrThrow({
-            where: { id },
+            where: { id: productId },
             select: {
                 id: true,
                 name: true,
@@ -75,17 +74,13 @@ function getProductInfo(req, res) {
                 createdAt: true,
             },
         });
-        if (!product)
-            return res.status(401).json({ message: `Cannot found ${id}` });
         // 현재 User가 좋아요 했는지 확인하기
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
+        const userId = req.userId;
         const checkLiked = yield prismaclient_1.default.productLikes.findUnique({
             where: {
                 userId_productId: {
                     userId,
-                    productId: id,
+                    productId,
                 },
             },
         });
@@ -98,9 +93,7 @@ function getProductInfo(req, res) {
 }
 function updateProduct(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const productId = Number(req.params.id);
-        console.log(productId);
-        // 업데이트 작업 진행
+        const productId = req.product.id;
         const productUpdate = yield prismaclient_1.default.product.update({
             where: { id: productId },
             data: req.body,
@@ -110,7 +103,7 @@ function updateProduct(req, res) {
 }
 function deleteProduct(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const productId = Number(req.params.id);
+        const productId = req.product.id;
         yield prismaclient_1.default.product.delete({
             where: { id: productId },
         });

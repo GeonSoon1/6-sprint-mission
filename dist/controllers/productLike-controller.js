@@ -17,29 +17,9 @@ exports.likeCountDown = likeCountDown;
 const prismaclient_1 = __importDefault(require("../lib/prismaclient"));
 function likeCountUp(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
         const userId = req.user.id;
-        const productId = Number(req.params.id);
-        // 제품 검증
-        const product = yield prismaclient_1.default.product.findUnique({ where: { id: productId } });
-        if (!product)
-            return res.status(401).json({ message: 'Cannot found product' });
-        // user 검증
-        const user = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // 이미 likeCount 증가 했다면 작업 종료
-        const readProductLikeCount = yield prismaclient_1.default.productLikes.findUnique({
-            where: {
-                userId_productId: {
-                    userId,
-                    productId,
-                },
-            },
-        });
-        if (readProductLikeCount && readProductLikeCount.likeCountBool)
-            return res.status(401).json({ message: '이미 좋아요를 눌렀습니다' });
+        const product = req.product;
+        const productId = product.id;
         // likeCount 증가 작업
         const upProductLikeCount = product.likeCount + 1;
         const updateProductLikesCount = yield prismaclient_1.default.product.update({
@@ -47,61 +27,30 @@ function likeCountUp(req, res) {
             data: { likeCount: Number(upProductLikeCount) },
         });
         // productLikes DB에 기록
-        let updateProductLikesDB;
-        if (readProductLikeCount && !readProductLikeCount.likeCountBool) {
-            updateProductLikesDB = yield prismaclient_1.default.productLikes.update({
-                where: { id: readProductLikeCount.id },
-                data: { likeCountBool: true },
-            });
-        }
-        else {
-            updateProductLikesDB = yield prismaclient_1.default.productLikes.create({
-                data: {
-                    userId,
-                    productId,
-                },
-            });
-        }
+        const updateProductLikesDB = yield prismaclient_1.default.productLikes.create({
+            data: {
+                userId,
+                productId,
+            },
+        });
         res.status(200).json({ updateProductLikesCount, updateProductLikesDB });
     });
 }
 function likeCountDown(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
         const userId = req.user.id;
-        const productId = Number(req.params.id);
-        // 제품 검증
-        const product = yield prismaclient_1.default.product.findUnique({ where: { id: productId } });
-        if (!product)
-            return res.status(401).json({ message: 'Cannot found product' });
-        // likeCount가 0 이하일 경우
-        if (product.likeCount < 1)
-            return res.status(401).json({ message: '더 이상 감소할 수 없습니다' });
-        // user 검증
-        const user = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // 이미 likeCount 감소(삭제) 했다면 작업 종료
-        const readProductLikeCount = yield prismaclient_1.default.productLikes.findUnique({
-            where: {
-                userId_productId: {
-                    userId,
-                    productId,
-                },
-            },
-        });
-        if (!readProductLikeCount)
-            return res.status(401).json({ message: '이미 취소 하였습니다' });
+        const product = req.product;
+        const productId = product.id;
         // likeCount 감소 작업
         const downProductLikeCount = product.likeCount - 1;
         const updateProductLikeCount = yield prismaclient_1.default.product.update({
             where: { id: productId },
             data: { likeCount: Number(downProductLikeCount) },
         });
+        const deleteProLikeId = req.proLikeId;
         // productLikes DB에서 삭제
         yield prismaclient_1.default.productLikes.delete({
-            where: { id: readProductLikeCount.id },
+            where: { id: deleteProLikeId },
         });
         res.status(200).json({ updateProductLikeCount });
     });

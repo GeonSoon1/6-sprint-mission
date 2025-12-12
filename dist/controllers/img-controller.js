@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.uploadImgController = uploadImgController;
-exports.imgNew = imgNew;
 const constants_1 = require("../lib/constants");
 const path_1 = __importDefault(require("path"));
 function uploadImgController(req, res) {
@@ -25,14 +24,5 @@ function uploadImgController(req, res) {
         const filePath = path_1.default.join(host, constants_1.STATIC_PATH, filename);
         const url = `http://${filePath}`;
         return res.send({ url });
-    });
-}
-function imgNew(req, res) {
-    return __awaiter(this, void 0, void 0, function* () {
-        if (!req.file)
-            return res.status(400).json({ message: '파일이 없습니다' });
-        const filename = req.file.filename;
-        const path = `/files/${filename}`;
-        res.json({ path });
     });
 }

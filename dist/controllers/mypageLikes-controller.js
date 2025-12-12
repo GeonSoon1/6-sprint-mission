@@ -17,17 +17,10 @@ exports.getUserlikedArticlesList = getUserlikedArticlesList;
 const prismaclient_1 = __importDefault(require("../lib/prismaclient"));
 function getUserlikedProductsList(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
-        const user = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!user)
-            return res.status(401).json({ message: 'Unauthorized' });
+        const userId = req.userId;
         const productLikeDB = yield prismaclient_1.default.productLikes.findMany({
             where: { userId },
         });
-        if (productLikeDB.length === 0)
-            return res.status(401).json({ message: 'cannot find like product' });
         const productLikeIds = productLikeDB.map((item) => item.productId);
         let likeProductList = [];
         for (const id of productLikeIds) {
@@ -41,17 +34,10 @@ function getUserlikedProductsList(req, res) {
 }
 function getUserlikedArticlesList(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
-        const user = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!user)
-            return res.status(401).json({ message: 'Unauthorized' });
+        const userId = req.userId;
         const articleLikeDB = yield prismaclient_1.default.articleLikes.findMany({
             where: { userId },
         });
-        if (articleLikeDB.length === 0)
-            return res.status(401).json({ message: 'cannot find like article' });
         const articleLikeIds = articleLikeDB.map((item) => item.articleId);
         let likeArticleList = [];
         for (const id of articleLikeIds) {

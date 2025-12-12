@@ -18,33 +18,8 @@ const prismaclient_1 = __importDefault(require("../lib/prismaclient"));
 //user가 생성한 product list 확인
 function getUserCreatedProductsList(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e;
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
-        // user 검증
-        const user = yield prismaclient_1.default.user.findUnique({
-            where: { id: userId },
-        });
-        if (!user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // 리스트 검색 조건
-        const name = String((_a = req.query.name) !== null && _a !== void 0 ? _a : '');
-        const description = String((_b = req.query.description) !== null && _b !== void 0 ? _b : '');
-        const limit = Number((_c = req.query.limit) !== null && _c !== void 0 ? _c : 10);
-        const offset = Number((_d = req.query.offset) !== null && _d !== void 0 ? _d : 0);
-        const sort = String((_e = req.query.sort) !== null && _e !== void 0 ? _e : 'newest');
-        let orderBy;
-        switch (sort) {
-            case 'oldest':
-                orderBy = { createdAt: 'asc' };
-                break;
-            case 'newest':
-                orderBy = { createdAt: 'desc' };
-                break;
-            default:
-                orderBy = { createdAt: 'desc' };
-        }
+        const userId = req.userId;
+        const { offset, limit, name, description, orderBy } = req.validated;
         const productList = yield prismaclient_1.default.product.findMany({
             where: {
                 userId,
@@ -56,40 +31,17 @@ function getUserCreatedProductsList(req, res) {
             orderBy,
         });
         if (!productList || productList.length === 0)
-            return res.status(401).json({ message: 'cannot find list' });
+            return res
+                .status(401)
+                .json({ message: '사용자가 생성 한 제품 목록을 찾을 수 없습니다' });
         res.status(200).json(productList);
     });
 }
 //user가 생성한 article list 확인
 function getUserCreatedArticlesList(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        var _a, _b, _c, _d, _e;
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
-        // user 검증
-        const user = yield prismaclient_1.default.user.findUnique({
-            where: { id: userId },
-        });
-        if (!user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // 리스트 검색 조건
-        const title = String((_a = req.query.name) !== null && _a !== void 0 ? _a : '');
-        const content = String((_b = req.query.description) !== null && _b !== void 0 ? _b : '');
-        const limit = Number((_c = req.query.limit) !== null && _c !== void 0 ? _c : 10);
-        const offset = Number((_d = req.query.offset) !== null && _d !== void 0 ? _d : 0);
-        const sort = String((_e = req.query.sort) !== null && _e !== void 0 ? _e : 'newest');
-        let orderBy;
-        switch (sort) {
-            case 'oldest':
-                orderBy = { createdAt: 'asc' };
-                break;
-            case 'newest':
-                orderBy = { createdAt: 'desc' };
-                break;
-            default:
-                orderBy = { createdAt: 'desc' };
-        }
+        const userId = req.userId;
+        const { offset, limit, title, content, orderBy } = req.validated;
         const articleList = yield prismaclient_1.default.article.findMany({
             where: {
                 userId,
@@ -101,7 +53,9 @@ function getUserCreatedArticlesList(req, res) {
             orderBy,
         });
         if (!articleList || articleList.length === 0)
-            return res.status(401).json({ message: 'cannot find list' });
+            return res
+                .status(401)
+                .json({ message: '사용자가 생성 한 게시글 목록을 찾을 수 없습니다' });
         res.status(200).json(articleList);
     });
 }

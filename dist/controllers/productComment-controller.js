@@ -19,8 +19,8 @@ exports.deleteProductComment = deleteProductComment;
 const prismaclient_1 = __importDefault(require("../lib/prismaclient"));
 function createProductComment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const userId = Number(req.user.id);
-        const productId = Number(req.params.productId);
+        const userId = req.userId;
+        const productId = req.product.id;
         const { content } = req.body;
         const commentCreate = yield prismaclient_1.default.commentProduct.create({
             data: {
@@ -37,12 +37,7 @@ function createProductComment(req, res) {
 }
 function getProductCommentList(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const productId = Number(req.params.productId);
-        const product = yield prismaclient_1.default.product.findUnique({
-            where: { id: productId },
-        });
-        if (!product)
-            return res.status(404).json({ message: 'Cannot found Product' });
+        const productId = req.product.id;
         const productComments = yield prismaclient_1.default.product.findUnique({
             where: { id: productId },
             include: {
@@ -56,34 +51,15 @@ function getProductCommentList(req, res) {
             },
         });
         if (!productComments)
-            return res.status(404).json({ message: 'Cannot found Product comment' });
+            return res
+                .status(404)
+                .json({ message: '제품의 댓글 목록을 찾을 수 없습니다' });
         res.status(200).json(productComments.comments);
     });
 }
 function updateProductComment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
-        const productId = Number(req.params.productId);
-        // product가 DB에 있는지 확인
-        const product = yield prismaclient_1.default.product.findUnique({ where: { id: productId } });
-        if (!product)
-            return res.status(401).json({ message: 'Cannot found product' });
-        // user가 DB에 존재 하는지 확인
-        const findUser = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!findUser)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // comment가 DB에 존재 하는지 확인
-        const commentId = Number(req.params.commentId);
-        const comment = yield prismaclient_1.default.commentProduct.findUnique({
-            where: { id: commentId },
-        });
-        if (!comment)
-            return res.status(404).json({ message: 'Cannot found comment' });
-        // DB에 있는 comment userID 정보와 로그인 한 User 정보가 같은지 확인
-        if (comment.userId !== userId)
-            return res.status(401).json({ message: 'Unauthorized' });
+        const commentId = req.proComment.id;
         const commentUpdate = yield prismaclient_1.default.commentProduct.update({
             where: { id: commentId },
             data: req.body,
@@ -93,28 +69,7 @@ function updateProductComment(req, res) {
 }
 function deleteProductComment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
-        const productId = Number(req.params.productId);
-        // product가 DB에 있는지 확인
-        const product = yield prismaclient_1.default.product.findUnique({ where: { id: productId } });
-        if (!product)
-            return res.status(401).json({ message: 'Cannot found product' });
-        // user가 DB에 존재 하는지 확인
-        const findUser = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!findUser)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // comment가 DB에 존재 하는지 확인
-        const commentId = Number(req.params.commentId);
-        const comment = yield prismaclient_1.default.commentProduct.findUnique({
-            where: { id: commentId },
-        });
-        if (!comment)
-            return res.status(404).json({ message: 'Cannot found comment' });
-        // DB에 있는 comment userID 정보와 로그인 한 User 정보가 같은지 확인
-        if (comment.userId !== userId)
-            return res.status(401).json({ message: 'Unauthorized' });
+        const commentId = req.proComment.id;
         yield prismaclient_1.default.commentProduct.delete({
             where: { id: commentId },
         });

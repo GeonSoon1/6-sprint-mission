@@ -19,18 +19,8 @@ exports.deleteArticleComment = deleteArticleComment;
 const prismaclient_1 = __importDefault(require("../lib/prismaclient"));
 function createArticleComment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        // article이 DB에 있는지 확인
-        const articleId = Number(req.params.articleId);
-        const article = yield prismaclient_1.default.article.findUnique({ where: { id: articleId } });
-        if (!article)
-            return res.status(404).json({ message: 'Cannot found article' });
-        // user가 DB에 존재 하는지 확인
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
-        const findUser = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!findUser)
-            return res.status(401).json({ message: 'Unauthorized' });
+        const userId = req.userId;
+        const articleId = req.article.id;
         const { content } = req.body;
         const commentCreate = yield prismaclient_1.default.commentArticle.create({
             data: {
@@ -47,10 +37,7 @@ function createArticleComment(req, res) {
 }
 function getArticleCommentsList(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const articleId = Number(req.params.articleId);
-        const article = yield prismaclient_1.default.article.findUnique({ where: { id: articleId } });
-        if (!article)
-            return res.status(404).json({ message: 'Cannot found article' });
+        const articleId = req.article.id;
         const articleComments = yield prismaclient_1.default.article.findUnique({
             where: { id: articleId },
             include: {
@@ -64,34 +51,15 @@ function getArticleCommentsList(req, res) {
             },
         });
         if (!articleComments)
-            return res.status(404).json({ message: 'Cannot found Article comment' });
+            return res
+                .status(404)
+                .json({ message: '게시글의 댓글 목록을 찾을 수 없습니다' });
         res.status(200).json(articleComments.comments);
     });
 }
 function updateArticleComment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        // article이 DB에 있는지 확인
-        const articleId = Number(req.params.articleId);
-        const article = yield prismaclient_1.default.article.findUnique({ where: { id: articleId } });
-        if (!article)
-            return res.status(404).json({ message: 'Cannot found article' });
-        // user가 DB에 존재 하는지 확인
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
-        const findUser = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!findUser)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // comment가 DB에 존재 하는지 확인
-        const commentId = Number(req.params.commentId);
-        const comment = yield prismaclient_1.default.commentArticle.findUnique({
-            where: { id: commentId },
-        });
-        if (!comment)
-            return res.status(404).json({ message: 'Cannot found comment' });
-        // DB에 있는 comment userID 정보와 로그인 한 User 정보가 같은지 확인
-        if (comment.userId !== userId)
-            return res.status(401).json({ message: 'Unauthorized' });
+        const commentId = req.artComment.id;
         const commentUpdate = yield prismaclient_1.default.commentArticle.update({
             where: { id: commentId },
             data: req.body,
@@ -101,28 +69,7 @@ function updateArticleComment(req, res) {
 }
 function deleteArticleComment(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        // article이 DB에 있는지 확인
-        const articleId = Number(req.params.articleId);
-        const article = yield prismaclient_1.default.article.findUnique({ where: { id: articleId } });
-        if (!article)
-            return res.status(404).json({ message: 'Cannot found article' });
-        // user가 DB에 존재 하는지 확인
-        if (!req.user)
-            return res.status(401).json({ message: 'Unauthorized' });
-        const userId = req.user.id;
-        const findUser = yield prismaclient_1.default.user.findUnique({ where: { id: userId } });
-        if (!findUser)
-            return res.status(401).json({ message: 'Unauthorized' });
-        // comment가 DB에 존재 하는지 확인
-        const commentId = Number(req.params.commentId);
-        const comment = yield prismaclient_1.default.commentArticle.findUnique({
-            where: { id: commentId },
-        });
-        if (!comment)
-            return res.status(404).json({ message: 'Cannot found comment' });
-        // DB에 있는 comment userID 정보와 로그인 한 User 정보가 같은지 확인
-        if (comment.userId !== userId)
-            return res.status(401).json({ message: 'Unauthorized' });
+        const commentId = req.artComment.id;
         yield prismaclient_1.default.commentArticle.delete({
             where: { id: commentId },
         });

@@ -36,15 +36,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CreateUser = void 0;
+exports.UpdateUser = exports.CreateUser = void 0;
 const s = __importStar(require("superstruct"));
 const is_email_1 = __importDefault(require("is-email"));
 // s.define이 원하는 함수 형식으로 emailValidator로 재구성
 // 타입스크립트에서는 미리 선언한 형식에 맞춰 값을 작성해야 하므로
-// 정확한 값을 표현하기 위한 추가 함수가 필요 해 졌음 
+// 정확한 값을 표현하기 위한 추가 함수가 필요 해 졌음
 const emailValidator = (value) => typeof value === 'string' && (0, is_email_1.default)(value);
 exports.CreateUser = s.object({
     email: s.define('email', emailValidator),
     nickname: s.size(s.string(), 1, 30),
     password: s.size(s.string(), 8, 20),
+});
+exports.UpdateUser = s.object({
+    nickname: s.size(s.string(), 1, 30),
 });

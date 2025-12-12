@@ -41,28 +41,32 @@ const asyncHandler_1 = __importDefault(require("../lib/asyncHandler"));
 const p = __importStar(require("../controllers/product-controller"));
 const pc = __importStar(require("../controllers/productComment-controller"));
 const pl = __importStar(require("../controllers/productLike-controller"));
+const common_dbcheck_validation_1 = require("../validators/common-dbcheck-validation");
+const common_permission_validation_1 = require("../validators/common-permission-validation");
+const common_query_validation_1 = require("../validators/common-query-validation");
 const product_validation_1 = require("../validators/product-validation");
-const comment_validation_1 = require("../validators/comment-validation");
+const productComment_validation_1 = require("../validators/productComment-validation");
+const userLike_validation_1 = require("../validators/userLike-validation");
 const authenticate_1 = __importDefault(require("../middleware/authenticate"));
 const productRoute = express_1.default.Router();
 // ======= ======= ======= ======= =======
 // =======  product 자체 API 명령어  =======
 // ======= ======= ======= ======= =======
-productRoute.post('/', authenticate_1.default, product_validation_1.productCreateValidation, (0, asyncHandler_1.default)(p.createProduct));
-productRoute.get('/', product_validation_1.productListValidation, (0, asyncHandler_1.default)(p.getProductsList));
-productRoute.get('/:id', authenticate_1.default, product_validation_1.productInfoValidation, (0, asyncHandler_1.default)(p.getProductInfo));
-productRoute.patch('/:id', authenticate_1.default, product_validation_1.productUpdateValidation, product_validation_1.productUserCheckValidation, (0, asyncHandler_1.default)(p.updateProduct));
-productRoute.delete('/:id', authenticate_1.default, product_validation_1.productUserCheckValidation, (0, asyncHandler_1.default)(p.deleteProduct));
+productRoute.post('/', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, product_validation_1.productCreateValidation, (0, asyncHandler_1.default)(p.createProduct));
+productRoute.get('/', common_query_validation_1.getQueryValidation, (0, asyncHandler_1.default)(p.getProductsList));
+productRoute.get('/:id', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, common_dbcheck_validation_1.productDataValidation, (0, asyncHandler_1.default)(p.getProductInfo));
+productRoute.patch('/:id', authenticate_1.default, product_validation_1.productUpdateValidation, common_dbcheck_validation_1.userDataValidation, common_dbcheck_validation_1.productDataValidation, common_permission_validation_1.productUserCheckValidation, (0, asyncHandler_1.default)(p.updateProduct));
+productRoute.delete('/:id', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, common_dbcheck_validation_1.productDataValidation, common_permission_validation_1.productUserCheckValidation, (0, asyncHandler_1.default)(p.deleteProduct));
 // ======= ======= ======= ======= =======
 // ======= product에 연결 된 comment =======
 // ======= ======= ======= ======= =======
-productRoute.post('/:productId/comments', authenticate_1.default, comment_validation_1.commentCreateValidation, (0, asyncHandler_1.default)(pc.createProductComment));
-productRoute.get('/:productId/comments', (0, asyncHandler_1.default)(pc.getProductCommentList));
-productRoute.patch('/:productId/comments/:commentId', authenticate_1.default, comment_validation_1.commentUpdateValidation, (0, asyncHandler_1.default)(pc.updateProductComment));
-productRoute.delete('/:productId/comments/:commentId', authenticate_1.default, (0, asyncHandler_1.default)(pc.deleteProductComment));
+productRoute.post('/:productId/comments', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, common_dbcheck_validation_1.productDataValidation, productComment_validation_1.commentCreateValidation, (0, asyncHandler_1.default)(pc.createProductComment));
+productRoute.get('/:productId/comments', common_dbcheck_validation_1.productDataValidation, (0, asyncHandler_1.default)(pc.getProductCommentList));
+productRoute.patch('/:productId/comments/:commentId', authenticate_1.default, productComment_validation_1.commentUpdateValidation, common_dbcheck_validation_1.userDataValidation, common_dbcheck_validation_1.productDataValidation, common_dbcheck_validation_1.productCommentDataValidation, common_permission_validation_1.proCommentUserCheckValidation, (0, asyncHandler_1.default)(pc.updateProductComment));
+productRoute.delete('/:productId/comments/:commentId', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, common_dbcheck_validation_1.productDataValidation, common_dbcheck_validation_1.productCommentDataValidation, common_permission_validation_1.proCommentUserCheckValidation, (0, asyncHandler_1.default)(pc.deleteProductComment));
 // ======= ======= ======= ======= =======
 // ====== product에 연결 된 likeCount ======
 // ======= ======= ======= ======= =======
-productRoute.post('/:id/likeCount', authenticate_1.default, (0, asyncHandler_1.default)(pl.likeCountUp));
-productRoute.delete('/:id/likeCount', authenticate_1.default, (0, asyncHandler_1.default)(pl.likeCountDown));
+productRoute.post('/:id/likeCount', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, common_dbcheck_validation_1.productDataValidation, userLike_validation_1.productLikeUpValidation, (0, asyncHandler_1.default)(pl.likeCountUp));
+productRoute.delete('/:id/likeCount', authenticate_1.default, common_dbcheck_validation_1.userDataValidation, common_dbcheck_validation_1.productDataValidation, userLike_validation_1.productLikeDownValidation, (0, asyncHandler_1.default)(pl.likeCountDown));
 exports.default = productRoute;

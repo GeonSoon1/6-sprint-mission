@@ -40,15 +40,6 @@ FROM orders
 WHERE id > 42 
 ORDER BY id ASC LIMIT 10;
 
--- 방법 2: date, time 기준 커서 페이지네이션 (최신순)
-SELECT * 
-FROM orders 
-WHERE (date, time) < (
-    SELECT date, time FROM orders WHERE id = 42
-)
-ORDER BY date DESC, time DESC 
-LIMIT 10;
-
 -- 8. `orders` 테이블에서 2025년 3월에 주문된 내역만 조회하세요.
 
 -- 방법 1: 범위 조건 사용
@@ -56,13 +47,7 @@ SELECT *
 FROM orders 
 WHERE date >= '2025-03-01' AND date < '2025-04-01';
 
--- 방법 2: EXTRACT 사용
-SELECT * 
-FROM orders 
-WHERE EXTRACT(YEAR FROM date) = 2025 
-AND EXTRACT(MONTH FROM date) = 3;
-
--- 방법 3: DATE_TRUNC 사용
+-- 방법 2: DATE_TRUNC 사용
 SELECT * 
 FROM orders 
 WHERE DATE_TRUNC('month', date) = '2025-03-01';
@@ -92,12 +77,6 @@ SELECT *
 FROM pizza_types 
 WHERE POSITION('Cheese' IN name) > 0 
 OR POSITION('Chicken' IN name) > 0;
-
--- 방법 3: 정규식 사용 (대소문자 구분)
-SELECT * 
-FROM pizza_types 
-WHERE name ~ '(Cheese|Chicken)';
-
 
 -- # 중급 문제
 

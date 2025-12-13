@@ -1,102 +1,58 @@
 import { Request, Response } from 'express';
 import prisma from '../lib/prismaclient';
 import { QueryList } from '../types/express/query.types';
+import {
+  CreateArticleRequestDto,
+  GetArticlesRequestDto,
+} from '../dto/article.dto';
+import { articleService } from '../service/article.service';
 
 export async function createArticle(req: Request, res: Response) {
-  const userId = req.userId;
+  const userId = req.user.id;
+  const requestDto = req.body;
 
-  // article 저장하기
-  const { title, content } = req.body;
-
-  const articleCreate = await prisma.article.create({
-    data: {
-      title,
-      content,
-      userId,
-    },
-  });
-
-  res.status(201).json(articleCreate);
+  const article = await articleService.createArticle(requestDto, userId);
+  res.status(201).json(article);
 }
 
 export async function getArticlesList(req: Request, res: Response) {
-  const { offset, limit, title, content, orderBy } = req.validated as QueryList;
-
-  const articles = await prisma.article.findMany({
-    where: {
-      title: {
-        contains: title,
-      },
-      content: {
-        contains: content,
-      },
-    },
-    skip: offset,
-    take: limit,
-    orderBy,
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      createdAt: true,
-    },
-  });
-
-  if (!articles)
-    return res.status(401).json({ message: '게시글 목록을 찾을 수 없습니다' });
-
+  const query = req.query;
+  const articles = await articleService.readArticles(query);
   res.status(200).json(articles);
 }
 
 export async function getArticleInfo(req: Request, res: Response) {
-  const articleId = req.article.id;
-  const article = await prisma.article.findUniqueOrThrow({
-    where: { id: articleId },
-    select: {
-      id: true,
-      title: true,
-      content: true,
-      createdAt: true,
-    },
-  });
+  const paramId = req.params.id;
+  const article = await articleService.readArticle(paramId);
 
-  // 현재 User가 좋아요 했는지 확인하기
   const userId = req.user.id;
-
-  const checkLiked = await prisma.articleLikes.findUnique({
-    where: {
-      userId_articleId: {
-        userId,
-        articleId,
-      },
-    },
-  });
-
-  let isLiked = false;
-  if (checkLiked) {
-    isLiked = true;
+  let isLiked;
+  if (userId) {
+    isLiked = await articleService.readArticleLike(paramId, userId);
   }
 
   res.status(200).json({ article, isLiked });
 }
 
 export async function updateArticle(req: Request, res: Response) {
-  const articleId = req.article.id;
+  const body = req.body;
+  const articleId = req.params.id;
+  const userId = req.user.id;
 
-  const articleUpdate = await prisma.article.update({
-    where: { id: articleId },
-    data: req.body,
-  });
+  const articleUpdate = await articleService.updateArticle(
+    body,
+    articleId,
+    userId
+  );
 
   res.status(200).json(articleUpdate);
 }
 
 export async function deleteArticle(req: Request, res: Response) {
-  const articleId = req.article.id;
+  const articleId = req.params.id;
+  const userId = req.user.id;
 
-  await prisma.article.delete({
-    where: { id: articleId },
-  });
+  await articleService.deleteArticle(articleId, userId);
 
   res.status(204).json({ message: '삭제 완료' });
 }

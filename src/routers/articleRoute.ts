@@ -44,37 +44,20 @@ articleRoute.post(
   '/',
   authenticate,
   articleCreateValidation,
-  userDataValidation,
   asyncHandler(a.createArticle)
 );
-articleRoute.get('/', getQueryValidation, asyncHandler(a.getArticlesList));
+articleRoute.get('/', asyncHandler(a.getArticlesList));
 
-articleRoute.get(
-  '/:id',
-  authenticate,
-  userDataValidation,
-  articleDataValidation,
-  asyncHandler(a.getArticleInfo)
-);
+articleRoute.get('/:id', authenticate, asyncHandler(a.getArticleInfo));
 
 articleRoute.patch(
   '/:id',
   authenticate,
   articleUpdateValidation,
-  userDataValidation,
-  articleDataValidation,
-  articleUserCheckValidation,
   asyncHandler(a.updateArticle)
 );
 
-articleRoute.delete(
-  '/:id',
-  authenticate,
-  userDataValidation,
-  articleDataValidation,
-  articleUserCheckValidation,
-  asyncHandler(a.deleteArticle)
-);
+articleRoute.delete('/:id', authenticate, asyncHandler(a.deleteArticle));
 
 // ======= ======= ======= ======= =======
 // ======= article에 연결 된 comment =======

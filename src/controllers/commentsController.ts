@@ -1,55 +1,74 @@
 import { create } from 'superstruct';
-import { prismaClient } from '../lib/prismaClient';
-import { UpdateCommentBodyStruct } from '../structs/commentsStruct';
-import NotFoundError from '../lib/errors/NotFoundError';
+import {
+  CreateCommentBodyStruct,
+  GetCommentListParamsStruct,
+  UpdateCommentBodyStruct,
+} from '../structs/commentsStruct';
 import { IdParamsStruct } from '../structs/commonStructs';
-import ForbiddenError from '../lib/errors/ForbiddenError';
-import UnauthorizeError from '../lib/errors/UnauthorizeError';
 import { Request, Response } from 'express';
+import { commentService } from '../service/commentService';
+import BadRequestError from '../lib/errors/BadRequestError';
 
-export async function updateComment(req: Request, res: Response) {
-  const { id } = create(req.params, IdParamsStruct);
-  const { content } = create(req.body, UpdateCommentBodyStruct);
+//article 댓글
+export async function createArticleComment(req: Request, res: Response) {
+  const { id: articleId } = create(req.params, IdParamsStruct);
+  const { content } = create(req.body, CreateCommentBodyStruct);
   const user = req.user;
 
-  const existingComment = await prismaClient.comment.findUnique({ where: { id } });
-  if (!existingComment) {
-    throw new NotFoundError('comment', id);
+  const result = await commentService.createArticleComment(content, user, articleId);
+
+  return res.status(201).send(result);
+}
+
+export async function getArticleCommentList(req: Request, res: Response) {
+  const { id: articleId } = create(req.params, IdParamsStruct);
+  const { cursor, limit } = create(req.query, GetCommentListParamsStruct);
+
+  const result = commentService.getArticleCommentList(articleId, cursor, limit);
+
+  return res.send(result);
+}
+
+//product 댓글
+export async function createProductComment(req: Request, res: Response) {
+  const { id: productId } = create(req.params, IdParamsStruct);
+  const { content } = create(req.body, CreateCommentBodyStruct);
+  const user = req.user;
+
+  const result = await commentService.createProductComment(content, user, productId);
+
+  return res.status(201).send(result);
+}
+
+export async function getProductCommentList(req: Request, res: Response) {
+  const { id: productId } = create(req.params, IdParamsStruct);
+  const { cursor, limit } = create(req.query, GetCommentListParamsStruct);
+
+  const result = commentService.getProductCommentList(productId, cursor, limit);
+
+  return res.send(result);
+}
+
+//그외 공통 부분(수정, 삭제)
+export async function updateComment(req: Request, res: Response) {
+  const { id } = create(req.params, IdParamsStruct);
+  const data = create(req.body, UpdateCommentBodyStruct);
+  const user = req.user;
+
+  if (!data) {
+    throw new BadRequestError('content is required');
   }
 
-  if (!user) {
-    throw new UnauthorizeError();
-  }
+  const result = commentService.updateComment(id, user, data);
 
-  if (existingComment.authorId !== user.id) {
-    throw new ForbiddenError('comment');
-  }
-
-  const updatedComment = await prismaClient.comment.update({
-    where: { id },
-    data: { content },
-  });
-
-  return res.send({ message: 'comment 수정됨', updatedComment });
+  return res.send({ message: 'comment 수정됨', result });
 }
 
 export async function deleteComment(req: Request, res: Response) {
   const { id } = create(req.params, IdParamsStruct);
   const user = req.user;
 
-  const existingComment = await prismaClient.comment.findUnique({ where: { id } });
-  if (!existingComment) {
-    throw new NotFoundError('comment', id);
-  }
+  const result = await commentService.deleteComment(id, user);
 
-  if (!user) {
-    throw new UnauthorizeError();
-  }
-  if (existingComment.authorId !== user.id) {
-    throw new ForbiddenError('comment');
-  }
-
-  await prismaClient.comment.delete({ where: { id } });
-
-  return res.status(204).send({ message: 'comment 삭제됨', existingComment });
+  return res.status(204).send({ message: 'comment 삭제됨', result });
 }

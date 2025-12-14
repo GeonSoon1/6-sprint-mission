@@ -24,93 +24,45 @@ exports.dislikeArticle = dislikeArticle;
 const superstruct_1 = require("superstruct");
 const prismaClient_1 = require("../lib/prismaClient");
 const NotFoundError_1 = __importDefault(require("../lib/errors/NotFoundError"));
-const ForbiddenError_1 = __importDefault(require("../lib/errors/ForbiddenError"));
 const commonStructs_1 = require("../structs/commonStructs");
 const articlesStructs_1 = require("../structs/articlesStructs");
 const commentsStruct_1 = require("../structs/commentsStruct");
 const UnauthorizeError_1 = __importDefault(require("../lib/errors/UnauthorizeError"));
+const articleService_1 = require("../service/articleService");
 function createArticle(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const data = (0, superstruct_1.create)(req.body, articlesStructs_1.CreateArticleBodyStruct);
-        const user = req.user;
-        if (!user) {
-            throw new UnauthorizeError_1.default();
-        }
-        const article = yield prismaClient_1.prismaClient.article.create({ data: Object.assign(Object.assign({}, data), { authorId: user.id }) });
-        return res.status(201).send({ message: 'article 생성됨', article });
+        const result = yield articleService_1.articleService.createArticle(data, req.user);
+        return res.status(201).send({ message: 'article 생성됨', result });
     });
 }
 function getArticle(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id } = (0, superstruct_1.create)(req.params, commonStructs_1.IdParamsStruct);
-        const user = req.user;
-        const article = yield prismaClient_1.prismaClient.article.findUnique({ where: { id } });
-        if (!article) {
-            throw new NotFoundError_1.default('article', id);
-        }
-        if (!user) {
-            throw new UnauthorizeError_1.default();
-        }
-        const isLiked = yield prismaClient_1.prismaClient.likeArticle.findFirst({
-            where: { userId: user.id, articleId: id },
-        });
-        return res.send({ article: article, isLike: Boolean(isLiked) });
+        const result = yield articleService_1.articleService.getArticle(id, req.user);
+        return res.send({ article: result.article, isLike: Boolean(result.isLike) });
     });
 }
 function updateArticle(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id } = (0, superstruct_1.create)(req.params, commonStructs_1.IdParamsStruct);
         const data = (0, superstruct_1.create)(req.body, articlesStructs_1.UpdateArticleBodyStruct);
-        const user = req.user;
-        const article = yield prismaClient_1.prismaClient.article.findUnique({ where: { id } });
-        if (!article) {
-            throw new NotFoundError_1.default('article', id);
-        }
-        if (!user) {
-            throw new UnauthorizeError_1.default();
-        }
-        if (article.authorId !== user.id) {
-            throw new ForbiddenError_1.default('article');
-        }
-        const updateArticle = yield prismaClient_1.prismaClient.article.update({ where: { id }, data });
-        return res.send({ message: 'article 수정됨', updateArticle });
+        const result = yield articleService_1.articleService.updateArticle(id, data, req.user);
+        return res.send({ message: 'article 수정됨', result });
     });
 }
 function deleteArticle(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { id } = (0, superstruct_1.create)(req.params, commonStructs_1.IdParamsStruct);
-        const user = req.user;
-        const article = yield prismaClient_1.prismaClient.article.findUnique({ where: { id } });
-        if (!article) {
-            throw new NotFoundError_1.default('article', id);
-        }
-        if (!user) {
-            throw new UnauthorizeError_1.default();
-        }
-        if (article.authorId !== user.id) {
-            throw new ForbiddenError_1.default('article');
-        }
-        yield prismaClient_1.prismaClient.article.delete({ where: { id } });
-        return res.status(204).send({ message: 'article 삭제됨' });
+        const result = yield articleService_1.articleService.deleteArticle(id, req.user);
+        return res.status(204).send({ message: 'article 삭제됨', article: result });
     });
 }
 function getArticleList(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { page, pageSize, orderBy, keyword } = (0, superstruct_1.create)(req.query, articlesStructs_1.GetArticleListParamsStruct);
-        const where = {
-            title: keyword ? { contains: keyword } : undefined,
-        };
-        const totalCount = yield prismaClient_1.prismaClient.article.count({ where });
-        const articles = yield prismaClient_1.prismaClient.article.findMany({
-            skip: (page - 1) * pageSize,
-            take: pageSize,
-            orderBy: orderBy === 'recent' ? { createdAt: 'desc' } : { id: 'asc' },
-            where,
-        });
-        return res.send({
-            list: articles,
-            totalCount,
-        });
+        const params = (0, superstruct_1.create)(req.query, articlesStructs_1.GetArticleListParamsStruct);
+        const result = yield articleService_1.articleService.getListArticle(params);
+        return res.send(result);
     });
 }
 function createComment(req, res) {

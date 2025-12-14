@@ -1,6 +1,6 @@
-import prisma from '../lib/prismaClient.js';
-import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants.js';
-import { verifyAccessToken } from '../lib/token.js';
+import prisma from '../lib/prismaClient';
+import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants';
+import { verifyAccessToken } from '../lib/token';
 
 // 내부에서 쓸 유저 id 추출
 function getOptionalUserId(req) {

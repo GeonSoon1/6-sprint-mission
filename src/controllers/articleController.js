@@ -1,8 +1,8 @@
-import prisma from '../lib/prismaClient.js';
+import prisma from '../lib/prismaClient';
 import { assert } from 'superstruct';
 import { CreateArticle, PatchArticle } from '../structs/articleStruct.js';
-import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants.js';
-import { verifyAccessToken } from '../lib/token.js';
+import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants';
+import { verifyAccessToken } from '../lib/token';
 
 function getOptionalUserId(req) {
   try {

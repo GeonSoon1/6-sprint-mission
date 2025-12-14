@@ -1,4 +1,4 @@
-import prisma from '../lib/prismaClient.js';
+import prisma from '../lib/prismaClient';
 
 export const createProductComment = async (req, res) => {
   const { content } = req.body;

@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
-import prisma from '../lib/prismaClient.js';
+import prisma from '../lib/prismaClient';
 import {
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
   NODE_ENV,
-} from '../lib/constants.js';
-import { generateTokens, verifyRefreshToken } from '../lib/token.js';
+} from '../lib/constants';
+import { generateTokens, verifyRefreshToken } from '../lib/token';
 
 export async function register(req, res) {
   const { email, nickname, password } = req.body;

@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { Prisma } from '@prisma/client';
+import { HttpError } from '../lib/httpError';
 
 function getMessage(e: unknown) {
   return e instanceof Error ? e.message : String(e);
@@ -33,6 +34,9 @@ export const errorHandler = (
     if (!Number.isNaN(status) && status >= 400 && status < 600) {
       return res.status(status).json({ message: getMessage(err) });
     }
+  }
+  if (err instanceof HttpError) {
+    return res.status(err.status).json({ message: err.message });
   }
 
   return res

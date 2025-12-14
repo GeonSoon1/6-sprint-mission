@@ -1,3 +1,6 @@
+import type { Product, ProductLike, ProductLike as Like } from '@prisma/client';
+import { HttpError } from '../lib/httpError';
+
 import {
   findProductsWithLikes,
   findProductByIdWithLikes,
@@ -32,20 +35,19 @@ export type UpdateProductDto = {
 
 export type CookieBag = Record<string, string> | undefined;
 
+type ProductWithLikes = Product & { likes: ProductLike[] };
+
 function getOptionalUserId(cookies: CookieBag): string | null {
   try {
     const token = cookies?.[ACCESS_TOKEN_COOKIE_NAME];
     if (!token) return null;
-    const decoded = verifyAccessToken(token);
-    const userId = String((decoded as any).id);
-    return userId || null;
+
+    const decoded = verifyAccessToken(token) as { id: string };
+    return decoded.id || null;
   } catch {
     return null;
   }
 }
-
-type LikeRow = { userId: string };
-type ProductWithLikes = { likes: LikeRow[]; [key: string]: any };
 
 function mapWithLike(product: ProductWithLikes, userId: string | null) {
   const likeCount = product.likes.length;
@@ -59,21 +61,20 @@ function mapWithLike(product: ProductWithLikes, userId: string | null) {
 
 export async function getProductsService(cookies: CookieBag) {
   const userId = getOptionalUserId(cookies);
-  const products = await findProductsWithLikes();
-  return products.map((p: any) => mapWithLike(p, userId));
+
+  const products = (await findProductsWithLikes()) as ProductWithLikes[];
+  return products.map((p) => mapWithLike(p, userId));
 }
 
 export async function getProductByIdService(id: string, cookies: CookieBag) {
   const userId = getOptionalUserId(cookies);
-  const product = await findProductByIdWithLikes(id);
 
-  if (!product) {
-    const e: any = new Error('상품을 찾을 수 없습니다.');
-    e.status = 404;
-    throw e;
-  }
+  const product = (await findProductByIdWithLikes(
+    id
+  )) as ProductWithLikes | null;
+  if (!product) throw new HttpError(404, '상품을 찾을 수 없습니다.');
 
-  return mapWithLike(product as any, userId);
+  return mapWithLike(product, userId);
 }
 
 export async function createProductService(
@@ -89,17 +90,10 @@ export async function updateProductService(
   userId: string
 ) {
   const product = await findProductById(id);
-
-  if (!product) {
-    const e: any = new Error('상품을 찾을 수 없습니다.');
-    e.status = 404;
-    throw e;
-  }
+  if (!product) throw new HttpError(404, '상품을 찾을 수 없습니다.');
 
   if (product.userId !== userId) {
-    const e: any = new Error('상품을 수정할 권한이 없습니다.');
-    e.status = 403;
-    throw e;
+    throw new HttpError(403, '상품을 수정할 권한이 없습니다.');
   }
 
   return updateProduct(id, data);
@@ -107,17 +101,10 @@ export async function updateProductService(
 
 export async function deleteProductService(id: string, userId: string) {
   const product = await findProductById(id);
-
-  if (!product) {
-    const e: any = new Error('상품을 찾을 수 없습니다.');
-    e.status = 404;
-    throw e;
-  }
+  if (!product) throw new HttpError(404, '상품을 찾을 수 없습니다.');
 
   if (product.userId !== userId) {
-    const e: any = new Error('상품을 삭제할 권한이 없습니다.');
-    e.status = 403;
-    throw e;
+    throw new HttpError(403, '상품을 삭제할 권한이 없습니다.');
   }
 
   await deleteProduct(id);
@@ -132,30 +119,18 @@ export async function toggleProductLikeService(
   userId: string
 ) {
   const product = await findProductById(productId);
-
-  if (!product) {
-    const e: any = new Error('상품을 찾을 수 없습니다.');
-    e.status = 404;
-    throw e;
-  }
+  if (!product) throw new HttpError(404, '상품을 찾을 수 없습니다.');
 
   const existing = await findProductLike(userId, productId);
 
-  if (existing) {
-    await deleteProductLike(existing.id);
-  } else {
-    await createProductLike(userId, productId);
-  }
+  if (existing) await deleteProductLike(existing.id);
+  else await createProductLike(userId, productId);
 
   const likeCount = await countProductLikes(productId);
-
-  return {
-    isLiked: !existing,
-    likeCount,
-  };
+  return { isLiked: !existing, likeCount };
 }
 
 export async function getLikedProductsService(userId: string) {
   const likes = await findLikedProducts(userId);
-  return likes.map((l: any) => l.product);
+  return likes.map((l) => l.product);
 }

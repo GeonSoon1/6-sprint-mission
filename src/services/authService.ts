@@ -15,13 +15,8 @@ export class AuthService {
    * 회원가입(signUp)
    */
   async singUp(userData: SignUpDTO) {
-    // 비즈니스 로직 처리 - 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(userData.password, 10);
-
-    // Repository에 전달할 데이터 준비
     const signupData = { ...userData, password: hashedPassword };
-
-    // authRepository 메소드 호출
     return this.authRepository.signUp(signupData);
   }
 
@@ -72,7 +67,9 @@ export class AuthService {
       const newAccessToken = jwt.sign(
         { userId: user.id },
         process.env.JWT_SECRET!,
-        { expiresIn: '1h' },
+        {
+          expiresIn: '1h',
+        },
       );
       return { accessToken: newAccessToken };
     } catch (error) {

@@ -17,7 +17,6 @@ export class UserService {
       updateData.password = hashedPassword;
     }
 
-    // userRepository 호출
     return this.userRepository.updateUser(id, updateData);
   }
 

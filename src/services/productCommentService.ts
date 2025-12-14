@@ -4,6 +4,9 @@ import { Prisma, Product, User, ProductComment } from '@prisma/client';
 export class ProductCommentService {
   constructor(private productCommentRepository: ProductCommentRepository) {}
 
+  /**
+   * 댓글 작성
+   */
   async createComment(
     productId: Product['id'],
     authorId: User['id'],
@@ -17,10 +20,16 @@ export class ProductCommentService {
     return this.productCommentRepository.create(data);
   }
 
+  /**
+   * 상품 ID로 댓글 찾기
+   */
   async getComments(productId: Product['id']) {
     return this.productCommentRepository.findByProductId(productId);
   }
 
+  /**
+   * 댓글 수정
+   */
   async updateComment(
     commentId: ProductComment['id'],
     authorId: User['id'],
@@ -30,6 +39,9 @@ export class ProductCommentService {
     return this.productCommentRepository.update(commentId, data);
   }
 
+  /**
+   * 댓글 삭제
+   */
   async deleteComment(commentId: ProductComment['id'], authorId: User['id']) {
     await this.checkCommentOwner(commentId, authorId);
     return this.productCommentRepository.delete(commentId);

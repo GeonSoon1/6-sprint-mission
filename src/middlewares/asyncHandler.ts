@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../lib/types';
 
-// 비동기 요청 핸들러의 타입 정의
+/**
+ * 비동기 요청 핸들러의 타입 정의
+ */
 type AsyncRequestHandler = (
   req: AuthRequest,
   res: Response,

@@ -5,7 +5,9 @@ import { CreateArticleDTO } from '../lib/dto';
 export class ArticleService {
   constructor(private articleRepository: ArticleRepository) {}
 
-  // 게시물 등록
+  /**
+   * 게시물 등록
+   */
   async createArticle(authorId: User['id'], articleData: CreateArticleDTO) {
     const { title, content } = articleData;
 
@@ -17,12 +19,16 @@ export class ArticleService {
     return this.articleRepository.createArticle(dataToCreate);
   }
 
-  // 게시물 목록 보기
+  /**
+   * 게시물 목록 보기
+   */
   async findArticles(options: Prisma.ArticleFindManyArgs) {
     return this.articleRepository.findArticles(options);
   }
 
-  // 게시물 상세 보기
+  /**
+   * 게시물 상세 보기
+   */
   async findArticleById(id: Article['id']) {
     const article = await this.articleRepository.findArticleById(id);
     if (!article) {
@@ -33,7 +39,9 @@ export class ArticleService {
     return article;
   }
 
-  // 게시물 수정
+  /**
+   * 게시물 수정
+   */
   async updateArticle(
     articleId: Article['id'],
     userId: User['id'],
@@ -43,7 +51,9 @@ export class ArticleService {
     return await this.articleRepository.updateArticle(articleId, data);
   }
 
-  // 게시물 삭제
+  /**
+   * 게시물 삭제
+   */
   async deleteArticle(articleId: Article['id'], userId: User['id']) {
     await this.checkArticleOwnership(articleId, userId);
     return this.articleRepository.deleteArticle(articleId);

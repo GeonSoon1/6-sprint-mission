@@ -3,19 +3,21 @@ import { PrismaClient, Product, Article, User } from '@prisma/client';
 export class LikeRepository {
   constructor(private prisma: PrismaClient) {}
 
-  // 상품 좋아요 찾기
+  /**
+   * 상품 좋아요 찾기
+   */
   async findProductLike(userId: User['id'], productId: Product['id']) {
     return this.prisma.favorite.findUnique({
       where: { userId_productId: { userId, productId } },
     });
   }
 
-  // 상품 좋아요 생성
+  /**
+   * 상품 좋아요 생성
+   */
   async createProductLike(userId: User['id'], productId: Product['id']) {
     return this.prisma.$transaction([
-      this.prisma.favorite.create({
-        data: { userId, productId },
-      }),
+      this.prisma.favorite.create({ data: { userId, productId } }),
       this.prisma.product.update({
         where: { id: productId },
         data: { likeCount: { increment: 1 } },
@@ -23,7 +25,9 @@ export class LikeRepository {
     ]);
   }
 
-  // 상품 좋아요 삭제
+  /**
+   * 상품 좋아요 삭제
+   */
   async deleteProductLike(userId: User['id'], productId: Product['id']) {
     return this.prisma.$transaction([
       this.prisma.favorite.delete({
@@ -36,7 +40,9 @@ export class LikeRepository {
     ]);
   }
 
-  // 게시글 좋아요 찾기
+  /**
+   * 게시글 좋아요 찾기
+   */
   async findArticleLike(userId: User['id'], articleId: Article['id']) {
     return this.prisma.like.findUnique({
       where: { userId_articleId: { userId, articleId } },
@@ -46,9 +52,7 @@ export class LikeRepository {
   // 게시글 좋아요 생성
   async createArticleLike(userId: User['id'], articleId: Article['id']) {
     return this.prisma.$transaction([
-      this.prisma.like.create({
-        data: { userId, articleId },
-      }),
+      this.prisma.like.create({ data: { userId, articleId } }),
       this.prisma.article.update({
         where: { id: articleId },
         data: { likeCount: { increment: 1 } },

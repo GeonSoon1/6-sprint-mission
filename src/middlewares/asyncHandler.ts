@@ -1,11 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { AuthRequest } from '../lib/types';
 
 /**
  * 비동기 요청 핸들러의 타입 정의
  */
 type AsyncRequestHandler = (
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) => Promise<any>;
@@ -17,6 +16,6 @@ type AsyncRequestHandler = (
  */
 export const asyncHandler = (requestHandler: AsyncRequestHandler) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(requestHandler(req as AuthRequest, res, next)).catch(next);
+    Promise.resolve(requestHandler(req, res, next)).catch(next);
   };
 };

@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
-import { AuthRequest } from '../lib/types';
 
 export async function isLoggedIn(
   req: Request,
@@ -33,7 +32,7 @@ export async function isLoggedIn(
 
     // 검증 성공 시, payload의 사용자 ID를 req.user에 할당
     // (authService에서 토큰 생성시 {userId:id} 형태로 payload를 만들었음)
-    (req as AuthRequest).user = { id: (payload as any).userId };
+    req.user = { id: (payload as any).userId };
     next();
   } catch (error) {
     // 모든 종류의 토큰 오류(만료, 형식 오류 등)를 여기에서 잡읍

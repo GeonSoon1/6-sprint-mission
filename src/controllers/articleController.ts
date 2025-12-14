@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { AuthRequest } from '../lib/types';
 import { CreateArticleDTO } from '../lib/dto';
 import { ArticleService } from '../services/articleService';
 
@@ -9,9 +8,9 @@ export class ArticleController {
   /**
    * 게시글 생성
    */
-  public createArticle = async (req: AuthRequest, res: Response) => {
+  public createArticle = async (req: Request, res: Response) => {
     const articleData: CreateArticleDTO = req.body;
-    const userId = req.user.id;
+    const userId = req.user!.id;
 
     const article = await this.articleService.createArticle(
       userId,
@@ -42,10 +41,10 @@ export class ArticleController {
   /**
    * 게시글 수정
    */
-  public updateArticle = async (req: AuthRequest, res: Response) => {
+  public updateArticle = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
-    const userId = req.user.id;
+    const userId = req.user!.id;
 
     const newArticle = await this.articleService.updateArticle(
       id,
@@ -58,9 +57,9 @@ export class ArticleController {
   /**
    * 게시글 삭제
    */
-  public deleteArticle = async (req: AuthRequest, res: Response) => {
+  public deleteArticle = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.user!.id;
 
     await this.articleService.deleteArticle(id, userId);
     res.status(204).send();

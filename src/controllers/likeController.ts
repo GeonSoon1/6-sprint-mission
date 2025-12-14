@@ -1,22 +1,21 @@
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { LikeService } from '../services/likeService';
-import { AuthRequest } from '../lib/types';
 
 export class LikeController {
   constructor(private likeService: LikeService) {}
 
   // 상품 좋아요 토글
-  public toggleProductLike = async (req: AuthRequest, res: Response) => {
+  public toggleProductLike = async (req: Request, res: Response) => {
     const { id: productId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user!.id;
 
     const result = await this.likeService.toggleProductLike(userId, productId);
     res.status(200).json(result);
   };
 
-  public toggleArticleLike = async (req: AuthRequest, res: Response) => {
+  public toggleArticleLike = async (req: Request, res: Response) => {
     const { id: articleId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user!.id;
 
     const result = await this.likeService.toggleArticleLike(userId, articleId);
     res.status(200).json(result);

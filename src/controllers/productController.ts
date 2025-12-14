@@ -1,5 +1,4 @@
 import type { Request, Response } from 'express';
-import { AuthRequest } from '../lib/types';
 import { CreateProductDTO } from '../lib/dto';
 import { ProductService } from '../services/productService';
 
@@ -7,8 +6,8 @@ export class ProductController {
   constructor(private productService: ProductService) {}
 
   // 상품 생성 콘트롤러
-  public createProduct = async (req: AuthRequest, res: Response) => {
-    const userId = req.user.id;
+  public createProduct = async (req: Request, res: Response) => {
+    const userId = req.user!.id;
     const product: CreateProductDTO = req.body;
 
     const newProduct = await this.productService.createProduct(userId, product);
@@ -31,9 +30,9 @@ export class ProductController {
   };
 
   // 상품 수정
-  public updateProduct = async (req: AuthRequest, res: Response) => {
+  public updateProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.user!.id;
     const product = req.body;
 
     const updatedProduct = await this.productService.updateProduct(
@@ -45,9 +44,9 @@ export class ProductController {
   };
 
   // 상품 삭제
-  public deleteProduct = async (req: AuthRequest, res: Response) => {
+  public deleteProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const userId = req.user.id;
+    const userId = req.user!.id;
 
     await this.productService.deleteProduct(id, userId);
     res.status(204).send();

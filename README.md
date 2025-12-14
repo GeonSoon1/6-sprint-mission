@@ -46,7 +46,9 @@ npm install
 - **`src/controller/`**: HTTP 요청을 수신하여 요청 데이터를 정제하고, 비즈니스 로직을 처리하는 서비스 계층에 작업을 위임한 후, 결과를 클라이언트에 응답합니다.
 - **`src/service/`**: 애플리케이션의 핵심 비즈니스 로직을 수행합니다. 여러 리포지토리를 호출하여 데이터를 조작합니다.
 - **`src/repository/`**: 데이터베이스와의 상호작용을 추상화합니다. Prisma 클라이언트를 사용하여 실제 데이터 CRUD 작업을 수행합니다.
-- **`src/middleware/`**: 인증, 오류 처리, 파일 업로드(Multer), 요청 데이터 유효성 검사 등 공통 관심사를 처리하는 미들웨어를 포함합니다.
+- **`src/middleware/`**: 인증, 오류 처리, 파일 업로드 등 공통 관심사를 처리합니다. 모든 비동기 에러는 `asyncHandler`를 통해 중앙 `errorHandler`로 전달되어 일관된 형식으로 처리됩니다.
+- **`src/lib/errors/`**: `BaseError`를 상속받는 커스텀 에러 클래스(`NotFoundError`, `ForbiddenError` 등)를 정의하여, 예측 가능한 에러를 HTTP 상태 코드와 함께 명확하게 처리합니다.
+- **`src/types/`**: Express의 `Request` 객체를 확장하는 등 프로젝트 전역에서 사용되는 타입 선언을 관리합니다.
 - **`prisma/`**: Prisma 관련 파일을 관리합니다.
   - `schema.prisma`: 데이터베이스 모델, 관계, enum을 정의합니다.
   - `seed.js`: 개발용 초기 데이터를 생성합니다.
@@ -69,50 +71,55 @@ npm install
 API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 
 #### 👤 인증 (Auth) - `/auth`
-| Method | Endpoint | 인증 | 설명 |
-| :--- | :--- | :-: | :--- |
-| `POST` | `/signup` | X | 신규 사용자 회원가입 |
-| `POST` | `/login` | X | 이메일/비밀번호로 로그인 |
-| `POST` | `/logout` | O | 로그아웃 (토큰 비활성화) |
-| `POST` | `/refresh` | X | Access Token 갱신 |
+
+| Method | Endpoint   | 인증 | 설명                     |
+| :----- | :--------- | :--: | :----------------------- |
+| `POST` | `/signup`  |  X   | 신규 사용자 회원가입     |
+| `POST` | `/login`   |  X   | 이메일/비밀번호로 로그인 |
+| `POST` | `/logout`  |  O   | 로그아웃 (토큰 비활성화) |
+| `POST` | `/refresh` |  X   | Access Token 갱신        |
 
 #### 🙋‍♂️ 사용자 (User) - `/user`
-| Method | Endpoint | 인증 | 설명 |
-| :--- | :--- | :-: | :--- |
-| `GET` | `/` | O | 닉네임으로 사용자 검색 |
-| `GET` | `/:id` | X | 특정 ID의 사용자 정보 조회 |
-| `PATCH` | `/:id` | O | 현재 로그인된 사용자 정보 수정 |
-| `DELETE`| `/:id` | O | 현재 로그인된 사용자 탈퇴 |
+
+| Method   | Endpoint | 인증 | 설명                           |
+| :------- | :------- | :--: | :----------------------------- |
+| `GET`    | `/`      |  X   | 닉네임으로 사용자 검색         |
+| `GET`    | `/:id`   |  O   | 특정 ID의 사용자 정보 조회     |
+| `PATCH`  | `/:id`   |  O   | 현재 로그인된 사용자 정보 수정 |
+| `DELETE` | `/:id`   |  O   | 현재 로그인된 사용자 탈퇴      |
 
 #### 📦 상품 (Products) - `/products`
-| Method | Endpoint | 인증 | 설명 |
-| :--- | :--- | :-: | :--- |
-| `GET` | `/` | X | 전체 상품 목록 조회 (페이지네이션) |
-| `POST` | `/` | O | 새 상품 등록 |
-| `GET` | `/:id` | X | 특정 상품 상세 조회 |
-| `PATCH` | `/:id` | O | 특정 상품 정보 수정 |
-| `DELETE`| `/:id` | O | 특정 상품 삭제 |
-| `POST` | `/:id/like`| O | 상품 좋아요/취소 (토글) |
+
+| Method   | Endpoint    | 인증 | 설명                               |
+| :------- | :---------- | :--: | :--------------------------------- |
+| `GET`    | `/`         |  X   | 전체 상품 목록 조회 (페이지네이션) |
+| `POST`   | `/`         |  O   | 새 상품 등록                       |
+| `GET`    | `/:id`      |  X   | 특정 상품 상세 조회                |
+| `PATCH`  | `/:id`      |  O   | 특정 상품 정보 수정                |
+| `DELETE` | `/:id`      |  O   | 특정 상품 삭제                     |
+| `POST`   | `/:id/like` |  O   | 상품 좋아요/취소 (토글)            |
 
 #### 📝 게시글 (Articles) - `/articles`
-| Method | Endpoint | 인증 | 설명 |
-| :--- | :--- | :-: | :--- |
-| `GET` | `/` | X | 전체 게시글 목록 조회 (페이지네이션) |
-| `POST` | `/` | O | 새 게시글 등록 |
-| `GET` | `/:id` | O | 특정 게시글 상세 조회 |
-| `PATCH` | `/:id` | O | 특정 게시글 정보 수정 |
-| `DELETE`| `/:id` | O | 특정 게시글 삭제 |
-| `POST` | `/:id/like`| O | 게시글 좋아요/취소 (토글) |
+
+| Method   | Endpoint    | 인증 | 설명                                 |
+| :------- | :---------- | :--: | :----------------------------------- |
+| `GET`    | `/`         |  X   | 전체 게시글 목록 조회 (페이지네이션) |
+| `POST`   | `/`         |  O   | 새 게시글 등록                       |
+| `GET`    | `/:id`      |  O   | 특정 게시글 상세 조회                |
+| `PATCH`  | `/:id`      |  O   | 특정 게시글 정보 수정                |
+| `DELETE` | `/:id`      |  O   | 특정 게시글 삭제                     |
+| `POST`   | `/:id/like` |  O   | 게시글 좋아요/취소 (토글)            |
 
 #### 💬 댓글 (Comments)
-| Method | Endpoint | 인증 | 설명 |
-| :--- | :--- | :-: | :--- |
-| `GET` | `/products/:id/comments` | X | 특정 상품의 모든 댓글 조회 |
-| `POST` | `/products/:id/comments` | O | 특정 상품에 새 댓글 작성 |
-| `GET` | `/articles/:id/comments` | X | 특정 게시글의 모든 댓글 조회 |
-| `POST` | `/articles/:id/comments` | O | 특정 게시글에 새 댓글 작성 |
-| `PATCH` | `/comments/:id` | O | 특정 댓글 수정 |
-| `DELETE`| `/comments/:id` | O | 특정 댓글 삭제 |
+
+| Method   | Endpoint                 | 인증 | 설명                         |
+| :------- | :----------------------- | :--: | :--------------------------- |
+| `GET`    | `/products/:id/comments` |  X   | 특정 상품의 모든 댓글 조회   |
+| `POST`   | `/products/:id/comments` |  O   | 특정 상품에 새 댓글 작성     |
+| `GET`    | `/articles/:id/comments` |  X   | 특정 게시글의 모든 댓글 조회 |
+| `POST`   | `/articles/:id/comments` |  O   | 특정 게시글에 새 댓글 작성   |
+| `PATCH`  | `/comments/:id`          |  O   | 특정 댓글 수정               |
+| `DELETE` | `/comments/:id`          |  O   | 특정 댓글 삭제               |
 
 ---
 
@@ -138,10 +145,10 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 │   │   ├── constants.ts
 │   │   ├── dto.ts
 │   │   ├── enums.ts
-│   │   └── types.ts
+│   │   └── errors/
 │   ├── middlewares/
 │   │   ├── asyncHandler.ts
-│   │   ├── errorController.ts
+│   │   ├── errorHandler.ts
 │   │   ├── imageUploader.ts
 │   │   ├── isLoggedIn.ts
 │   │   ├── pagination.ts
@@ -162,14 +169,16 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 │   │   ├── productCommentRouter.ts
 │   │   ├── productRouter.ts
 │   │   └── userRouter.ts
-│   └── services/
-│       ├── articleCommentService.ts
-│       ├── articleService.ts
-│       ├── authService.ts
-│       ├── likeService.ts
-│       ├── productCommentService.ts
-│       ├── productService.ts
-│       └── userService.ts
+│   ├── services/
+│   │   ├── articleCommentService.ts
+│   │   ├── articleService.ts
+│   │   ├── authService.ts
+│   │   ├── likeService.ts
+│   │   ├── productCommentService.ts
+│   │   ├── productService.ts
+│   │   └── userService.ts
+│   └── types/
+│       └── express.d.ts
 ├── uploads/
 ├── .gitignore
 ├── package.json
@@ -184,7 +193,7 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 
 - **코드 스타일**: Prettier를 사용하여 일관된 코드 스타일을 유지합니다. (`.prettierrc` 설정 파일 참고)
 - **언어**: TypeScript를 사용하여 타입 안정성을 확보합니다.
-- **비동기 처리**: 모든 비동기 작업은 `async/await`를 사용하며, 컨트롤러에서는 `asyncHandler` 유틸리티를 통해 오류를 중앙에서 처리합니다.
+- **비동기 처리**: 모든 비동기 작업은 `async/await`를 사용합니다. 컨트롤러의 비동기 로직은 `asyncHandler` 유틸리티로 감싸 에러를 중앙에서 처리합니다. 서비스 로직에서 `NotFoundError`, `ForbiddenError` 등 상황에 맞는 커스텀 에러를 `throw`하면, 중앙 에러 핸들러(`errorHandler.ts`)가 이를 감지하여 적절한 HTTP 상태 코드와 메시지를 클라이언트에 응답합니다.
 - **데이터 유효성 검사**: `express-validator`를 사용하여 각 API의 요청 `body`, `params`, `query`를 검증합니다. 유효성 검사 로직은 `validator.ts` 미들웨어를 통해 라우터 레벨에서 적용됩니다.
 - **데이터베이스 모델링**: `prisma/schema.prisma` 파일에서 데이터 모델과 관계를 정의합니다. 스키마 변경 후에는 `npx prisma migrate dev` 명령어로 마이그레이션을 수행해야 합니다.
 
@@ -199,6 +208,7 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 - 프로젝트 루트에 `DATABASE_URL`이 포함된 `.env` 파일 생성
 
 **.env 파일 예시**
+
 ```
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 PORT=3000

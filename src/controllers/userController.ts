@@ -1,8 +1,5 @@
-import { prisma } from '../lib/constants';
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
-import { UserRepository } from '../repositories/userRepository';
-import { AuthRequest } from '../lib/types';
 
 export class UserController {
   constructor(private userService: UserService) {}
@@ -25,8 +22,8 @@ export class UserController {
   /**
    * 회원정보 수정
    */
-  public updateUser = async (req: AuthRequest, res: Response) => {
-    const userId = req.user.id;
+  public updateUser = async (req: Request, res: Response) => {
+    const userId = req.user!.id;
     const updatedUser = await this.userService.updateUser(userId, req.body);
 
     const { password, ...userData } = updatedUser;
@@ -39,8 +36,8 @@ export class UserController {
   /**
    * 회원 탈퇴(삭제)
    */
-  public deleteUser = async (req: AuthRequest, res: Response) => {
-    const userId = req.user.id;
+  public deleteUser = async (req: Request, res: Response) => {
+    const userId = req.user!.id;
     const { password } = req.body;
 
     await this.userService.deleteUser(userId, password);

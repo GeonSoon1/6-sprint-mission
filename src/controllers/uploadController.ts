@@ -1,17 +1,18 @@
-import path from 'path';
-import fs from 'fs';
+import type { Request, Response, NextFunction } from 'express';
 
-export const uploadFileController = (req, res, next) => {
+export const uploadFileController = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: '업로드할 파일이 없습니다.' });
     }
 
-    // 파일 저장 경로
     const fileUrl = `/uploads/${req.file.filename}`;
 
-    // 결과 반환
-    res.status(200).json({
+    return res.status(200).json({
       message: '파일 업로드 성공!',
       fileName: req.file.originalname,
       fileUrl,

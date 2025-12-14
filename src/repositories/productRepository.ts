@@ -1,7 +1,4 @@
 import prisma from '../lib/prismaClient';
-import { Product } from '@prisma/client';
-
-type UserId = Product['userId'];
 
 export function findProductsWithLikes() {
   return prisma.product.findMany({
@@ -18,7 +15,9 @@ export function findProductByIdWithLikes(id: string) {
 }
 
 export function findProductById(id: string) {
-  return prisma.product.findUnique({ where: { id } });
+  return prisma.product.findUnique({
+    where: { id },
+  });
 }
 
 export function createProduct(data: {
@@ -26,7 +25,7 @@ export function createProduct(data: {
   description: string;
   price: number;
   tags: string;
-  userId: UserId;
+  userId: string;
 }) {
   return prisma.product.create({ data });
 }
@@ -40,11 +39,16 @@ export function updateProduct(
     tags?: string;
   }
 ) {
-  return prisma.product.update({ where: { id }, data });
+  return prisma.product.update({
+    where: { id },
+    data,
+  });
 }
 
 export function deleteProduct(id: string) {
-  return prisma.product.delete({ where: { id } });
+  return prisma.product.delete({
+    where: { id },
+  });
 }
 
 export function findMyProducts(userId: string) {
@@ -61,7 +65,9 @@ export function findProductLike(userId: string, productId: string) {
 }
 
 export function deleteProductLike(likeId: string) {
-  return prisma.productLike.delete({ where: { id: likeId } });
+  return prisma.productLike.delete({
+    where: { id: likeId },
+  });
 }
 
 export function createProductLike(userId: string, productId: string) {
@@ -71,7 +77,9 @@ export function createProductLike(userId: string, productId: string) {
 }
 
 export function countProductLikes(productId: string) {
-  return prisma.productLike.count({ where: { productId } });
+  return prisma.productLike.count({
+    where: { productId },
+  });
 }
 
 export function findLikedProducts(userId: string) {

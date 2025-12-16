@@ -31,8 +31,8 @@ model User {
   articles        Article[]
   productComments ProductComment[]
   articleComments ArticleComment[]
-  favorites       Favorite[]
-  likes           Like[]
+  productLikes    ProductLike[]
+  articleLikes    ArticleLike[]
 }
 
 model UserPreference {
@@ -45,22 +45,22 @@ model UserPreference {
 }
 
 model Product {
-  id          String           @id @default(uuid())
-  name        String
-  description String?
-  category    Category
-  price       Float
-  stock       Int
-  status      ProductStatus    @default(ON_SALE)
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
-  tags        Tag[]
-  images      ProductImage[]
-  comments    ProductComment[]
-  likeCount   Int              @default(0)
-  author      User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String
-  favorites   Favorite[]
+  id           String           @id @default(uuid())
+  name         String
+  description  String?
+  category     Category
+  price        Float
+  stock        Int
+  status       ProductStatus    @default(ON_SALE)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  tags         Tag[]
+  images       ProductImage[]
+  comments     ProductComment[]
+  likeCount    Int              @default(0)
+  author       User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId     String
+  productLikes ProductLike[]
 }
 
 model Tag {
@@ -83,6 +83,16 @@ model ProductImage {
   createdAt DateTime @default(now())
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
+}
+
+model ProductLike {
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  createdAt DateTime @default(now())
+
+  @@id([userId, productId])
 }
 
 enum Category {
@@ -114,16 +124,16 @@ enum ProductStatus {
 }
 
 model Article {
-  id        String           @id @default(uuid())
-  title     String
-  content   String
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-  comments  ArticleComment[]
-  likeCount Int              @default(0)
-  author    User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId  String
-  likes     Like[]
+  id           String           @id @default(uuid())
+  title        String
+  content      String
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  comments     ArticleComment[]
+  likeCount    Int              @default(0)
+  author       User             @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId     String
+  articleLikes ArticleLike[]
 }
 
 model ArticleComment {
@@ -148,17 +158,7 @@ model ProductComment {
   authorId  String
 }
 
-model Favorite {
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
-  createdAt DateTime @default(now())
-
-  @@id([userId, productId])
-}
-
-model Like {
+model ArticleLike {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
   article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)

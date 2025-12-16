@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { fakerKO as faker } from '@faker-js/faker';
-import { CATEGORIES, PRODUCT_STATUS } from '../dist/lib/enums.js';
+import { CATEGORIES, PRODUCT_STATUS } from '../src/lib/enums.js';
 import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();

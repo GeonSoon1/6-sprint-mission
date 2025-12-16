@@ -1,0 +1,67 @@
+import { Request, Response } from 'express';
+import { CreateArticleDTO } from '../lib/dto';
+import { ArticleService } from '../services/articleService';
+
+export class ArticleController {
+  constructor(private articleService: ArticleService) {}
+
+  /**
+   * 게시글 생성
+   */
+  public createArticle = async (req: Request, res: Response) => {
+    const articleData: CreateArticleDTO = req.body;
+    const userId = req.user!.id;
+
+    const article = await this.articleService.createArticle(
+      userId,
+      articleData,
+    );
+    res.status(201).json(article);
+  };
+
+  /**
+   * 게시글 목록
+   */
+  public getArticles = async (req: Request, res: Response) => {
+    const { skip, take } = (req as any).pagination;
+    const articles = await this.articleService.findArticles({ skip, take });
+    res.status(200).json(articles);
+  };
+
+  /**
+   * 게시글 상세
+   */
+  public getArticleById = async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    const article = await this.articleService.findArticleById(id);
+    res.status(200).json(article);
+  };
+
+  /**
+   * 게시글 수정
+   */
+  public updateArticle = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const data = req.body;
+    const userId = req.user!.id;
+
+    const newArticle = await this.articleService.updateArticle(
+      id,
+      userId,
+      data,
+    );
+    res.status(200).json(newArticle);
+  };
+
+  /**
+   * 게시글 삭제
+   */
+  public deleteArticle = async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const userId = req.user!.id;
+
+    await this.articleService.deleteArticle(id, userId);
+    res.status(204).send();
+  };
+}

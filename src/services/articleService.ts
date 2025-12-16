@@ -1,9 +1,13 @@
-import { ArticleRepository } from '../repositories/articleRepository';
+import { ArticleRepository } from '../repositories';
 import { Prisma, User, Article } from '@prisma/client';
-import { CreateArticleDTO } from '../lib/dto';
+import { CreateArticleDTO } from '../dto';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
+import { NotFoundError, ForbiddenError } from '../lib/errors';
 
+@injectable()
 export class ArticleService {
-  constructor(private articleRepository: ArticleRepository) {}
+  constructor(@inject(TYPES.ArticleRepository) private articleRepository: ArticleRepository) {}
 
   /**
    * 게시물 등록
@@ -32,9 +36,7 @@ export class ArticleService {
   async findArticleById(id: Article['id']) {
     const article = await this.articleRepository.findArticleById(id);
     if (!article) {
-      const error = new Error('게시글을 찾을 수 없습니다.');
-      (error as any).status = 404;
-      throw error;
+      throw new NotFoundError('게시글을 찾을 수 없습니다.');
     }
     return article;
   }
@@ -62,22 +64,15 @@ export class ArticleService {
   /**
    * 헬퍼 메소드(private)
    */
-  private async checkArticleOwnership(
-    articleId: Article['id'],
-    userId: User['id'],
-  ) {
+  private async checkArticleOwnership(articleId: Article['id'], userId: User['id']) {
     const article = await this.articleRepository.findArticleById(articleId);
 
     if (!article) {
-      const error = new Error('게시글을 찾을 수 없습니다.');
-      (error as any).status = 404;
-      throw error;
+      throw new NotFoundError('게시글을 찾을 수 없습니다.');
     }
 
     if (article.authorId !== userId) {
-      const error = new Error('수정 권한이 없습니다.');
-      (error as any).status = 403; // Forbidden(권한 없음)
-      throw error;
+      throw new ForbiddenError('게시글을 찾을 수 없습니다.');
     }
     return article;
   }

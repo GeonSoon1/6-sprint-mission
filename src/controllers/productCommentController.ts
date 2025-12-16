@@ -1,19 +1,21 @@
 import { Request, Response } from 'express';
-import { ProductCommentService } from '../services/productCommentService';
+import { ProductCommentService } from '../services';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
 
+@injectable()
 export class ProductCommentController {
-  constructor(private readonly productCommentService: ProductCommentService) {}
+  constructor(
+    @inject(TYPES.ProductCommentService)
+    private readonly productCommentService: ProductCommentService,
+  ) {}
 
   public createComment = async (req: Request, res: Response) => {
     const { productId } = req.params;
     const authorId = req.user!.id;
     const content = req.body;
 
-    const newProduct = await this.productCommentService.createComment(
-      productId,
-      authorId,
-      content,
-    );
+    const newProduct = await this.productCommentService.createComment(productId, authorId, content);
 
     res.status(201).json(newProduct);
   };

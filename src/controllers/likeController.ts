@@ -1,8 +1,11 @@
 import type { Request, Response } from 'express';
-import { LikeService } from '../services/likeService';
+import { LikeService } from '../services';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
 
+@injectable()
 export class LikeController {
-  constructor(private likeService: LikeService) {}
+  constructor(@inject(TYPES.LikeService) private readonly likeService: LikeService) {}
 
   // 상품 좋아요 토글
   public toggleProductLike = async (req: Request, res: Response) => {

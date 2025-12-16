@@ -1,78 +1,50 @@
 import { Router } from 'express';
-import { PrismaClient } from '@prisma/client';
-
 import { pagination } from '../middlewares/pagination';
 import { isLoggedIn } from '../middlewares/isLoggedIn';
 import { asyncHandler } from '../middlewares/asyncHandler';
-import { validate, ArticleValidators } from '../middlewares/validator';
+import { validator } from '../middlewares/validator';
+import { CreateArticleDTO, UpdateArticleDTO, ArticleIdParamDTO } from '../dto';
+import { ArticleController, LikeController } from '../controllers';
 
-import { ArticleRepository } from '../repositories/articleRepository';
-import { ArticleService } from '../services/articleService';
-import { ArticleController } from '../controllers/articleController';
+import { container } from '../lib/inversify.config';
+import { TYPES } from '../types/di';
 
-import { LikeRepository } from '../repositories/likeRepository';
-import { LikeService } from '../services/likeService';
-import { LikeController } from '../controllers/likeController';
-
-import { ProductRepository } from '../repositories/productRepository';
+const articleController = container.get<ArticleController>(TYPES.ArticleController);
+const likeController = container.get<LikeController>(TYPES.LikeController);
 
 const router = Router();
-
-const prisma = new PrismaClient();
-const articleRepository = new ArticleRepository(prisma);
-const productRepository = new ProductRepository(prisma);
-const articleService = new ArticleService(articleRepository);
-const articleController = new ArticleController(articleService);
-
-const likeRepository = new LikeRepository(prisma);
-const likeService = new LikeService(
-  likeRepository,
-  productRepository,
-  articleRepository,
-);
-const likeController = new LikeController(likeService);
-
-const articleValidator = ArticleValidators();
 
 router
   .route('/')
   .post(
     isLoggedIn,
-    articleValidator.createValidator,
-    validate,
-    asyncHandler(articleController.createArticle),
+    validator({ body: CreateArticleDTO }),
+    asyncHandler(articleController.createArticle), // 게시글 생성
   )
-  .get(pagination, asyncHandler(articleController.getArticles));
+  .get(pagination, asyncHandler(articleController.getArticles)); // 게시글 목록
 
 router
   .route('/:id')
   .patch(
     isLoggedIn,
-    articleValidator.validateId,
-    articleValidator.updateValidator,
-    validate,
-    asyncHandler(articleController.updateArticle),
+    validator({ body: UpdateArticleDTO, params: ArticleIdParamDTO }),
+    asyncHandler(articleController.updateArticle), //게시글 수정
   )
   .get(
     isLoggedIn,
-    articleValidator.validateId,
-    validate,
-    asyncHandler(articleController.getArticleById),
+    validator({ params: ArticleIdParamDTO }),
+    asyncHandler(articleController.getArticleById), // 게시글 ID로 가져오기
   )
   .delete(
     isLoggedIn,
-    articleValidator.validateId,
-    validate,
-    asyncHandler(articleController.deleteArticle),
+    validator({ params: ArticleIdParamDTO }),
+    asyncHandler(articleController.deleteArticle), // 게시글 삭제
   );
 
-router
-  .route('/:id/like')
-  .post(
-    isLoggedIn,
-    articleValidator.validateArticleId,
-    validate,
-    asyncHandler(likeController.toggleArticleLike),
-  );
+router.route('/:id/like').post(
+  isLoggedIn,
+  validator({ params: ArticleIdParamDTO }),
+  asyncHandler(likeController.toggleArticleLike), //게시글 좋아요 토글
+);
 
 export default router;

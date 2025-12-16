@@ -1,21 +1,22 @@
 import type { Request, Response } from 'express';
-import { AuthService } from '../services/authService';
+import { AuthService } from '../services';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
+import { UnauthorizedError } from '../lib/errors';
 
+@injectable()
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(@inject(TYPES.AuthService) private readonly authService: AuthService) {}
 
   /**
    * 회원가입(signUp)
    */
   public signUp = async (req: Request, res: Response) => {
-    const newUser = await this.authService.singUp(req.body);
+    const newUser = await this.authService.signUp(req.body);
+    const { password, ...newUserData } = newUser;
     res.status(201).json({
       message: '회원가입이 완료되었습니다.',
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        nickname: newUser.nickname,
-      },
+      user: newUserData,
     });
   };
 
@@ -48,13 +49,9 @@ export class AuthController {
   public refresh = async (req: Request, res: Response) => {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
-      const error = new Error('Refresh Token이 존재하지 않습니다.');
-      (error as any).status = 401;
-      throw error;
+      throw new UnauthorizedError('Refresh Token이 존재하지 않습니다.');
     }
-    const { accessToken } = await this.authService.refreshAccessToken(
-      refreshToken,
-    );
+    const { accessToken } = await this.authService.refreshAccessToken(refreshToken);
 
     res.status(200).json({
       message: 'Access Token이 재발급되었습니다.',

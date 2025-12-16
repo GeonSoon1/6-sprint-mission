@@ -1,7 +1,10 @@
-import type { Prisma, PrismaClient, User } from '@prisma/client';
+import type { Prisma, PrismaClient, Product } from '@prisma/client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
 
+@injectable()
 export class ProductRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(TYPES.PrismaClient) private prisma: PrismaClient) {}
 
   /**
    * 상품 등록
@@ -20,21 +23,21 @@ export class ProductRepository {
   /**
    * 상품 ID로 찾기
    */
-  async findProductById(id: User['id']) {
+  async findProductById(id: Product['id']) {
     return this.prisma.product.findUnique({ where: { id } });
   }
 
   /**
    * 상품정보수정
    */
-  async updateProduct(id: User['id'], data: Prisma.ProductUpdateInput) {
+  async updateProduct(id: Product['id'], data: Prisma.ProductUpdateInput) {
     return this.prisma.product.update({ where: { id }, data });
   }
 
   /**
    * 상품삭제
    */
-  async deleteProduct(id: User['id']) {
+  async deleteProduct(id: Product['id']) {
     return this.prisma.product.delete({ where: { id } });
   }
 }

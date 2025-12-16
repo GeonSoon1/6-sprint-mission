@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
-import { CreateArticleDTO } from '../lib/dto';
-import { ArticleService } from '../services/articleService';
+import { CreateArticleDTO } from '../dto';
+import { ArticleService } from '../services';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
 
+@injectable()
 export class ArticleController {
-  constructor(private articleService: ArticleService) {}
+  constructor(@inject(TYPES.ArticleService) private readonly articleService: ArticleService) {}
 
   /**
    * 게시글 생성
@@ -12,10 +15,7 @@ export class ArticleController {
     const articleData: CreateArticleDTO = req.body;
     const userId = req.user!.id;
 
-    const article = await this.articleService.createArticle(
-      userId,
-      articleData,
-    );
+    const article = await this.articleService.createArticle(userId, articleData);
     res.status(201).json(article);
   };
 
@@ -46,11 +46,7 @@ export class ArticleController {
     const data = req.body;
     const userId = req.user!.id;
 
-    const newArticle = await this.articleService.updateArticle(
-      id,
-      userId,
-      data,
-    );
+    const newArticle = await this.articleService.updateArticle(id, userId, data);
     res.status(200).json(newArticle);
   };
 

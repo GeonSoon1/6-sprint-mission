@@ -1,17 +1,20 @@
-import { ProductCommentRepository } from '../repositories/productCommentRepository';
+import { ProductCommentRepository } from '../repositories';
 import { Prisma, Product, User, ProductComment } from '@prisma/client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
+import { NotFoundError, UnauthorizedError } from '../lib/errors';
 
+@injectable()
 export class ProductCommentService {
-  constructor(private productCommentRepository: ProductCommentRepository) {}
+  constructor(
+    @inject(TYPES.ProductCommentRepository)
+    private productCommentRepository: ProductCommentRepository,
+  ) {}
 
   /**
    * 댓글 작성
    */
-  async createComment(
-    productId: Product['id'],
-    authorId: User['id'],
-    content: string,
-  ) {
+  async createComment(productId: Product['id'], authorId: User['id'], content: string) {
     const data: Prisma.ProductCommentCreateInput = {
       product: { connect: { id: productId } },
       author: { connect: { id: authorId } },
@@ -48,18 +51,15 @@ export class ProductCommentService {
   }
 
   // 헬퍼 메소드
-  async checkCommentOwner(
-    commentId: ProductComment['id'],
-    authorId: User['id'],
-  ) {
+  async checkCommentOwner(commentId: ProductComment['id'], authorId: User['id']) {
     const comment = await this.productCommentRepository.findById(commentId);
 
     if (!comment) {
-      throw new Error('댓글을 찾을 수 없습니다.');
+      throw new NotFoundError('댓글을 찾을 수 없습니다.');
     }
 
     if (comment.authorId !== authorId) {
-      throw new Error('수정 및 삭제할 권한이 없습니다.');
+      throw new UnauthorizedError('수정 및 삭제할 권한이 없습니다.');
     }
   }
 }

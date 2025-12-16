@@ -1,8 +1,12 @@
 import { Request, Response } from 'express';
-import { UserService } from '../services/userService';
+import { UserService } from '../services';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
+import { NotFoundError, ForbiddenError } from '../lib/errors';
 
+@injectable()
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(@inject(TYPES.UserService) private readonly userService: UserService) {}
 
   /**
    * 회원 ID로 회원 찾기
@@ -12,7 +16,7 @@ export class UserController {
 
     const user = await this.userService.findUserById(id);
     if (!user) {
-      return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+      throw new NotFoundError('사용자를 찾을 수 없습니다.');
     }
 
     const { password, ...restUser } = user;

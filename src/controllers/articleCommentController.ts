@@ -1,19 +1,21 @@
 import { Request, Response } from 'express';
-import { ArticleCommentService } from '../services/articleCommentService';
+import { ArticleCommentService } from '../services';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
 
+@injectable()
 export class ArticleCommentController {
-  constructor(private articleCommentService: ArticleCommentService) {}
+  constructor(
+    @inject(TYPES.ArticleCommentService)
+    private readonly articleCommentService: ArticleCommentService,
+  ) {}
 
   public createComment = async (req: Request, res: Response) => {
     const { articleId } = req.params;
     const authorId = req.user!.id;
     const content = req.body;
 
-    const newComment = await this.articleCommentService.createComment(
-      articleId,
-      authorId,
-      content,
-    );
+    const newComment = await this.articleCommentService.createComment(articleId, authorId, content);
     res.status(201).json(newComment);
   };
 

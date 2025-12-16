@@ -1,8 +1,10 @@
-# Panda Market API Server
+# Panda Market API Server (Refactored with DI)
 
 ## 개요
 
-이 프로젝트는 'Panda Market' 중고 거래 애플리케이션을 위한 API 서버입니다. Node.js, Express.js, TypeScript를 기반으로 구축되었으며, Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용합니다. RESTful API 서버를 구현하고, 계층화된 아키텍처(Controller, Service, Repository)를 적용하여 코드의 모듈성과 유지보수성을 높이는 데 중점을 두었습니다.
+이 프로젝트는 'Panda Market' 중고 거래 애플리케이션을 위한 API 서버입니다. **Node.js, Express, TypeScript**를 기반으로 구축되었으며, **IoC(Inversion of Control, 제어의 역전)** 원칙을 적용하기 위해 **InversifyJS** 의존성 주입(DI) 프레임워크를 도입하여 아키텍처를 개선했습니다. 이를 통해 각 계층(Controller, Service, Repository) 간의 결합도를 낮추고 코드의 유연성, 테스트 용이성, 유지보수성을 극대화했습니다.
+
+Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통적인 Express 라우팅 방식과 DI 컨테이너를 결합하여 명확하고 확장 가능한 구조를 구현했습니다.
 
 ### 주요 기술
 
@@ -10,8 +12,9 @@
 - **언어:** TypeScript
 - **Database:** PostgreSQL
 - **ORM:** Prisma
+- **DI (Dependency Injection):** InversifyJS, reflect-metadata
 - **인증:** JWT (jsonwebtoken), bcrypt
-- **Validation:** express-validator
+- **Validation:** class-validator, class-transformer
 - **파일 업로드:** Multer
 
 ### 주요 라이브러리
@@ -21,48 +24,51 @@
 - **`@prisma/client`**: Prisma 클라이언트 (데이터베이스 쿼리용)
 - **`express`**: 웹 프레임워크
 - **`typescript`**: 타입스크립트 언어 지원
+- **`inversify`**: 의존성 주입(DI) 컨테이너
+- **`reflect-metadata`**: 데코레이터 메타데이터를 분석하기 위한 라이브러리 (InversifyJS 필수 의존성)
 - **`jsonwebtoken`**: JWT 기반 인증 토큰 생성 및 검증
 - **`bcrypt`**: 비밀번호 해싱
-- **`express-validator`**: API 요청 데이터 유효성 검사
+- **`class-validator`**, **`class-transformer`**: DTO 클래스 기반의 데이터 유효성 검사 및 변환
 - **`multer`**: 파일 업로드(multipart/form-data) 처리
-- **`cors`**: CORS(Cross-Origin Resource Sharing) 처리
-- **`dotenv`**: 환경 변수 관리
-- **`nodemon`**: 개발 환경에서 파일 변경 시 자동 서버 재시작
-
-### 의존성 설치
-
-```bash
-npm install
-```
 
 ---
 
-## 아키텍처
+## 아키텍처 (DI와 Express Router 결합)
 
-본 프로젝트는 역할에 따라 코드를 분리하는 계층형 아키텍처(Layered Architecture)를 따릅니다.
+본 프로젝트는 **DI 컨테이너**가 계층별 객체 생성을 책임지고, **Express 라우터**가 HTTP 요청을 처리하는 역할을 명확히 분리한 아키텍처를 따릅니다.
 
-- **`src/main.ts`**: Express 애플리케이션의 진입점으로, 미들웨어 설정 및 라우터 등록을 담당합니다.
-- **`src/router/`**: API 엔드포인트를 정의하고, 해당 경로로 들어온 요청을 적절한 컨트롤러에 연결합니다.
-- **`src/controller/`**: HTTP 요청을 수신하여 요청 데이터를 정제하고, 비즈니스 로직을 처리하는 서비스 계층에 작업을 위임한 후, 결과를 클라이언트에 응답합니다.
-- **`src/service/`**: 애플리케이션의 핵심 비즈니스 로직을 수행합니다. 여러 리포지토리를 호출하여 데이터를 조작합니다.
-- **`src/repository/`**: 데이터베이스와의 상호작용을 추상화합니다. Prisma 클라이언트를 사용하여 실제 데이터 CRUD 작업을 수행합니다.
-- **`src/middleware/`**: 인증, 오류 처리, 파일 업로드 등 공통 관심사를 처리합니다. 모든 비동기 에러는 `asyncHandler`를 통해 중앙 `errorHandler`로 전달되어 일관된 형식으로 처리됩니다.
-- **`src/lib/errors/`**: `BaseError`를 상속받는 커스텀 에러 클래스(`NotFoundError`, `ForbiddenError` 등)를 정의하여, 예측 가능한 에러를 HTTP 상태 코드와 함께 명확하게 처리합니다.
-- **`src/types/`**: Express의 `Request` 객체를 확장하는 등 프로젝트 전역에서 사용되는 타입 선언을 관리합니다.
-- **`prisma/`**: Prisma 관련 파일을 관리합니다.
-  - `schema.prisma`: 데이터베이스 모델, 관계, enum을 정의합니다.
-  - `seed.js`: 개발용 초기 데이터를 생성합니다.
+1.  **DI 컨테이너 설정 (`src/lib/inversify.config.ts`)**
+
+    - 프로젝트의 모든 서비스, 리포지토리, 컨트롤러 등 각 계층의 구현체를 식별자(`TYPES`)에 바인딩(연결)하는 **설정의 중심**입니다.
+    - 애플리케이션에 필요한 모든 객체(인스턴스)는 이곳에서 생성되고 관리됩니다.
+
+2.  **라우터 계층 (`src/routers/`)**
+
+    - 각 기능(auth, users, products 등)별로 라우터 파일을 분리하여 관리합니다.
+    - 각 라우터 파일은 DI 컨테이너(`inversify.config.ts`)에서 필요한 **컨트롤러 인스턴스를 주입**받습니다. (`container.get<MyController>(...)`)
+    - 주입받은 컨트롤러의 메서드를 Express 경로(`router.get(...)`, `router.post(...)` 등)에 **수동으로 바인딩**하여 어떤 요청을 어떤 로직이 처리할지 결정합니다.
+
+3.  **애플리케이션 진입점 (`src/main.ts`)**
+
+    - Express 애플리케이션의 시작점입니다.
+    - CORS, JSON 파서 등 **글로벌 미들웨어를 설정**합니다.
+    - `src/routers/index.ts`에 통합된 **메인 라우터를 애플리케이션에 등록**하여 API 엔드포인트를 활성화합니다.
+
+4.  **계층별 역할**
+    - **`Controllers`**: HTTP 요청과 응답을 직접 처리합니다. 요청 데이터(body, params, query)를 DTO로 변환 및 검증하고, 비즈니스 로직 처리를 `Service` 계층에 위임한 뒤, 그 결과를 받아 클라이언트에 응답합니다.
+    - **`Services`**: 애플리케이션의 핵심 비즈니스 로직을 수행합니다. 여러 리포지토리를 조합하여 복잡한 작업을 처리할 수 있으며, 컨트롤러로부터 독립적으로 설계됩니다.
+    - **`Repositories`**: 데이터베이스 상호작용(CRUD)만을 담당합니다. Prisma Client를 사용하여 특정 데이터 모델에 대한 저수준(low-level) 작업을 수행합니다.
 
 ---
 
 ## 주요 기능
 
-- **사용자 인증**: 회원가입, 로그인, 토큰 갱신
-- **사용자 관리**: 프로필 조회 및 수정 (이미지 업로드 포함)
+- **사용자 인증**: 회원가입, 로그인, 로그아웃, 토큰 갱신
+- **사용자 관리**: 프로필 조회, 수정, 탈퇴, 사용자 검색
 - **상품(Product) 관리**: 상품 등록, 조회, 수정, 삭제 (CRUD)
 - **게시글(Article) 관리**: 게시글 등록, 조회, 수정, 삭제 (CRUD)
 - **댓글(Comment) 관리**: 상품 및 게시글에 대한 댓글 CRUD
-- **좋아요/즐겨찾기**: 게시글 좋아요 및 상품 즐겨찾기 기능
+- **좋아요**: 게시글 좋아요/취소 토글 기능
 
 ---
 
@@ -79,47 +85,43 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 | `POST` | `/logout`  |  O   | 로그아웃 (토큰 비활성화) |
 | `POST` | `/refresh` |  X   | Access Token 갱신        |
 
-#### 🙋‍♂️ 사용자 (User) - `/user`
+#### 🧑‍🤝‍🧑 사용자 (Users) - `/users`
 
-| Method   | Endpoint | 인증 | 설명                           |
-| :------- | :------- | :--: | :----------------------------- |
-| `GET`    | `/`      |  X   | 닉네임으로 사용자 검색         |
-| `GET`    | `/:id`   |  O   | 특정 ID의 사용자 정보 조회     |
-| `PATCH`  | `/:id`   |  O   | 현재 로그인된 사용자 정보 수정 |
-| `DELETE` | `/:id`   |  O   | 현재 로그인된 사용자 탈퇴      |
+| Method   | Endpoint | 인증 | 설명                  |
+| :------- | :------- | :--: | :-------------------- |
+| `GET`    | `/`      |  X   | 사용자 검색           |
+| `GET`    | `/:id`   |  O   | 특정 사용자 정보 조회 |
+| `PATCH`  | `/:id`   |  O   | 내 정보 수정          |
+| `DELETE` | `/:id`   |  O   | 회원 탈퇴             |
 
 #### 📦 상품 (Products) - `/products`
 
-| Method   | Endpoint    | 인증 | 설명                               |
-| :------- | :---------- | :--: | :--------------------------------- |
-| `GET`    | `/`         |  X   | 전체 상품 목록 조회 (페이지네이션) |
-| `POST`   | `/`         |  O   | 새 상품 등록                       |
-| `GET`    | `/:id`      |  X   | 특정 상품 상세 조회                |
-| `PATCH`  | `/:id`      |  O   | 특정 상품 정보 수정                |
-| `DELETE` | `/:id`      |  O   | 특정 상품 삭제                     |
-| `POST`   | `/:id/like` |  O   | 상품 좋아요/취소 (토글)            |
+| Method   | Endpoint                          | 인증 | 설명                               |
+| :------- | :-------------------------------- | :--: | :--------------------------------- |
+| `GET`    | `/`                               |  X   | 전체 상품 목록 조회 (페이지네이션) |
+| `POST`   | `/`                               |  O   | 신규 상품 등록                     |
+| `GET`    | `/:id`                            |  X   | 특정 상품 상세 조회                |
+| `PATCH`  | `/:id`                            |  O   | 상품 정보 수정                     |
+| `DELETE` | `/:id`                            |  O   | 상품 삭제                          |
+| `GET`    | `/:productId/comments`            |  X   | 특정 상품의 댓글 목록 조회         |
+| `POST`   | `/:productId/comments`            |  O   | 특정 상품에 댓글 작성              |
+| `PATCH`  | `/:productId/comments/:commentId` |  O   | 상품 댓글 수정                     |
+| `DELETE` | `/:productId/comments/:commentId` |  O   | 상품 댓글 삭제                     |
 
 #### 📝 게시글 (Articles) - `/articles`
 
-| Method   | Endpoint    | 인증 | 설명                                 |
-| :------- | :---------- | :--: | :----------------------------------- |
-| `GET`    | `/`         |  X   | 전체 게시글 목록 조회 (페이지네이션) |
-| `POST`   | `/`         |  O   | 새 게시글 등록                       |
-| `GET`    | `/:id`      |  O   | 특정 게시글 상세 조회                |
-| `PATCH`  | `/:id`      |  O   | 특정 게시글 정보 수정                |
-| `DELETE` | `/:id`      |  O   | 특정 게시글 삭제                     |
-| `POST`   | `/:id/like` |  O   | 게시글 좋아요/취소 (토글)            |
-
-#### 💬 댓글 (Comments)
-
-| Method   | Endpoint                 | 인증 | 설명                         |
-| :------- | :----------------------- | :--: | :--------------------------- |
-| `GET`    | `/products/:id/comments` |  X   | 특정 상품의 모든 댓글 조회   |
-| `POST`   | `/products/:id/comments` |  O   | 특정 상품에 새 댓글 작성     |
-| `GET`    | `/articles/:id/comments` |  X   | 특정 게시글의 모든 댓글 조회 |
-| `POST`   | `/articles/:id/comments` |  O   | 특정 게시글에 새 댓글 작성   |
-| `PATCH`  | `/comments/:id`          |  O   | 특정 댓글 수정               |
-| `DELETE` | `/comments/:id`          |  O   | 특정 댓글 삭제               |
+| Method   | Endpoint                          | 인증 | 설명                                 |
+| :------- | :-------------------------------- | :--: | :----------------------------------- |
+| `GET`    | `/`                               |  X   | 전체 게시글 목록 조회 (페이지네이션) |
+| `POST`   | `/`                               |  O   | 신규 게시글 작성                     |
+| `GET`    | `/:id`                            |  O   | 특정 게시글 상세 조회                |
+| `PATCH`  | `/:id`                            |  O   | 게시글 정보 수정                     |
+| `DELETE` | `/:id`                            |  O   | 게시글 삭제                          |
+| `POST`   | `/:id/like`                       |  O   | 게시글 좋아요/취소 토글              |
+| `GET`    | `/:articleId/comments`            |  X   | 특정 게시글의 댓글 목록 조회         |
+| `POST`   | `/:articleId/comments`            |  O   | 특정 게시글에 댓글 작성              |
+| `PATCH`  | `/:articleId/comments/:commentId` |  O   | 게시글 댓글 수정                     |
+| `DELETE` | `/:articleId/comments/:commentId` |  O   | 게시글 댓글 삭제                     |
 
 ---
 
@@ -132,54 +134,21 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 │   ├── schema.prisma
 │   └── seed.js
 ├── src/
-│   ├── main.ts
-│   ├── controllers/
-│   │   ├── articleCommentController.ts
-│   │   ├── articleController.ts
-│   │   ├── authController.ts
-│   │   ├── likeController.ts
-│   │   ├── productCommentController.ts
-│   │   ├── productController.ts
-│   │   └── userController.ts
-│   ├── lib/
-│   │   ├── constants.ts
-│   │   ├── dto.ts
-│   │   ├── enums.ts
-│   │   └── errors/
-│   ├── middlewares/
-│   │   ├── asyncHandler.ts
-│   │   ├── errorHandler.ts
-│   │   ├── imageUploader.ts
-│   │   ├── isLoggedIn.ts
-│   │   ├── pagination.ts
-│   │   └── validator.ts
-│   ├── repositories/
-│   │   ├── articleCommentRepository.ts
-│   │   ├── articleRepository.ts
-│   │   ├── authRepository.ts
-│   │   ├── likeRepository.ts
-│   │   ├── productCommentRepository.ts
-│   │   ├── productRepository.ts
-│   │   └── userRepository.ts
-│   ├── routers/
-│   │   ├── articleCommentRouter.ts
-│   │   ├── articleRouter.ts
+│   ├── main.ts              <-- Express 앱 설정 및 실행
+│   ├── controllers/         <-- HTTP 요청/응답 처리 로직
+│   ├── services/            <-- 비즈니스 로직
+│   ├── repositories/        <-- 데이터베이스 접근 로직
+│   ├── routers/             <-- API 엔드포인트 정의 및 컨트롤러 연결
+│   │   ├── index.ts         <-- 모든 라우터 통합
 │   │   ├── authRouter.ts
-│   │   ├── index.ts
-│   │   ├── productCommentRouter.ts
-│   │   ├── productRouter.ts
-│   │   └── userRouter.ts
-│   ├── services/
-│   │   ├── articleCommentService.ts
-│   │   ├── articleService.ts
-│   │   ├── authService.ts
-│   │   ├── likeService.ts
-│   │   ├── productCommentService.ts
-│   │   ├── productService.ts
-│   │   └── userService.ts
+│   │   └── ... (기타 라우터)
+│   ├── dto/                 <-- 데이터 전송 객체 (유효성 검사 규칙 포함)
+│   ├── lib/
+│   │   ├── inversify.config.ts  <-- DI 컨테이너 설정
+│   │   └── errors/
+│   ├── middlewares/         <-- Express 미들웨어 (인증, 에러 핸들링 등)
 │   └── types/
-│       └── express.d.ts
-├── uploads/
+│       └── di.ts            <-- DI 주입 식별자(타입)
 ├── .gitignore
 ├── package.json
 ├── tsconfig.json
@@ -191,11 +160,19 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 
 ## 개발 컨벤션
 
-- **코드 스타일**: Prettier를 사용하여 일관된 코드 스타일을 유지합니다. (`.prettierrc` 설정 파일 참고)
-- **언어**: TypeScript를 사용하여 타입 안정성을 확보합니다.
-- **비동기 처리**: 모든 비동기 작업은 `async/await`를 사용합니다. 컨트롤러의 비동기 로직은 `asyncHandler` 유틸리티로 감싸 에러를 중앙에서 처리합니다. 서비스 로직에서 `NotFoundError`, `ForbiddenError` 등 상황에 맞는 커스텀 에러를 `throw`하면, 중앙 에러 핸들러(`errorHandler.ts`)가 이를 감지하여 적절한 HTTP 상태 코드와 메시지를 클라이언트에 응답합니다.
-- **데이터 유효성 검사**: `express-validator`를 사용하여 각 API의 요청 `body`, `params`, `query`를 검증합니다. 유효성 검사 로직은 `validator.ts` 미들웨어를 통해 라우터 레벨에서 적용됩니다.
-- **데이터베이스 모델링**: `prisma/schema.prisma` 파일에서 데이터 모델과 관계를 정의합니다. 스키마 변경 후에는 `npx prisma migrate dev` 명령어로 마이그레이션을 수행해야 합니다.
+- **코드 스타일**: Prettier를 사용하여 일관된 코드 스타일을 유지합니다.
+- **의존성 주입(DI)**:
+  - 주입 가능한 모든 클래스(서비스, 리포지토리, 컨트롤러)는 `@injectable()` 데코레이터를 가져야 합니다.
+  - 의존성은 생성자 주입을 원칙으로 하며, `@inject(TYPES.Identifier)` 데코레이터를 사용하여 주입받을 대상을 명시합니다.
+  - 모든 의존성 바인딩 정보는 `inversify.config.ts`에서 중앙 관리합니다.
+- **라우팅**:
+  - `src/routers` 폴더에서 기능별로 라우터 파일을 관리합니다.
+  - 각 라우터 파일은 Inversify 컨테이너에서 컨트롤러 인스턴스를 `get()`하여 사용합니다.
+  - Express의 `Router`를 사용하여 경로와 컨트롤러 메서드를 명시적으로 연결합니다.
+- **비동기 처리**: 컨트롤러의 비동기 로직은 `asyncHandler` 유틸리티로 감싸 중앙 `errorHandler`에서 에러를 일괄 처리합니다.
+- **데이터 유효성 검사**:
+  - `src/dto/` 폴더에 각 기능별 DTO 클래스를 정의하고 `class-validator` 데코레이터를 사용해 유효성 규칙을 선언합니다.
+  - 라우터에 `validator` 미들웨어를 사용하여 해당 DTO를 기준으로 요청 데이터를 검증합니다. 예: `validator(CreateArticleDto)`
 
 ---
 
@@ -232,6 +209,9 @@ npx prisma db seed
 개발 모드에서는 `nodemon`과 `ts-node`를 사용하여 파일 변경 시 서버가 자동으로 재시작됩니다.
 
 ```bash
+# 의존성 설치
+npm install
+
 # 개발 모드로 실행
 npm run dev
 ```

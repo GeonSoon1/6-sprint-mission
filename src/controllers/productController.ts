@@ -1,9 +1,12 @@
 import type { Request, Response } from 'express';
-import { CreateProductDTO } from '../lib/dto';
-import { ProductService } from '../services/productService';
+import { CreateProductDTO } from '../dto';
+import { ProductService } from '../services';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types/di';
 
+@injectable()
 export class ProductController {
-  constructor(private productService: ProductService) {}
+  constructor(@inject(TYPES.ProductService) private readonly productService: ProductService) {}
 
   // 상품 생성 콘트롤러
   public createProduct = async (req: Request, res: Response) => {
@@ -35,11 +38,7 @@ export class ProductController {
     const userId = req.user!.id;
     const product = req.body;
 
-    const updatedProduct = await this.productService.updateProduct(
-      id,
-      userId,
-      product,
-    );
+    const updatedProduct = await this.productService.updateProduct(id, userId, product);
     res.status(200).json(updatedProduct);
   };
 

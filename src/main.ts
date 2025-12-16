@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import cors from 'cors';
 import express from 'express';
 import cookieParser from 'cookie-parser';
@@ -5,7 +7,8 @@ import cookieParser from 'cookie-parser';
 import { PORT } from './lib/constants';
 import { uploadPath } from './middlewares/imageUploader';
 import { errorHandler } from './middlewares/errorHandler';
-import router from './routers/index';
+
+import router from './routers';
 
 const app = express();
 

@@ -8,7 +8,10 @@ import { NotFoundError, ForbiddenError } from '../lib/errors';
 @injectable()
 export class ProductService {
   // 생성자(constructor)에서 ProductRepository의 인스턴스 주입 받음
-  constructor(@inject(TYPES.ProductRepository) private productRepository: ProductRepository) {}
+  constructor(
+    @inject(TYPES.ProductRepository)
+    private productRepository: ProductRepository,
+  ) {}
 
   /**
    * 상품 등록

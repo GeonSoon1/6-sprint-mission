@@ -7,7 +7,10 @@ import { NotFoundError, ForbiddenError } from '../lib/errors';
 
 @injectable()
 export class ArticleService {
-  constructor(@inject(TYPES.ArticleRepository) private articleRepository: ArticleRepository) {}
+  constructor(
+    @inject(TYPES.ArticleRepository)
+    private articleRepository: ArticleRepository,
+  ) {}
 
   /**
    * 게시물 등록

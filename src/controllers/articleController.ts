@@ -6,7 +6,10 @@ import { TYPES } from '../types/di';
 
 @injectable()
 export class ArticleController {
-  constructor(@inject(TYPES.ArticleService) private readonly articleService: ArticleService) {}
+  constructor(
+    @inject(TYPES.ArticleService)
+    private readonly articleService: ArticleService,
+  ) {}
 
   /**
    * 게시글 생성

@@ -6,7 +6,10 @@ import { TYPES } from '../types/di';
 
 @injectable()
 export class ProductController {
-  constructor(@inject(TYPES.ProductService) private readonly productService: ProductService) {}
+  constructor(
+    @inject(TYPES.ProductService)
+    private readonly productService: ProductService,
+  ) {}
 
   // 상품 생성 콘트롤러
   public createProduct = async (req: Request, res: Response) => {

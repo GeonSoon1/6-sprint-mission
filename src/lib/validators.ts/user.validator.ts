@@ -1,7 +1,6 @@
 import {
   registerDecorator,
   ValidationOptions,
-  ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { prisma } from '../constants'; // export된 prisma 인스턴스를 가져옵니다.

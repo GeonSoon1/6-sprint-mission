@@ -1,11 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
 
-export async function isLoggedIn(
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+export async function isLoggedIn(req: Request, res: Response, next: NextFunction) {
   // 환경변수에서 비밀 키 가져오기(없으면 서버 실행 안됨)
   const secretKey = process.env.JWT_SECRET_KEY;
 

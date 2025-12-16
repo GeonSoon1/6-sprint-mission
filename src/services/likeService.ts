@@ -8,8 +8,10 @@ import { NotFoundError } from '../lib/errors';
 export class LikeService {
   constructor(
     @inject(TYPES.LikeRepository) private likeRepository: LikeRepository,
-    @inject(TYPES.ProductRepository) private productRepository: ProductRepository,
-    @inject(TYPES.ArticleRepository) private articleRepository: ArticleRepository,
+    @inject(TYPES.ProductRepository)
+    private productRepository: ProductRepository,
+    @inject(TYPES.ArticleRepository)
+    private articleRepository: ArticleRepository,
   ) {}
 
   async toggleProductLike(userId: User['id'], productId: Product['id']) {

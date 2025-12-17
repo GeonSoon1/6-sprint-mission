@@ -1,8 +1,10 @@
-import productRepository from '../repositories/productRepository.js';
-import productLikeRepository from '../repositories/productLikeRepository.js';
+import productRepository from '../repositories/productRepository';
+import productLikeRepository from '../repositories/productLikeRepository';
+import { ProductFindOptions } from '../libs/interfaces';
+
 
 class ProductService {
-    async likeProduct(userId, productId) {
+    async likeProduct(userId: number, productId: number) {
         const existingLike = await productLikeRepository.find(userId, productId);
 
         if (existingLike) {
@@ -14,13 +16,13 @@ class ProductService {
         }
     }
 
-    async getProductById(productId, userId) {
+    async getProductById(productId: number, userId: number) {
         const product = await productRepository.findById(productId, userId);
         const { productLikes, ...rest } = product;
         return { ...rest, isLiked: productLikes.length > 0 };
     }
 
-    async getProducts(findOptions, userId) {
+    async getProducts(findOptions: ProductFindOptions, userId: number) {
         const products = await productRepository.findAll(findOptions, userId);
         return products.map((product) => {
             const { productLikes, ...rest } = product;

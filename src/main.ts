@@ -1,8 +1,8 @@
-import { PORT, EXPRESS } from './libs/constants.js';
+import { PORT, EXPRESS } from './libs/constants';
 import cors from 'cors';
-import { RouterManager } from './Routers/routerManager.js';
-import { getCorsOrigin, corsOriginChecker } from './libs/corsSetUp.js';
-import errorHandler from './libs/Handler/errorHandler.js';
+import { RouterManager } from './Routers/routerManager';
+import { getCorsOrigin } from './libs/corsSetUp';
+import errorHandler from './libs/Handler/errorHandler';
 
 const app = EXPRESS();
 

@@ -1,12 +1,13 @@
-import { userService } from '../services/userService.js';
+import { userService } from '../services/userService';
+import { ExpressHandler } from '../libs/constants';
 
 export default class UserServiceController {
-    async register(req, res) {
+    register: ExpressHandler = async (req, res) => {
         const user = await userService.createUser(req.body);
         return res.status(201).json(user);
-    }
+    };
 
-    async login(req, res) {
+    login: ExpressHandler = async (req, res) => {
         const { email, password } = req.body;
         const user = await userService.getUser(email, password);
         const accessToken = userService.createToken(user);
@@ -18,10 +19,10 @@ export default class UserServiceController {
             secure: true
         });
         return res.status(200).json({ accessToken });
-    }
-    async refresh(req, res) {
+    };
+    refresh: ExpressHandler = async (req, res) => {
         const { refreshToken } = req.cookies;
-        const { userId } = req.auth;
+        const { userId } = req.auth!;
         const { accessToken, newRefreshToken } = await userService.refreshToken(userId, refreshToken); // 변경
         await userService.updateUser(userId, { refreshToken: newRefreshToken }); // 추가
         res.cookie('refreshToken', newRefreshToken, { // 추가
@@ -31,33 +32,33 @@ export default class UserServiceController {
             secure: true,
         });
         return res.json({ accessToken });
-    }
-    async GetMe(req, res) {
-        const userId = req.user.userId;
+    };
+    GetMe: ExpressHandler = async (req, res) => {
+        const userId = req.user!.userId;
         const user = await userService.getUserById(userId);
         return res.status(200).json(user);
-    }
-    async updateMe(req, res) {
-        const userId = req.user.userId;
+    };
+    updateMe: ExpressHandler = async (req, res) => {
+        const userId = req.user!.userId;
         const updatedUser = await userService.updateProfile(userId, req.body);
         return res.status(200).json(updatedUser);
-    }
+    };
 
-    async updateMyPassword(req, res) {
-        const userId = req.user.userId;
+    updateMyPassword: ExpressHandler = async (req, res) => {
+        const userId = req.user!.userId;
         const updatedUser = await userService.updatePassword(userId, req.body);
         return res.status(200).json(updatedUser);
-    }
+    };
 
-    async getMyProducts(req, res) {
-        const userId = req.user.userId;
+    getMyProducts: ExpressHandler = async (req, res) => {
+        const userId = req.user!.userId;
         const products = await userService.getProductsByUserId(userId);
         return res.status(200).json(products);
-    }
+    };
 
-    async getMyLikedProducts(req, res) {
-        const userId = req.user.userId;
+    getMyLikedProducts: ExpressHandler = async (req, res) => {
+        const userId = req.user!.userId;
         const products = await userService.getLikedProductsByUserId(userId);
         return res.status(200).json(products);
-    }
+    };
 }

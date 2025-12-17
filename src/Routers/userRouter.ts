@@ -1,7 +1,7 @@
-import { EXPRESS } from './../libs/constants.js';
-import { catchAsync } from './../libs/catchAsync.js';
-import UserServiceController from '../controller/userController.js';
-import auth from '../middlewares/auth.js';
+import { EXPRESS } from '../libs/constants';
+import { catchAsync } from '../libs/catchAsync';
+import UserServiceController from '../controller/userController';
+import auth from '../middlewares/auth';
 
 const userRouter = EXPRESS.Router();
 const userController = new UserServiceController();

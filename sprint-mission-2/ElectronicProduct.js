@@ -1,4 +1,4 @@
-import { Product } from './product.js';
+import { Product } from './product';
 
 export class ElectronicProduct extends Product {
   constructor(name, decription, prcie, tags, images, manufacturerr) {

@@ -1,6 +1,7 @@
-import { prismaClient } from '../libs/constants.js';
+import { prismaClient } from '../libs/constants';
+import { UserType } from "./../libs/interfaces";
 
-async function findById(id) {
+async function findById(id: number) {
     return prismaClient.user.findUnique({
         where: {
             id,
@@ -8,15 +9,15 @@ async function findById(id) {
     });
 }
 
-async function findByEmail(email) {
+async function findByEmail(email: string) {
     return await prismaClient.user.findUnique({
         where: {
             email,
         },
     });
-}
+};
 
-async function save(user) {
+async function save(user: UserType) {
     return prismaClient.user.create({
         data: {
             email: user.email,
@@ -26,20 +27,16 @@ async function save(user) {
     });
 }
 
-async function update(id, data) {
+async function update(id: number, data: Partial<UserType>) {
+    const { createdAt, updatedAt, articleLikes, productLikes, ...Newdata } = data;
+
     return prismaClient.user.update({
         where: {
             id,
         },
-        data: data,
-    });
-}
-
-async function createOrUpdate(provider, providerId, email, name) {
-    return prismaClient.user.upsert({
-        where: { provider, providerId },
-        update: { email, name },
-        create: { provider, providerId, email, name },
+        data: {
+            ...Newdata
+        },
     });
 }
 
@@ -47,6 +44,5 @@ export default {
     findById,
     findByEmail,
     save,
-    update,
-    createOrUpdate,
+    update
 };

@@ -1,9 +1,9 @@
-import { EXPRESS } from './../libs/constants.js';
-import { catchAsync } from './../libs/catchAsync.js';
+import { EXPRESS } from '../libs/constants';
+import { catchAsync } from '../libs/catchAsync';
 import multer from 'multer';
 import {
     UploadSingleImage
-} from '../controller/uploadController.js';
+} from '../controller/uploadController';
 
 const uploadRouter = EXPRESS.Router();
 

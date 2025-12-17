@@ -1,6 +1,10 @@
-import { prismaClient } from '../libs/constants.js';
+import { prismaClient } from '../libs/constants';
+import { ProductPublicData, ProductFindOptions, UpdateProductData } from './../libs/interfaces';
 
-async function findByUserId(userId) {
+
+
+
+async function findByUserId(userId: number) {
     return prismaClient.product.findMany({
         where: {
             id: userId,
@@ -8,7 +12,7 @@ async function findByUserId(userId) {
     });
 }
 
-async function findById(id, userId) {
+async function findById(id: number, userId?: number) {
     const include = {
         productLikes: userId ? { where: { userId } } : false,
     };
@@ -20,7 +24,7 @@ async function findById(id, userId) {
     });
 }
 
-async function findAll(findOptions, userId) {
+async function findAll(findOptions: ProductFindOptions, userId: number) {
     const include = {
         productLikes: userId ? { where: { userId } } : false,
     };
@@ -30,26 +34,26 @@ async function findAll(findOptions, userId) {
     });
 }
 
-async function update(id, data) {
+async function update(id: number, data: UpdateProductData) {
+    const { comments, productLikes, ...updateData } = data;
     return prismaClient.product.update({
         where: {
             id,
         },
-        data: {
-            ...data,
-        },
+        data: updateData,
     });
 }
 
-async function create(userFields) {
+async function create(userFields: ProductPublicData) {
+    const { comments, productLikes, ...NewuserFields } = userFields;
     return await prismaClient.product.create({
         data: {
-            ...userFields,
+            ...NewuserFields,
         },
     });
 }
 
-async function ondelete(id) {
+async function ondelete(id: number) {
     return await prismaClient.product.delete({
         where: {
             id,
@@ -63,5 +67,5 @@ export default {
     update,
     create,
     ondelete,
-    findByUserId,
+    findByUserId
 };

@@ -1,13 +1,13 @@
-import { EXPRESS } from './../libs/constants.js';
-import { catchAsync, catchAsyncAll } from './../libs/catchAsync.js';
-import auth from './../middlewares/auth.js';
+import { EXPRESS } from '../libs/constants';
+import { catchAsync, catchAsyncAll } from '../libs/catchAsync';
+import auth from '../middlewares/auth';
 import {
     GetComment,
     PostComment,
     GetCommentById,
     PatchCommentById,
     DeleteCommentById
-} from '../controller/commentController.js';
+} from '../controller/commentController';
 
 const commentRouter = EXPRESS.Router();
 

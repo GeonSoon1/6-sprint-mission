@@ -1,6 +1,6 @@
-import { prismaClient } from '../libs/constants.js';
+import { prismaClient } from '../libs/constants';
 
-async function find(userId, articleId) {
+async function find(userId: number, articleId: number) {
     return prismaClient.articleLike.findUnique({
         where: {
             userId_articleId: {
@@ -11,7 +11,7 @@ async function find(userId, articleId) {
     });
 }
 
-async function create(userId, articleId) {
+async function create(userId: number, articleId: number) {
     return prismaClient.articleLike.create({
         data: {
             userId,
@@ -20,7 +20,7 @@ async function create(userId, articleId) {
     });
 }
 
-async function remove(id) {
+async function remove(id: number) {
     return prismaClient.articleLike.delete({
         where: {
             id,

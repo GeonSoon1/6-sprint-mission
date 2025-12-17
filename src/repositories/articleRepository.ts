@@ -1,6 +1,11 @@
-import { prismaClient } from '../libs/constants.js';
+import { prismaClient } from '../libs/constants';
+import {
+    ArticlePublicData,
+    ArticleFindOptions,
+    UpdateArticleData,
+} from '../libs/interfaces';
 
-async function findById(id, userId) {
+async function findById(id: number, userId?: number) {
     const include = {
         articleLikes: userId ? { where: { userId } } : false,
     };
@@ -12,36 +17,38 @@ async function findById(id, userId) {
     });
 }
 
-async function findAll(findOptions, userId) {
+async function findAll(findOptions: ArticleFindOptions, userId: number) {
     const include = {
         articleLikes: userId ? { where: { userId } } : false,
     };
+
     return prismaClient.article.findMany({
         ...findOptions,
         include,
     });
 }
 
-async function create(userFields) {
+async function create(userFields: ArticlePublicData) {
+    const { comments, articleLikes, ...NewuserFields } = userFields;
+
     return await prismaClient.article.create({
         data: {
-            ...userFields,
+            ...NewuserFields,
         },
     });
 }
 
-async function update(id, data) {
+async function update(id: number, data: UpdateArticleData) {
+    const { comments, articleLikes, ...updateData } = data;
     return prismaClient.article.update({
         where: {
             id,
         },
-        data: {
-            ...data,
-        },
+        data: updateData,
     });
 }
 
-async function ondelete(id) {
+async function ondelete(id: number) {
     return await prismaClient.article.delete({
         where: {
             id,

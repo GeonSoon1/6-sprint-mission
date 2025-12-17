@@ -1,7 +1,7 @@
-import { EXPRESS } from './../libs/constants.js';
-import { catchAsync } from './../libs/catchAsync.js';
-import auth from './../middlewares/auth.js';
-import ArticleController from '../controller/articleController.js';
+import { EXPRESS } from '../libs/constants';
+import { catchAsync } from '../libs/catchAsync';
+import auth from '../middlewares/auth';
+import ArticleController from '../controller/articleController';
 
 const articleRouter = EXPRESS.Router();
 const articleController = new ArticleController();

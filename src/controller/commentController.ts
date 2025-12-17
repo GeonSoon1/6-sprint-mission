@@ -1,27 +1,28 @@
-import { prismaClient } from '../libs/constants.js';
+import { prismaClient, Prisma } from '../libs/constants';
 import { assert } from 'superstruct';
-import { CreateComment, PatchComment } from '../structs/structs.js';
+import { CreateComment, PatchComment } from '../structs/structs';
+import { ExpressRequest, ExpressResponse } from '../libs/constants';
+import { CustomError } from '../libs/Handler/errorHandler';
 
 
 
-export async function GetComment(req, res) {
-    const { productId, articleId } = req.query;
-    const { take = '10', cursor } = req.query;
-    const parsedTake = parseInt(take, 10);
+export async function GetComment(req: ExpressRequest, res: ExpressResponse) {
+    const { take = '10', cursor, productId, articleId } = req.query;
+    const parsedTake = parseInt(take as string, 10) || 0;
 
     if (isNaN(parsedTake) || parsedTake <= 0) {
         return res.status(400).send({ error: 'Invalid "take" parameter.' });
     }
 
-    const whereClause = {};
+    const whereClause: Prisma.CommentWhereInput = {};
 
     if (productId) {
-        whereClause.productId = productId; // 상품 ID로 필터링
+        whereClause.productId = Number(productId); // 상품 ID로 필터링
     } else if (articleId) {
-        whereClause.articleId = articleId; // 게시글 ID로 필터링
+        whereClause.articleId = Number(articleId); // 게시글 ID로 필터링
     }
 
-    const findOptions = {
+    const findOptions: Prisma.CommentFindManyArgs = {
         take: parsedTake,
         where: whereClause,
         orderBy: {
@@ -30,16 +31,18 @@ export async function GetComment(req, res) {
     };
 
     if (cursor) {
+        const parsedCursor = parseInt(cursor as string, 10);
+
         findOptions.skip = 1;
         findOptions.cursor = {
-            id: cursor,
+            id: parsedCursor,
         };
     }
 
     const comments = await prismaClient.comment.findMany(findOptions); // 
     let nextCursor = null;
-    if (comments.length === parsedTake) {
-        nextCursor = comments[comments.length - 1].id;
+    if (comments.length > 0 && comments.length === parsedTake) {
+        nextCursor = comments[comments.length - 1]!.id;
     }
     res.status(200).json({
         comments,
@@ -49,18 +52,20 @@ export async function GetComment(req, res) {
 }
 
 
-export async function GetCommentById(req, res) {
+export async function GetCommentById(req: ExpressRequest, res: ExpressResponse) {
     const { id } = req.params;
+    const paesedId = parseInt(id as string, 10) || null;
+    if (!paesedId) return new CustomError(404, "id Not Found");
     const Comment = await prismaClient.comment.findUniqueOrThrow({
         where: {
-            id
+            id: paesedId
         },
     });
     res.send(Comment);
 }
 
 
-export async function PostComment(req, res) {
+export async function PostComment(req: ExpressRequest, res: ExpressResponse) {
     assert(req.body, CreateComment);
     const { content, productId, articleId } = req.body;
     if ((productId && articleId) || (!productId && !articleId)) {
@@ -82,18 +87,19 @@ export async function PostComment(req, res) {
     res.status(201).send(comment);
 }
 
-export async function PatchCommentById(req, res) {
-    const { id } = req.params;
+export async function PatchCommentById(req: ExpressRequest, res: ExpressResponse) {
     assert(req.body, PatchComment);
     const { content } = req.body;
-
+    const { id } = req.params;
+    const paesedId = parseInt(id as string, 10) || null;
+    if (!paesedId) return new CustomError(404, "id Not Found");
     if (content !== undefined && content.trim() === '') {
         return res.status(400).json({ error: 'Content cannot be empty.' });
     }
 
     const comment = await prismaClient.comment.update({
         where: {
-            id
+            id: paesedId
         },
         data: {
             content: content,
@@ -102,11 +108,13 @@ export async function PatchCommentById(req, res) {
     res.send(comment);
 }
 
-export async function DeleteCommentById(req, res) {
+export async function DeleteCommentById(req: ExpressRequest, res: ExpressResponse) {
     const { id } = req.params;
+    const paesedId = parseInt(id as string, 10) || null;
+    if (!paesedId) return new CustomError(404, "id Not Found");
     const Comment = await prismaClient.comment.delete({
         where: {
-            id
+            id: paesedId
         },
     });
     res.send(Comment);

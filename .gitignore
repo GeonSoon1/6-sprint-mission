@@ -125,6 +125,7 @@ dist
 
 ### VSCode 관련 ###
 # 개인 개발환경 설정 제외 (필요한 일부만 허용)
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

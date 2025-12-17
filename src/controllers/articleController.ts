@@ -5,6 +5,7 @@ import { ArticleRepogitory } from '../repogitories/articleRepogitory';
 
 export class ArticleController {
   constructor(private service: ArticleService) {}
+
   // 게시글 생성
   async create(req: Request, res: Response) {
     const dto: ArticleCreateDto = {
@@ -14,6 +15,7 @@ export class ArticleController {
     const data = await this.service.create(dto);
     res.status(201).json(data);
   }
+
   // 게시글 목록 조회
   async getArticles(req: Request, res: Response) {
     const dto: ArticleQueryDto = {
@@ -55,7 +57,7 @@ export class ArticleController {
   async delete(req: Request, res: Response) {
     const id = req.validatedId!.id;
     await this.service.delete(id);
-    res.status(204).json();
+    res.status(204);
   }
 }
 

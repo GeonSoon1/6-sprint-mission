@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Article, Prisma } from '@prisma/client';
 import {
   ArticleCreateDto,
   ArticleQueryDto,
@@ -7,16 +7,24 @@ import {
 import { ArticleRepogitory } from '../repogitories/articleRepogitory';
 import { NotFoundError } from '../libs/error';
 
+type GetArticleData = Omit<
+  Article,
+  'likedArticles' | 'userId' | 'updatedAt'
+> & { isLiked?: boolean };
+type getArticleById = Omit<Article, 'updatedAt' | 'userId'> & {
+  isLiked?: boolean;
+};
+
 export class ArticleService {
   constructor(private repo: ArticleRepogitory) {}
 
   // 게시글 생성
-  async create(dto: ArticleCreateDto) {
+  async create(dto: ArticleCreateDto): Promise<Article> {
     return this.repo.create(dto);
   }
 
   // 게시글 목록 조회 (페이지네이션, 정렬, 유저 인증 시 좋아요 여부)
-  async getArticles(dto: ArticleQueryDto) {
+  async getArticles(dto: ArticleQueryDto): Promise<GetArticleData[]> {
     const { page, limit, search, sort, userId } = dto;
     const skip = (page - 1) * limit;
 
@@ -59,7 +67,7 @@ export class ArticleService {
   }
 
   // 게시글 상세 조회(유저 인증 시 좋아요 여부)
-  async getById(id: string, userId?: string | null) {
+  async getById(id: string, userId?: string | null): Promise<getArticleById> {
     const article = await this.repo.findById(id);
     if (!article) throw new NotFoundError();
 
@@ -70,17 +78,17 @@ export class ArticleService {
   }
 
   // 게시글 수정
-  async update(id: string, dto: ArticleUpdateDto) {
+  async update(id: string, dto: ArticleUpdateDto): Promise<Article> {
     return this.repo.update(id, dto);
   }
 
   // 게시글 삭제
-  async delete(id: string) {
-    return this.repo.delete(id);
+  async delete(id: string): Promise<void> {
+    await this.repo.delete(id);
   }
 
   // 유저가 생성한 게시글 목록 조회
-  async getUserArticles(userId: string) {
+  async getUserArticles(userId: string): Promise<Article[]> {
     return this.repo.findByUserId(userId);
   }
 }

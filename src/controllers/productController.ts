@@ -1,5 +1,4 @@
-import prisma from '../libs/prismaClient';
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { ProductService } from '../services/productService';
 import {
   ProductCreateDto,

@@ -1,6 +1,5 @@
 import { UserCreateDto } from '../dto/userDto';
 import { BadRequestError } from '../libs/error';
-import prisma from '../libs/prismaClient';
 import { ArticleRepogitory } from '../repogitories/articleRepogitory';
 import { LikeRepository } from '../repogitories/likeRepogitory';
 import { ProductRepository } from '../repogitories/productRepogitory';

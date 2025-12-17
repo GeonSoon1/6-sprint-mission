@@ -1,9 +1,13 @@
+import { Article, Product } from '@prisma/client';
 import { LikeRepository } from '../repogitories/likeRepogitory';
 
 export class LikeService {
   constructor(private repo: LikeRepository) {}
   // Product
-  async toggleProductLike(userId: string, productId: string) {
+  async toggleProductLike(
+    userId: string,
+    productId: string
+  ): Promise<'상품 좋아요 등록' | '상품 좋아요 해제'> {
     await this.repo.productFindProductById(productId); // 존재 확인
 
     const existing = await this.repo.productFindExistingLike(userId, productId);
@@ -19,13 +23,16 @@ export class LikeService {
     }
   }
 
-  async getLikedProducts(userId: string) {
+  async getLikedProducts(userId: string): Promise<Product[]> {
     const data = await this.repo.getLikedProducts(userId);
-    return data.likedProducts; // product 목록만 반환
+    return data.likedProducts.map((l) => l.product); // product 목록만 반환
   }
 
   // Article
-  async toggleArticleLike(userId: string, articleId: string) {
+  async toggleArticleLike(
+    userId: string,
+    articleId: string
+  ): Promise<'게시글 좋아요 등록' | '게시글 좋아요 해제'> {
     await this.repo.articleFindArticleById(articleId);
 
     const existing = await this.repo.articleFindExistingLike(userId, articleId);
@@ -41,8 +48,8 @@ export class LikeService {
     }
   }
 
-  async getLikedArticles(userId: string) {
+  async getLikedArticles(userId: string): Promise<Article[]> {
     const data = await this.repo.getLikedArticles(userId);
-    return data.likedArticles; // article 목록만 넘겨줌
+    return data.likedArticles.map((i) => i.article); // article 목록만 넘겨줌
   }
 }

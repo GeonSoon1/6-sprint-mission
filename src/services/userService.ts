@@ -10,10 +10,13 @@ import { User } from '@prisma/client';
 import { UserRepository } from '../repogitories/userRepogitory';
 import { UserCreateDto } from '../dto/userDto';
 
+type CreateUserData = Omit<User, 'password' | 'refreshToken'>;
+type PublicUser = Omit<User, 'password' | 'refreshToken'>;
+
 export class UserService {
   constructor(private repo: UserRepository) {}
 
-  async createUser(dto: UserCreateDto) {
+  async createUser(dto: UserCreateDto): Promise<CreateUserData> {
     const { email, password, ...rest } = dto;
 
     const existedUser = await this.repo.findByEmail(email);
@@ -33,29 +36,38 @@ export class UserService {
     return bcrypt.hash(password, 10);
   }
 
-  async filterSensitiveUserData(user: User) {
+  async filterSensitiveUserData(user: User): Promise<PublicUser> {
     const { password, refreshToken, ...rest } = user;
     return rest;
   }
 
-  async verifyPassword(inputPassword: string, savedPassword: string) {
+  async verifyPassword(
+    inputPassword: string,
+    savedPassword: string
+  ): Promise<void> {
     const isValid = await bcrypt.compare(inputPassword, savedPassword);
     if (!isValid) throw new ForbiddenError();
   }
 
-  async isSamePassword(inputPassword: string, savedPassword: string) {
+  async isSamePassword(
+    inputPassword: string,
+    savedPassword: string
+  ): Promise<void> {
     const isSame = await bcrypt.compare(inputPassword, savedPassword);
     if (isSame) throw new IsSamePasswordError();
   }
 
-  async getUser(email: string, password: string) {
+  async getUser(email: string, password: string): Promise<PublicUser> {
     const user = await this.repo.findByEmail(email);
     if (!user) throw new BadRequestError('사용자 없음');
     await this.verifyPassword(password, user.password);
     return this.filterSensitiveUserData(user);
   }
 
-  async createToken(user: { id: string }, type?: 'access' | 'refresh') {
+  async createToken(
+    user: { id: string },
+    type?: 'access' | 'refresh'
+  ): Promise<string> {
     const payload = { userId: user.id };
     const options: SignOptions = {
       expiresIn: type === 'refresh' ? '2w' : '1h',
@@ -64,7 +76,13 @@ export class UserService {
   }
 
   //JWT 슬라이딩 세션
-  async refreshToken(userId: string, refreshToken: string) {
+  async refreshToken(
+    userId: string,
+    refreshToken: string
+  ): Promise<{
+    accessToken: string;
+    newRefreshToken: string;
+  }> {
     const user = await this.repo.findById(userId);
     if (!user || user.refreshToken !== refreshToken)
       throw new BadRequestError();
@@ -74,15 +92,15 @@ export class UserService {
     return { accessToken, newRefreshToken };
   }
 
-  async updateRefreshToken(email: string, refreshToken: string) {
-    return this.repo.updateRefreshTokenByEmail(email, refreshToken);
+  async updateRefreshToken(email: string, refreshToken: string): Promise<void> {
+    await this.repo.updateRefreshTokenByEmail(email, refreshToken);
   }
 
-  async logOutUser(userId: string) {
+  async logOutUser(userId: string): Promise<void> {
     await this.repo.clearRefreshToken(userId);
   }
 
-  async getUserProfile(id: string) {
+  async getUserProfile(id: string): Promise<PublicUser> {
     const user = await this.repo.findById(id);
     if (!user) throw new NotFoundError();
     return this.filterSensitiveUserData(user);
@@ -107,7 +125,10 @@ export class UserService {
     return this.repo.update(id, updateData);
   }
 
-  async updateUserRefreshToken(userId: string, refreshToken: string) {
-    return this.repo.updateRefreshToken(userId, refreshToken);
+  async updateUserRefreshToken(
+    userId: string,
+    refreshToken: string
+  ): Promise<void> {
+    await this.repo.updateRefreshToken(userId, refreshToken);
   }
 }

@@ -1,4 +1,5 @@
 @baseUrl = http://localhost:3000
+
 ### 회원가입 (새 유저 만들 때 사용)
 POST {{baseUrl}}/auth/register
 Content-Type: application/json

@@ -1,7 +1,7 @@
 ```mermaid
 erDiagram
 
-    User {
+    Users {
         Int id PK
         String nickname UK "유니크"
         DateTime created_at
@@ -17,7 +17,7 @@ erDiagram
         DateTime updated_at
     }
 
-    SocialAccount {
+    SocialAccounts {
         Int id PK
         Int userId FK
         String provider "google, kakao"
@@ -48,14 +48,14 @@ erDiagram
         DateTime deleted_at "Soft Delete"
     }
 
-    Favorite {
+    Favorites {
         Int id PK
         Int productId FK
         Int authorId FK
         DateTime created_at
     }
 
-    ProductComment {
+    ProductComments {
         Int id PK
         Int productId FK
         Int authorId FK
@@ -65,7 +65,7 @@ erDiagram
         DateTime deleted_at "Soft Delete"
     }
 
-    Article {
+    Articles {
         Int id PK
         Int authorId FK
         String title
@@ -83,7 +83,7 @@ erDiagram
         DateTime created_at
     }
 
-    ArticleComment {
+    ArticleComments {
         Int id PK
         Int articleId FK
         Int authorId FK
@@ -94,24 +94,24 @@ erDiagram
     }
 
     %% 유저 - 인증
-    User ||--o| UserCredential : "1:0..1 (이메일 사용자만)"
-    User ||--o{ SocialAccount : "1:N (소셜 계정)"
-    User ||--o{ Token : "1:N (다중 기기)"
+    Users ||--o| UserCredential : "1:0..1 (이메일 사용자만)"
+    Users ||--o{ SocialAccounts : "1:N (소셜 계정)"
+    Users ||--o{ Token : "1:N (다중 기기)"
 
     %% 유저 - 작성 활동
-    User ||--o{ Product : "판매글 작성"
-    User ||--o{ ProductComment : "상품 댓글 작성"
-    User ||--o{ Favorite : "상품 찜하기"
+    Users ||--o{ Product : "판매글 작성"
+    Users ||--o{ ProductComments : "상품 댓글 작성"
+    Users ||--o{ Favorites : "상품 찜하기"
 
-    User ||--o{ Article : "게시글 작성"
-    User ||--o{ ArticleComment : "게시글 댓글 작성"
-    User ||--o{ Like : "게시글 좋아요"
+    Users ||--o{ Articles : "게시글 작성"
+    Users ||--o{ ArticleComments : "게시글 댓글 작성"
+    Users ||--o{ Like : "게시글 좋아요"
 
     %% 상품 관계
-    Product ||--o{ Favorite : "N명이 찜함"
-    Product ||--o{ ProductComment : "N개 댓글"
+    Product ||--o{ Favorites : "N명이 찜함"
+    Product ||--o{ ProductComments : "N개 댓글"
 
     %% 게시글 관계
-    Article ||--o{ Like : "N명이 좋아요"
-    Article ||--o{ ArticleComment : "N개 댓글"
+    Articles ||--o{ Like : "N명이 좋아요"
+    Articles ||--o{ ArticleComments : "N개 댓글"
 ```

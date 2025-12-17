@@ -1,4 +1,7 @@
 node_modules/
-__http__
+__http__/
 .env
 sprint-mission2
+dist
+sprint-mission-6
+sprint-mission-7

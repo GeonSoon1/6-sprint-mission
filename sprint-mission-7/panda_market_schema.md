@@ -5,6 +5,7 @@ int id PK
 nickname @unique
 created_at
 updated_at
+deleted_at - Soft Delete
 }
 
 user_crsdentials{
@@ -46,6 +47,7 @@ tags
 authorId
 created_at
 updated_at
+deleted_at - Soft Delete
 }
 
 Favorites{
@@ -63,6 +65,7 @@ authorId FK
 productId FK
 created_at
 updated_at
+deleted_at - Soft Delete
 }
 
 ---
@@ -75,6 +78,7 @@ images
 authorId FK
 created_at
 updated_at
+deleted_at - Soft Delete
 }
 
 Likes{
@@ -91,5 +95,6 @@ authorId FK
 articleId FK
 created_at
 updated_at
+deleted_at - Soft Delete
 }
 ```

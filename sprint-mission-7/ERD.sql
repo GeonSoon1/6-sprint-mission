@@ -6,6 +6,7 @@ erDiagram
         String nickname UK "유니크"
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
 
     UserCredential {
@@ -44,6 +45,7 @@ erDiagram
         String[] tags "태그 배열"
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
 
     Favorite {
@@ -62,6 +64,7 @@ erDiagram
         String content
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
 
     Article {
@@ -72,6 +75,7 @@ erDiagram
         String[] images "이미지 URL 배열"
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
 
     Like {
@@ -90,6 +94,7 @@ erDiagram
         String content
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
 
     %% 유저 - 인증

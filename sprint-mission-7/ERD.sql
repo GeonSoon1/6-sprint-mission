@@ -1,4 +1,4 @@
-````mermaid
+```mermaid
 erDiagram
 
     User {
@@ -114,5 +114,3 @@ erDiagram
     Article ||--o{ Like : "N명이 좋아요"
     Article ||--o{ ArticleComment : "N개 댓글"
 ```
-
-````

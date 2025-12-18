@@ -1,15 +1,14 @@
-# 스프린트 미션 4
+# 스프린트 미션 5
 
-1. **토큰과 쿠키를 활용한 인증 인가\_** 구현
-2. **유저 모델과 유저API, 좋아요기능** 구현
-3. **에러핸들러** 구현
-4. **리프레쉬 토큰을 활용한 JWT슬라이딩 세션** 구현
+1. **타입스크립트 마이그레이션**
+2. **타입스크립트 개발 환경 세팅하기**
+3. **Layered Architecture 적용**
+4. **계층간에 DTO 사용**
 
 ---
 
-- 디렉토리 새롭게 재구성
+- 디렉토리 파일 js 에서 ts로 변환
 - 기존의 미흡한 코드 개선 및 수정
-- 유효성 검증 강화
 
 ---
 
@@ -18,7 +17,7 @@
 
 6-sprint-mission
 
-├─ **http**/
+├─ __http__/
 │ ├─ article.http
 │ ├─ comment.http
 │ ├─ product.http
@@ -30,39 +29,56 @@
 │ └─ schema.prisma
 ├─ src/
 │ ├─ controller/
-│ │ ├─ articleController.js
-│ │ ├─ commentController.js
-│ │ ├─ imageController.js
-│ │ ├─ productController.js
-│ │ └─ userController.js
+│ │ ├─ articleController.ts
+│ │ ├─ commentController.ts
+│ │ ├─ imageController.ts
+│ │ ├─ productController.ts
+│ │ └─ userController.ts
+│ ├─ dto/
+│ │ ├─ articleDto.ts
+│ │ ├─ commentDto.ts
+│ │ ├─ productDto.ts
+│ │ └─ userDto.ts
 │ ├─ lib/
-│ │ ├─ asyncHandler.js
-│ │ ├─ constants.js
-│ │ ├─ error.js
-│ │ └─ prismaClient.js
+│ │ ├─ asyncHandler.ts
+│ │ ├─ constants.ts
+│ │ ├─ error.ts
+│ │ └─ prismaClient.ts
 │ ├─ middlewares/
 │ │ ├─ errorHandler/
-│ │ │ └─ errorHandler.js
+│ │ │ └─ errorHandler.ts
 │ │ ├─ validate/
-│ │ │ ├─ validateArticle.js
-│ │ │ ├─ validateComment.js
-│ │ │ ├─ validateId.js
-│ │ │ ├─ validateProduct.js
-│ │ │ └─ validateUser.js
-│ │ └─ auth.js
+│ │ │ ├─ validateArticle.ts
+│ │ │ ├─ validateComment.ts
+│ │ │ ├─ validateId.ts
+│ │ │ ├─ validateProduct.ts
+│ │ │ └─ validateUser.ts
+│ │ └─ auth.ts
+│ ├─ repogitories/
+│ │ ├─ articleRepogitory.ts
+│ │ ├─ commentRepogitory.ts
+│ │ ├─ likeRepogitory.ts
+│ │ ├─ producRepogitoryr.ts
+│ │ └─ userRepogitory.ts
 │ ├─ router/
-│ │ ├─ articleRouter.js
-│ │ ├─ commentRouter.js
-│ │ ├─ imageRouter.js
-│ │ ├─ productRouter.js
-│ │ └─ userRouter.js
+│ │ ├─ articleRouter.ts
+│ │ ├─ commentRouter.ts
+│ │ ├─ imageRouter.ts
+│ │ ├─ productRouter.ts
+│ │ └─ userRouter.ts
 │ ├─ seed/
-│ │ ├─ mock.js
-│ │ └─ seed.js
-│ ├─ service/
-│ │ └─ userService.js
-│ └─ server.js
-│ └─ uploads.js
+│ │ ├─ mock.ts
+│ │ └─ seed.ts
+│ ├─ services/
+│ │ ├─ articleService.ts
+│ │ ├─ commentService.ts
+│ │ ├─ likeService.ts
+│ │ ├─ productService.ts
+│ │ └─ userService.ts
+│ └─ server.ts
+│ └─ uploads.ts
+├─ typings/
+│ └─ express.d.ts
 ├─ uploads/
 ├─ .env.sample
 ├─ .gitignore
@@ -100,5 +116,5 @@ RESTClient 설치
 
 이메일 : passfile2@naver.com
 
-제출일 : 2025-11-26
+제출일 : 2025-12-17
 ```

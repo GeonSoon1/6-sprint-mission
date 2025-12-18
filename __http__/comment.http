@@ -1,10 +1,10 @@
 // 상품 댓글 목록 조회
 ###
-GET http://localhost:4000/comments/product/88b8a9fe-f341-4e68-91a0-baaa7fffc523
+GET http://localhost:4000/comments/product/94dba363-a076-4a9e-9fe0-dfb35ee12e91
 
 // 상품 댓글 생성
 ###
-POST http://localhost:4000/comments/product/88b8a9fe-f341-4e68-91a0-baaa7fffc523
+POST http://localhost:4000/comments/product/94dba363-a076-4a9e-9fe0-dfb35ee12e91
 Content-Type: application/json
 
 {
@@ -13,11 +13,11 @@ Content-Type: application/json
 
 // 게시글 댓글 목록 조회
 ###
-GET http://localhost:4000/comments/article/b16aae15-4990-49c7-95fb-2aeb414ac13d
+GET http://localhost:4000/comments/article/9ecc1270-3cc5-4e39-8f1a-53494475ceac
 
 // 게시글 댓글 생성
 ###
-POST http://localhost:4000/comments/article/b16aae15-4990-49c7-95fb-2aeb414ac13d
+POST http://localhost:4000/comments/article/9ecc1270-3cc5-4e39-8f1a-53494475ceac
 Content-Type: application/json
 
 {
@@ -26,7 +26,7 @@ Content-Type: application/json
 
 // 댓글 수정
 ###
-PATCH http://localhost:4000/comments/70857e62-74f3-4241-9cf4-6e20c4ee118b
+PATCH http://localhost:4000/comments/39580c34-4b8e-4883-82f2-8b87230b2c24
 Content-Type: application/json
 
 {
@@ -35,4 +35,4 @@ Content-Type: application/json
 
 // 댓글 삭제
 ###
-DELETE http://localhost:4000/comments/70857e62-74f3-4241-9cf4-6e20c4ee118b
+DELETE http://localhost:4000/comments/39580c34-4b8e-4883-82f2-8b87230b2c24

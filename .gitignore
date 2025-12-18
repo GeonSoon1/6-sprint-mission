@@ -1,1 +1,11 @@
+.DS_Store
+.vscode/
+
+seed.sql
+enum.md
+erDiagram.mmd
+
 pizza_place_sales.sql
+schema_review.md
+Sprint_Mission_7.md
+schema_review_suggestions.md

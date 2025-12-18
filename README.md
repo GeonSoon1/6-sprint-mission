@@ -2,122 +2,45 @@
 
 ### [ 목표 ]
 
-- 토큰 기반 유저 인증 및 인가 구현
-- [심화] Refresh Token 구현하기
-- [심화] Prisma로 관계형 활용하기
+- 타입스크립트 마이그레이션 하기
+- 타입스크립트 개발 환경 셋팅하기
+- [심화] Layered Architecture 적용하기
 
 ### [ 작업 내용 ]
 
 ### 1. 기본 요구사항
 
-### 1.1 회원 인증 기능
+### 1.1 프로젝트 셋팅
 
-- USER 스키마 작성
+- [x] tsconfig.json 파일을 생성하고, 필요한 옵션을 설정해 주세요. (예: outDir)
+- [x] 필요한 npm script를 설정해 주세요. (예: 빌드 및 개발 서버 실행 명령어)
 
-  - [x] 모델 선언 : model User
-    - [x] 개별 필드 항목 : id, email, nicknamee, image, password, createdAt, updatedAt
-    - [x] 관계형 필드 항목 : createProducts(Product[]), createArticle(Article[]), commentProducts(CommentProduct[]), commentArticles(CommentArticle[])
+### 1.2 타입스크립트 마이그레이션
 
-- 회원 인증 관련 API 작성
-  - [x] 회원가입(POST)
-    - [x] 사용 값 : nickname, password, email
-    - [x] password의 경우 해싱 작업 진행
-  - [x] 로그인(POST)
-    - [x] 사용 값 : email, password
-    - [x] password의 경우 역해싱 작업을 통해 회원 확인
-    - [x] 인증을 마친 뒤 Access Token, Refresh Token 생성
-    - [x] 생성된 Access Token, Refresh Token을 쿠키에 담아서 클라이언트에 전달
-  - [x] 로그아웃(POST)
-    - [x] 활성화 된 Access Token, Refresh Token의 사용 기한을 만료 시킴
-  - [x] 각 API 응답에 적절한 상태 코드 리턴
-  - [x] 각 API에 맞는 적절한 에러 처리 진행
+- [x] 기존 Express.js 프로젝트를 타입스크립트 프로젝트로 마이그레이션 해주세요.
+- [x] 필요한 타입 패키지를 설치해 주세요.
+- [x] any 타입의 사용은 최소화해주세요.
+- [x] 복잡한 객체 구조나 배열 구조를 가진 변수에 인터페이스 또는 타입 별칭을 사용하세요.
+- [x] 필요한 경우, 타입 별칭 또는 유틸리티 타입을 사용해 타입 복잡성을 줄여주세요.
+- [x] 필요한 경우, declare를 사용하여 타입을 오버라이드하거나 확장합니다. (예: req.user)
 
-### 1.2 회원 인가 기능
+### 1.3 개발 환경 설정
 
-- 기존 모델 스키마 수정
+- [x] ts-node 를 사용해 .ts 코드를 바로 실행할 수 있는 npm script를 만들어 주세요. (예: npm run dev)
+- [x] nodemon을 사용해 .ts 코드가 변경될 때마다 서버가 다시 실행되는 npm script를 만들어 주세요. (예: npm run dev)
+      <br>
 
-  - [x] 모델 Product : 관계형 필드 userId(User[]) 추가
-  - [x] 모델 Article : 관계형 필드 userId(User[]) 추가
-  - [x] 모델 CommentProduct : 관계형 필드 userId(User[]) 추가
-  - [x] 모델 CommentArticle : 관계형 필드 userId(User[]) 추가
+### 2. 심화 요구사항 - Layered Architecture 적용하기
 
-- 회원 인가 관련 API 생성
-
-  - 모델 User
-    - [x] 유저 정보 확인(GET) : 회원 가입 시 작성 한 자신의 "유저 정보"만 확인 가능
-    - [x] 유저 정보 수정(PATCH) : 회원 가입 시 작성 한 자신의 "유저 정보"만 수정 가능
-    - [x] 유저 패스워드 수정(PATCH) : 자신의 "비밀 번호"만 수정 가능
-    - [x] 작성한 제품 리스트 확인(GET) : 자신이 생성한 "제품"만 목록으로 확인 가능
-    - [x] 작성한 게시글 리스트 확인(GET) : 자신이 생성한 "게시글"만 목록으로 확인 가능
-
-- 회원 인가 관련 API 수정
-  - 모델 Product
-    - [x] 제품 등록(POST) : 로그인 한 유저만 제품을 등록 할 수 있음
-    - [x] 제품 수정(PATCH) : 자신이 등록 한 제품만 상세 정보를 수정 할 수 있음
-    - [x] 제품 삭제(DELETE) : 자신이 등록 한 제품만 삭제 할 수 있음
-  - 모델 Article
-    - [x] 게시글 등록(POST) : 로그인 한 유저만 게시글을 등록 할 수 있음
-    - [x] 게시글 수정(PATCH) : 자신이 등록 한 게시글만 정보를 수정 할 수 있음
-    - [x] 게시글 삭제(DELETE) : 자신이 등록 한 게시글만 삭제 할 수 있음
-  - 모델 CommentProduct
-    - [x] 제품 댓글 등록(POST) : 로그인 한 유저만 제품의 댓글을 등록 할 수 있음
-    - [x] 제품 댓글 수정(PATCH) : 자신이 등록 한 댓글만 수정 할 수 있음
-    - [x] 제품 댓글 삭제(DELETE) : 자신이 등록 한 댓글만 삭제 할 수 있음
-  - 모델 CommentArticle
-    - [x] 게시글 댓글 등록(POST) : 로그인 한 유저만 게시글의 댓글을 등록 할 수 있음
-    - [x] 게시글 댓글 수정(PATCH) : 자신이 등록 한 댓글만 수정 할 수 있음
-    - [x] 게시글 댓글 삭제(DELETE) : 자신이 등록 한 댓글만 삭제 할 수 있음
-
-### 2. 심화 요구사항
-
-2.1 Refresh Token 발급
-
-- [x] Refresh Token 재발급(POST) : 발급했던 토큰을 기반으로 Refresh Token 재발급
-
-  <br>
-2.2 "좋아요" 기능 추가
-
-- ProductLikes / ArticleLikes 스키마 작성
-
-  - 모델 선언 : model ProductLikes
-
-    - [x] 개별 필드 항목 : id, likeCountBool, createdAt, updatedAt
-    - [x] 관계형 필드 항목 : userId(User), productId(ProductId)
-
-  - 모델 선언 : model ArticleLikes
-
-    - [x] 개별 필드 항목 : id, likeCountBool, createdAt, updatedAt
-    - [x] 관계형 필드 항목 : userId(User), articleId(Article)
-
-- 기존 모델 스키마 수정
-
-  - [x] 모델 User : 관계형 필드 likeProducts(ProductLikes[]), likeArticles(ArticleLikes[]) 추가
-  - [x] 모델 Product : "좋아요" 총 숫자 필드, 관계형 필드 userId(User[]) 추가
-  - [x] 모델 Article : 관계형 필드 userId(User[]) 추가
-
-- API 작성
-
-  - 모델 User
-
-    - [x] "좋아요" 한 제품 리스트 확인(GET) : 자신이 "좋아요"를 누른 "제품"만 목록으로 확인 가능
-    - [x] "좋아요" 한 제품 리스트 확인(GET) : 자신이 "좋아요"를 누른 "게시글"만 목록으로 확인 가능
-
-  - 모델 Product
-
-    - [x] "좋아요" 등록(POST) : 서버에 등록 된 제품에 "좋아요"를 할 수 있음
-    - [x] "좋아요" 확인(GET) : 제품 상세페이지 조회 시 자신이 "좋아요" 한 제품 인지 확인 가능
-    - [x] "좋아요" 삭제(DELETE) : 자신이 "좋아요"를 한 제품에 취소 할 수 있음
-
-  - 모델 Article
-    - [x] "좋아요" 등록(POST) : 서버에 등록 된 게시글에 "좋아요"를 할 수 있음
-    - [x] "좋아요" 확인(GET) : 제품 상세페이지 조회 시 자신이 "좋아요" 한 게시글 인지 확인 가능
-    - [x] "좋아요" 삭제(DELETE) : 자신이 "좋아요"를 한 게시글에 취소 할 수 있음
+- [ ] Controller, Service, Repository로 나누어 코드를 리팩토링해 주세요.
+- [ ] 필요하다면, 계층 사이에서 데이터를 주고 받을 때 DTO를 활용해 주세요.
 
 <br><br><br><br>
 
 ## 멘토에게
 
-주먹구구로 코드 작업을 해서, 주말에 검증(validate) / Tag 기능 구현 등 일부 코드를 최종 수정하고 보내려고 했으나<br>
-지금 감기가 심하게 와서 MD 파일만 겨우 작성해서 제출합니다 ㅠㅠ
-
-코드가 반복되어 읽기 힘들더라도 양해 부탁드립니다!
+심화 요구 사항에 대해서 공부하고 고민 해 봤는데,<br>
+막상 제 코드에 적용 하려니 어디서 부터 고쳐야 할지 엄두가 나지 않습니다.<br><br>
+그래서 일단 현재까지 작업 한 결과물을 우선 제출하고 <br>
+일요일에 있는 특강 코드 리뷰를 보고 추후에 적용하는 방향으로 제출하겠습니다!<br>
+감사합니다 :)

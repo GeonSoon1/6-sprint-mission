@@ -57,12 +57,12 @@ erDiagram
 
     Categories {
         Int id PK
-        String name @unique
+        String name UK
     }
 
     Status {
         Int id PK
-        String name @unique
+        String name UK
     }
 
     Favorites {

@@ -5,8 +5,7 @@ CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     nickname VARCHAR(50) UNIQUE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP -- Soft Delete
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- UserCredential 테이블 (이메일 로그인)
@@ -39,18 +38,40 @@ CREATE TABLE tokens (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Categories 테이블 (상품 카테고리)
+CREATE TABLE categories (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL
+);
+
+-- Status 테이블 (상품 상태)
+CREATE TABLE status (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) UNIQUE NOT NULL
+);
+
 -- Product 테이블 (상품)
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
     author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    category_id INTEGER NOT NULL REFERENCES categories(id),
+    status_id INTEGER NOT NULL REFERENCES status(id),
     name VARCHAR(255) NOT NULL,
     description TEXT,
-    price INTEGER NOT NULL,
+    current_price INTEGER NOT NULL,
+    view_count INTEGER NOT NULL DEFAULT 0,
     image VARCHAR(500), -- 이미지 URL (최대 1개)
     tags TEXT[], -- 태그 배열
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP -- Soft Delete
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- PriceHistory 테이블 (가격 히스토리)
+CREATE TABLE price_history (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+    price INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Favorite 테이블 (상품 찜하기)
@@ -69,8 +90,7 @@ CREATE TABLE product_comments (
     author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP -- Soft Delete
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Article 테이블 (게시글)
@@ -79,10 +99,10 @@ CREATE TABLE articles (
     author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
+    view_count INTEGER NOT NULL DEFAULT 0,
     images TEXT[], -- 이미지 URL 배열
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP -- Soft Delete
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Like 테이블 (게시글 좋아요)
@@ -101,8 +121,7 @@ CREATE TABLE article_comments (
     author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP -- Soft Delete
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 인덱스 생성 (성능 최적화)

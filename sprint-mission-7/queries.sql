@@ -68,8 +68,8 @@ WHERE author_id = 1;
   - 현재 로그인한 유저 id가 1이라고 가정
 */
 
-INSERT INTO products (author_id, name, description, price, image, tags)
-VALUES (1, '테스트 상품', '테스트 상품 설명입니다.', 10000, 'https://example.com/image.jpg', ARRAY['태그1', '태그2']);
+INSERT INTO products (author_id, category_id, status_id, name, description, current_price, image, tags)
+VALUES (1, 1, 1, '테스트 상품', '테스트 상품 설명입니다.', 10000, 'https://example.com/image.jpg', ARRAY['태그1', '태그2']);
 
 
 /*
@@ -110,7 +110,7 @@ UPDATE products
 SET 
     name = '수정된 상품명',
     description = '수정된 상품 설명',
-    price = 15000,
+    current_price = 15000,
     image = 'https://example.com/updated-image.jpg',
     tags = ARRAY['수정된태그1', '수정된태그2'],
     updated_at = CURRENT_TIMESTAMP

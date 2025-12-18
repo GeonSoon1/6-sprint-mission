@@ -4,18 +4,18 @@ import NotFoundError from '../middleware/errors/NotFoundError';
 import articleRepo from '../repository/article.repo';
 import { isEmpty } from '../lib/myFuns';
 import { selectFields } from '../lib/selectFields';
-import { CreateArticleDTO, UpdateArticleDTO } from '../dto/dto';
+import { CreateArticleDto, UpdateArticleDto } from '../dto/dto';
 import { Article, Prisma } from '@prisma/client';
 
 // 게시물 생성, 수정, 삭제: 토큰 인증된 유저만 가능
-async function post(userId: number, data: CreateArticleDTO) {
+async function post(userId: number, data: CreateArticleDto) {
   const articleData = { ...data, userId };
   assert(articleData, CreateArticle);
   const article = await articleRepo.post(articleData as Article);
   return article;
 }
 
-async function patch(articleId: string, articleData: UpdateArticleDTO) {
+async function patch(articleId: string, articleData: UpdateArticleDto) {
   assert(articleData, PatchArticle);
   const article = await articleRepo.patch(
     Number(articleId),

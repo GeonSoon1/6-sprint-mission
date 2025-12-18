@@ -9,7 +9,7 @@ import { CreateUser, PatchUser } from '../struct/structs';
 import { print, isEmpty } from '../lib/myFuns';
 import { selectUserFields } from '../lib/selectFields';
 import { Request, Response } from 'express';
-import { CreateUserDTO } from '../dto/dto';
+import { CreateUserDto } from '../dto/dto';
 import { User } from '@prisma/client';
 
 async function getList() {
@@ -22,7 +22,7 @@ async function getList() {
   }
 }
 
-async function register(data: CreateUserDTO) {
+async function register(data: CreateUserDto) {
   assert(data, CreateUser);
   const { email, nickname, password } = data;
 

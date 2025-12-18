@@ -3,18 +3,18 @@ import { isEmpty } from '../lib/myFuns';
 import productRepo from '../repository/product.repo';
 import { CreateProduct, PatchProduct } from '../struct/structs';
 import { selectFields } from '../lib/selectFields';
-import { CreateProductDTO, UpdateProductDTO } from '../dto/dto';
+import { CreateProductDto, UpdateProductDto } from '../dto/dto';
 import { Prisma, Product } from '@prisma/client';
 import NotFoundError from '../middleware/errors/NotFoundError';
 
-async function post(userId: number, data: CreateProductDTO) {
+async function post(userId: number, data: CreateProductDto) {
   const productData = { ...data, userId };
   assert(productData, CreateProduct);
   const product = await productRepo.post(productData as Product);
   return product;
 }
 
-async function patch(productId: string, productData: UpdateProductDTO) {
+async function patch(productId: string, productData: UpdateProductDto) {
   assert(productData, PatchProduct);
   const product = await productRepo.patch(
     Number(productId),

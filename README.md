@@ -3,7 +3,7 @@
 ### [ 목표 ]
 
 - [x] SQL 스키마 설계하기
-- [ ] ER Diagram 그리기
+- [X] ER Diagram 그리기
 - [ ] SQL 쿼리 작성하기
 
 ### [ 작업 내용 ]
@@ -18,9 +18,10 @@
 
 ### 1.2. ER 다이어그램 그리기
 
-- [ ] 설계한 스키마를 바탕으로 ER 다이어그램 제작
-- [ ] 소프트웨어 도구를 사용 : mermaid.js 사용
-- [ ] 이미지 파일을 저장 :
+- [X] 설계한 스키마를 바탕으로 ER 다이어그램 제작
+- [X] 소프트웨어 도구를 사용 : mermaid.js 사용
+- [X] 이미지 파일을 저장 : sprint-mission-7-ERD.png
+![ERD](./sprint-mission-7/sprint-mission-7-ERD.png)
 
 ### 1.3. SQL 쿼리 작성하기
 

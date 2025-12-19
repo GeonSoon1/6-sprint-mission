@@ -14,7 +14,7 @@
 
 - [x] 설계한 스키마를 바탕으로 ER 다이어그램 제작
 - [x] 소프트웨어 도구를 사용 (예: erdcloud, draw.io, dbdiagram.io, mermaid.js 등) -> mermaid.js 사용
-- [] 만든 다이어그램은 erd.png와 같이 erd라는 이름으로 이미지 파일 저장
+- [x] 만든 다이어그램은 erd.png와 같이 erd라는 이름으로 이미지 파일 저장
 
 ### SQL 쿼리 작성하기
 

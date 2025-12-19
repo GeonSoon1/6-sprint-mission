@@ -46,27 +46,27 @@ erDiagram
         Int current_price "현재 가격"
         Int viewCount "상품 조회수"
         String image "URL (1개)"
-        String[] tags "태그 배열"
+        String tags "태그 배열"
         DateTime created_at
         DateTime updated_at
         DateTime deleted_at "Soft Delete"
     }
 
-    PriceHistory{
+    PriceHistory {
         Int id PK
         Int productId FK
         Int price
-        DateTime create_at
+        DateTime created_at
     }
 
     Categories {
         Int id PK
-        String name @unique
+        String name UK
     }
 
     Status {
         Int id PK
-        String name @unique
+        String name UK
     }
 
     Favorites {
@@ -74,8 +74,8 @@ erDiagram
         Int productId FK
         Int authorId FK
         DateTime created_at
-        %% UK: [authorId, productId] 중복 방지
     }
+    %% UK: [authorId, productId] 중복 방지
 
     ProductComments {
         Int id PK
@@ -93,7 +93,7 @@ erDiagram
         String title
         String content
         Int viewCount "게시글 조회수"
-        String[] images "이미지 URL 배열"
+        String images "이미지 URL 배열"
         DateTime created_at
         DateTime updated_at
         DateTime deleted_at "Soft Delete"
@@ -104,8 +104,8 @@ erDiagram
         Int articleId FK
         Int authorId FK
         DateTime created_at
-        %% UK: [authorId, articleId] 중복 방지
     }
+    %% UK: [authorId, articleId] 중복 방지
 
     ArticleComments {
         Int id PK
@@ -120,7 +120,7 @@ erDiagram
     %% 유저 - 인증
     Users ||--o| UserCredential : "1:0..1 (이메일 사용자만)"
     Users ||--o{ SocialAccounts : "1:N (소셜 계정)"
-    Users ||--o{ Token : "1:N (다중 기기)"
+    Users ||--o{ Tokens : "1:N (다중 기기)"
 
     %% 유저 - 작성 활동
     Users ||--o{ Products : "판매글 작성"
@@ -135,8 +135,10 @@ erDiagram
     Products ||--o{ Favorites : "N명이 찜함"
     Products ||--o{ ProductComments : "N개 댓글"
     Products ||--o{ PriceHistory : "has"
-    Products ||--|| Categories : "belongs to" %% 카테고리 관계
-    Products ||--|| Status : "belongs to" %% 상태 관계
+    %% 카테고리 관계
+    Products ||--|| Categories : "belongs to"
+    %% 상태 관계
+    Products ||--|| Status : "belongs to"
 
     %% 게시글 관계
     Articles ||--o{ Likes : "N명이 좋아요"

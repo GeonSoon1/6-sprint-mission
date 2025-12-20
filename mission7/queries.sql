@@ -1,4 +1,3 @@
--- psql postgresql://postgres:password@localhost:5432/mission7
 /*
   다음 경우들에 대해 총 14개의 SQL 쿼리를 작성해 주세요.
   예시로 값이 필요한 경우 적당한 값으로 채워넣어서 작성하면 됩니다. 
@@ -71,9 +70,9 @@ INSERT INTO products (name, description, price, tags, user_id) VALUES
 */
 SELECT *
 FROM products
-WHERE name ilike '%air%'  -- test 들어간 상품명 없어서 air로
+WHERE name ilike '%test%'  -- test 들어간 상품명 없으니 air로 테스트하면 좋을 듯
 ORDER BY created_at DESC
-LIMIT 3;  -- 10개 이상 들어간 상품 없어서 3개로
+LIMIT 10;  -- 이름에 air 포함된 상품은 10개 미만임
 
 /*
   8. 상품 상세 조회
@@ -104,8 +103,7 @@ DELETE FROM products WHERE id = 1;
   11. 상품 좋아요
   - 1번 유저가 2번 상품 좋아요
 */
-INSERT into product_likes (user_id, product_id) VALUES (1, 2); -- 이미 좋아요 눌렀음
-INSERT into product_likes (user_id, product_id) VALUES (1, 38); -- 38번으로 테스트
+INSERT into product_likes (user_id, product_id) VALUES (1, 2); -- seeding된 data에선 이미 좋아요 눌렀음
 /*
   12. 상품 좋아요 취소
   - 1번 유저가 2번 상품 좋아요 취소
@@ -130,4 +128,4 @@ SELECT *
 FROM product_comments
 WHERE product_id = 1 AND created_at < '2025-03-25 00:00:00'
 ORDER BY created_at DESC
-LIMIT 5; -- 총 갯수가 6개라서, 5개 조회
+LIMIT 10; -- seeding된 data에서는 총 갯수가 6개

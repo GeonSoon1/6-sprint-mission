@@ -27,7 +27,6 @@ erDiagram
         String description
         Int price
         String image
-        Int likeCount
         Int userId FK
         DateTime createdAt
         DateTime updatedAt
@@ -72,7 +71,6 @@ erDiagram
         String title
         String content
         String image
-        Int likeCount
         Int userId FK
         DateTime createdAt
         DateTime updatedAt

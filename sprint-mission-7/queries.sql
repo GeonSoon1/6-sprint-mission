@@ -162,6 +162,9 @@ VALUES (1,2,'너무너무너무너무 좋아요 bbbb');
   - 최신 순으로 정렬
   - 댓글 날짜 2025-03-25 기준일을 제외한 이전 데이터 10개
 */
+
+-- 1번 상품 대신 데이터가 있는 51번 상품을 진행
+
 SELECT * 
 FROM product_comments
 WHERE product_id = 51 AND created_at < '2025-03-25 %'

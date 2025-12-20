@@ -1,31 +1,26 @@
 # 미션 목표
 
-기본 SQL 문법 연습
-벡엔드 서버에서 ORM으로 사용하던 것을 직접 SQL로 작성해 보기
+- SQL 스키마 설계하기
+- ER Diagram 그리기
+- SQL 쿼리 작성하기
 
-## 요구사항
+### 1. SQL 스키마 설계하기
 
-### 미션 준비하기
+- [x] "판다마켓 디자인"을 바탕으로 필요한 스키마 설계
+- [x] SQL CREATE TABLE 문법을 사용하여 테이블을 생성하는 코드로 설계 작성
+- [x] 작성한 코드를 schema.sql로 저장
 
-- [x] PostgreSQL 설치
-- [x] 데이터베이스와 데이터 세팅
-  - Postgre SQL 접속
-  - 데이터베이스 생성
-  - 데이터베이스 접속
-  - 다운받은 미션용 데이터 추가
-  - 생성된 테이블 확인
+### 2. ER 다이어그램 그리기
 
-### 문제 풀기
+- [x] 설계한 스키마를 바탕으로 ERD를 만듬
+- [x] 소프트웨어 도구를 사용 (mermaid.js)
+- [x] 만든 다이어그램은 erd.png 파일로 저장
 
-- [x] 초급 문제 10
-- [x] 중급 문제 7
-- [x] 고급 문제 5
+### 3. SQL 쿼리 작성하기
 
-## 스크린샷
+- [x] 14개의 SQL 쿼리 작성
+- [x] 예시가 필요한 경우 적당히 값을 채워 넣어 작성
+
+## 이미지 첨부
+
 ERD
-<img width="1142" height="842" alt="image" src="https://github.com/user-attachments/assets/eb20dab6-692d-4421-9ba0-2a5ad58111fd" />
-
-
-데이터베이스 생성 & 데이터 추가
-<img width="963" height="861" alt="image" src="https://github.com/user-attachments/assets/e05df196-afb0-49a6-94a1-378de5cf8a00" />
-

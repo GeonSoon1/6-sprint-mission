@@ -45,10 +45,33 @@ from (
   )
 order by id desc;
 
+select *
+from (
+  select * 
+  from orders 
+  where id < 42
+  order by id desc
+  limit 10
+  )
+order by id desc;
+
+select * from orders
+where id <= 42
+order by id desc limit 10;
+
 -- 8. `orders` 테이블에서 2025년 3월에 주문된 내역만 조회하세요.
 select *
 from orders
-where date >= '2025-03-01' and date < '2025.04.01';
+where date >= '2025-03-01' and date < '2025-04-01';
+-- 또는
+select *
+from orders
+where date between '2025-03-01' and '2025-03-31';
+-- 또는 (지금 계속 공부 중이라...)
+select *
+from orders
+where extract(year from date) = 2025 and extract(month from date) = 03;
+
 
 -- 9. `orders` 테이블에서 2025년 3월 12일 오전에 주문된 내역만 조회하세요.
 select *
@@ -78,24 +101,24 @@ group by pizza_id;
 -- 1,2가 같은 결과를 내지 않음을 아래에서 확인
 select * 
 from order_details 
-where quantity > 1;
+where quantity > 1; -- 같은 피자를 여럿 주문한 order_id가 많음.
 
-create view nCount as 
+create view nCount as -- order_id count table 생성
 (select pizza_id, count(order_id)
 from order_details
 group by pizza_id);
 
-create view nSum as 
+create view nSum as -- quantity sum table 생성
 (select pizza_id, sum(quantity)
 from order_details
 group by pizza_id);
 
-select sum(diff) 
+select sum(diff) -- 두 table에서 row별 차이 출력하고 합산 
 from (
   select (sum - count) as diff 
   from nCount 
   join nSum on nCount.pizza_id = nSum.pizza_id
-  ); --여기서 0 나오면 같음. 그러나 954 출력됨. 즉 같은 피자를 여럿 주문한 order_id가 많았음  
+  ); --여기서 0 나오면 같음. 그러나 954 출력됨. (같은 피자를 여럿 주문한 order_id가 많아서)
 
 
 -- 3. `pizzas` 테이블에서 `price`의 크기가 20보다 큰 피자의 종류만 `order_details` 테이블에서 조회하세요. (힌트: 서브쿼리)
@@ -128,7 +151,7 @@ join (
 
 
 -- 7. 날짜별로 피자 주문 건수(`order_count`)와 총 주문 수량(`total_quantity`)을 구하세요.
-select date, count(*) as order_count, sum(quantity) as total_quantity 
+select date, count(distinct order_id) as order_count, sum(quantity) as total_quantity 
 from orders
 join order_details
 on orders.id = order_details.order_id
@@ -157,14 +180,14 @@ order by date desc;
             bbq_ckn_m     | bbq_ckn     | M    | 16.75 |            956
         ```
 */
-select pizza_id, type_id, size, price, sale_quantity 
+select pizza_id, type_id, size, price, total_quantity 
 from pizzas
 join 
-(select pizza_id, sum(quantity) as sale_quantity
+(select pizza_id, sum(quantity) as total_quantity
 from order_details
 group by pizza_id)
 on id = pizza_id
-order by sale_quantity desc limit 10;
+order by total_quantity desc limit 10;
 
 
 /*
@@ -186,6 +209,16 @@ from orders
 join order_details
 on orders.id = order_details.order_id
 left join pizzas
+on pizzas.id = order_details.pizza_id
+group by date
+having date between '2025-03-01' and '2025-03-31'
+order by date asc;
+
+select date, count(distinct order_id) as total_orders, sum(quantity*price) as total_amount
+from orders
+join order_details
+on orders.id = order_details.order_id
+join pizzas
 on pizzas.id = order_details.pizza_id
 group by date
 having date between '2025-03-01' and '2025-03-31'

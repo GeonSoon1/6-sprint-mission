@@ -6,6 +6,7 @@ erDiagram
         String nickname UK "유니크"
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
 
     UserCredential {
@@ -13,6 +14,7 @@ erDiagram
         Int userId FK
         String email UK "로그인 ID"
         String password "Nullable (소셜유저는 없음)"
+        DateTime created_at
         DateTime updated_at
     }
 
@@ -47,12 +49,13 @@ erDiagram
         String[] tags "태그 배열"
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
-    PriceHistory{
+    PriceHistory {
         Int id PK
         Int productId FK
         Int price
-        DateTime create_at
+        DateTime created_at
     }
 
     Categories {
@@ -80,6 +83,7 @@ erDiagram
         String content
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
 
     Articles {
@@ -91,9 +95,10 @@ erDiagram
         String[] images "이미지 URL 배열"
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
 
-    Likes{
+    Likes {
         Int id PK
         Int articleId FK
         Int authorId FK
@@ -108,6 +113,7 @@ erDiagram
         String content
         DateTime created_at
         DateTime updated_at
+        DateTime deleted_at "Soft Delete"
     }
 
     %% 유저 - 인증
@@ -119,7 +125,6 @@ erDiagram
     Users ||--o{ Products : "판매글 작성"
     Users ||--o{ ProductComments : "상품 댓글 작성"
     Users ||--o{ Favorites : "상품 찜하기"
-
     Users ||--o{ Articles : "게시글 작성"
     Users ||--o{ ArticleComments : "게시글 댓글 작성"
     Users ||--o{ Likes : "게시글 좋아요"

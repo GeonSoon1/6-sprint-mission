@@ -13,6 +13,7 @@ erDiagram
         Int userId FK
         String email UK "로그인 ID"
         String password "Nullable (소셜유저는 없음)"
+        DateTime created_at
         DateTime updated_at
     }
 
@@ -50,7 +51,7 @@ erDiagram
         DateTime deleted_at "Soft Delete"
     }
 
-    PriceHistory{
+    PriceHistory {
         Int id PK
         Int productId FK
         Int price
@@ -97,7 +98,7 @@ erDiagram
         DateTime deleted_at "Soft Delete"
     }
 
-    Likes{
+    Likes {
         Int id PK
         Int articleId FK
         Int authorId FK

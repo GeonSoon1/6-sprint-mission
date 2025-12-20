@@ -14,6 +14,7 @@ erDiagram
         Int userId FK
         String email UK "로그인 ID"
         String password "Nullable (소셜유저는 없음)"
+        DateTime created_at
         DateTime updated_at
     }
 
@@ -51,7 +52,7 @@ erDiagram
         DateTime deleted_at "Soft Delete"
     }
 
-    PriceHistory{
+    PriceHistory {
         Int id PK
         Int productId FK
         Int price
@@ -98,7 +99,7 @@ erDiagram
         DateTime deleted_at "Soft Delete"
     }
 
-    Likes{
+    Likes {
         Int id PK
         Int articleId FK
         Int authorId FK
@@ -125,7 +126,6 @@ erDiagram
     Users ||--o{ Products : "판매글 작성"
     Users ||--o{ ProductComments : "상품 댓글 작성"
     Users ||--o{ Favorites : "상품 찜하기"
-
     Users ||--o{ Articles : "게시글 작성"
     Users ||--o{ ArticleComments : "게시글 댓글 작성"
     Users ||--o{ Likes : "게시글 좋아요"
@@ -142,4 +142,5 @@ erDiagram
     %% 게시글 관계
     Articles ||--o{ Likes : "N명이 좋아요"
     Articles ||--o{ ArticleComments : "N개 댓글"
+
 ```

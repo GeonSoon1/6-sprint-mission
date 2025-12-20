@@ -24,6 +24,7 @@ WHERE id = 1;
 SELECT * 
 FROM products 
 WHERE author_id = 1 
+  AND deleted_at IS NULL
 ORDER BY created_at DESC 
 LIMIT 10 OFFSET 20;
 
@@ -35,7 +36,8 @@ LIMIT 10 OFFSET 20;
 
 SELECT COUNT(*) AS total_count 
 FROM products 
-WHERE author_id = 1;
+WHERE author_id = 1 
+  AND deleted_at IS NULL;
 
 
 /*
@@ -49,6 +51,7 @@ SELECT p.*
 FROM products p
 INNER JOIN favorites f ON p.id = f.product_id
 WHERE f.author_id = 1
+  AND p.deleted_at IS NULL
 ORDER BY f.created_at DESC
 LIMIT 10 OFFSET 20;
 
@@ -86,6 +89,7 @@ SELECT
 FROM products p
 LEFT JOIN favorites f ON p.id = f.product_id
 WHERE p.name LIKE '%test%'
+  AND p.deleted_at IS NULL
 GROUP BY p.id
 ORDER BY p.created_at DESC
 LIMIT 10 OFFSET 0;
@@ -98,7 +102,8 @@ LIMIT 10 OFFSET 0;
 
 SELECT * 
 FROM products 
-WHERE id = 1;
+WHERE id = 1 
+  AND deleted_at IS NULL;
 
 
 /*
@@ -119,10 +124,12 @@ WHERE id = 1;
 
 /*
   10. 상품 삭제
-  - 1번 상품 삭제
+  - 1번 상품 삭제 (Soft Delete)
 */
 
-DELETE FROM products 
+UPDATE products 
+SET deleted_at = CURRENT_TIMESTAMP,
+    updated_at = CURRENT_TIMESTAMP
 WHERE id = 1;
 
 
@@ -131,9 +138,9 @@ WHERE id = 1;
   - 1번 유저가 2번 상품 좋아요
 */
 
-INSERT INTO favorites (author_id, product_id)
-VALUES (1, 2)
-ON CONFLICT (author_id, product_id) DO NOTHING;
+INSERT INTO favorites (product_id, author_id)
+VALUES (2, 1)
+ON CONFLICT (product_id, author_id) DO NOTHING;
 
 
 /*
@@ -165,5 +172,6 @@ SELECT *
 FROM product_comments 
 WHERE product_id = 1 
   AND created_at < '2025-03-25 00:00:00'
+  AND deleted_at IS NULL
 ORDER BY created_at DESC 
 LIMIT 10;

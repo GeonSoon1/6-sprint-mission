@@ -1,143 +1,141 @@
--- 판다마켓 데이터베이스 스키마
+-- 판다마켓 데이터베이스 스키마 (예시 스키마 기준으로 업그레이드)
 
--- Users 테이블
+-- 유저 기본 정보
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    nickname VARCHAR(50) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP
+    nickname VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ DEFAULT NULL
 );
 
--- UserCredential 테이블 (이메일 로그인)
-CREATE TABLE user_credentials (
+-- 유저 로그인 정보 (이메일/패스워드)
+CREATE TABLE user_credential (
     id SERIAL PRIMARY KEY,
-    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id INTEGER UNIQUE NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     email VARCHAR(255) UNIQUE NOT NULL,
-    password VARCHAR(255), -- NULL 가능 (소셜 로그인 사용자는 없음)
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    -- 중요: 비밀번호는 반드시 해싱하여 저장해야 합니다. VARCHAR(255)는 해시된 값을 저장하기에 충분합니다.
+    password VARCHAR(255),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- SocialAccount 테이블 (소셜 로그인)
+-- 소셜 로그인 정보
 CREATE TABLE social_accounts (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    provider VARCHAR(50) NOT NULL, -- 'google', 'kakao' 등
-    provider_id VARCHAR(255) NOT NULL, -- 소셜 서비스의 고유 ID
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(provider, provider_id)
+    provider VARCHAR(255) NOT NULL,
+    provider_id VARCHAR(255) NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    -- 한 유저는 특정 소셜 서비스 제공자(provider) 당 하나의 계정만 가질 수 있음
+    UNIQUE (provider, provider_id)
 );
 
--- Token 테이블 (리프레시 토큰 관리)
+-- 리프레시 토큰 저장
 CREATE TABLE tokens (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    refresh_token VARCHAR(500) UNIQUE NOT NULL,
-    user_agent TEXT, -- 기기 정보
-    expires_at TIMESTAMP NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    refresh_token TEXT UNIQUE NOT NULL,
+    user_agent VARCHAR(255),
+    expires_at TIMESTAMPTZ NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Categories 테이블 (상품 카테고리)
+
+-- ==== PRODUCT TABLES ====
+
+-- 상품 카테고리 (e.g., 디지털기기, 가구/인테리어)
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) UNIQUE NOT NULL
 );
 
--- Status 테이블 (상품 상태)
+-- 상품 상태 (e.g., 판매중, 예약중, 판매완료)
 CREATE TABLE status (
     id SERIAL PRIMARY KEY,
-    name VARCHAR(50) UNIQUE NOT NULL
+    name VARCHAR(100) UNIQUE NOT NULL
 );
 
--- Product 테이블 (상품)
+-- 상품 정보
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
-    author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    category_id INTEGER NOT NULL REFERENCES categories(id),
-    status_id INTEGER NOT NULL REFERENCES status(id),
-    name VARCHAR(255) NOT NULL,
+    author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    category_id INTEGER NOT NULL REFERENCES categories(id) ON DELETE RESTRICT,
+    status_id INTEGER NOT NULL REFERENCES status(id) ON DELETE RESTRICT, 
+    name VARCHAR(500) NOT NULL,
     description TEXT,
-    current_price INTEGER NOT NULL,
+    current_price INTEGER NOT NULL CHECK (current_price >= 0),
     view_count INTEGER NOT NULL DEFAULT 0,
-    image VARCHAR(500), -- 이미지 URL (최대 1개)
-    tags TEXT[], -- 태그 배열
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP
+    image TEXT, -- 이미지 URL 저장
+    tags TEXT[], -- 태그 목록 (PostgreSQL 배열 타입)
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ DEFAULT NULL
 );
 
--- PriceHistory 테이블 (가격 히스토리)
+-- 상품 가격 변동 이력
 CREATE TABLE price_history (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
-    price INTEGER NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    price INTEGER NOT NULL CHECK (price >= 0),
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Favorite 테이블 (상품 찜하기)
+-- 찜(관심 상품) 목록
 CREATE TABLE favorites (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(author_id, product_id) -- 중복 찜 방지
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    -- 한 유저는 하나의 상품을 한 번만 찜할 수 있음
+    UNIQUE (product_id, author_id)
 );
 
--- ProductComment 테이블 (상품 댓글)
+-- 상품 댓글
 CREATE TABLE product_comments (
     id SERIAL PRIMARY KEY,
     product_id INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
     author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ DEFAULT NULL
 );
 
--- Article 테이블 (게시글)
+
+-- ==== ARTICLE(동네생활) TABLES ====
+
+-- 동네생활 게시글
 CREATE TABLE articles (
     id SERIAL PRIMARY KEY,
-    author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     view_count INTEGER NOT NULL DEFAULT 0,
-    images TEXT[], -- 이미지 URL 배열
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP
+    image TEXT[], -- 이미지 URL 목록 (PostgreSQL 배열 타입)
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ DEFAULT NULL
 );
 
--- Like 테이블 (게시글 좋아요)
+-- 게시글 좋아요
 CREATE TABLE likes (
     id SERIAL PRIMARY KEY,
     article_id INTEGER NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
     author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(author_id, article_id) -- 중복 좋아요 방지
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    -- 한 유저는 하나의 게시글에 한 번만 좋아요를 누를 수 있음
+    UNIQUE (article_id, author_id)
 );
 
--- ArticleComment 테이블 (게시글 댓글)
+-- 게시글 댓글
 CREATE TABLE article_comments (
     id SERIAL PRIMARY KEY,
     article_id INTEGER NOT NULL REFERENCES articles(id) ON DELETE CASCADE,
     author_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    deleted_at TIMESTAMP
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    deleted_at TIMESTAMPTZ DEFAULT NULL
 );
-
--- 인덱스 생성 (성능 최적화)
-CREATE INDEX idx_products_author_id ON products(author_id);
-CREATE INDEX idx_products_created_at ON products(created_at DESC);
-CREATE INDEX idx_favorites_author_id ON favorites(author_id);
-CREATE INDEX idx_favorites_product_id ON favorites(product_id);
-CREATE INDEX idx_product_comments_product_id ON product_comments(product_id);
-CREATE INDEX idx_product_comments_created_at ON product_comments(created_at DESC);
-CREATE INDEX idx_articles_author_id ON articles(author_id);
-CREATE INDEX idx_articles_created_at ON articles(created_at DESC);
-CREATE INDEX idx_likes_article_id ON likes(article_id);
-CREATE INDEX idx_article_comments_article_id ON article_comments(article_id);
-

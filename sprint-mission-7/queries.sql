@@ -8,6 +8,9 @@
   - 닉네임을 "test"로 업데이트
   - 현재 로그인한 유저 id가 1이라고 가정
 */
+UPDATE users
+SET nickname = 'test'
+WHERE id = 1;
 
 
 /*
@@ -16,12 +19,21 @@
   - 최신 순으로 정렬
   - 10개씩 페이지네이션, 3번째 페이지
 */
-
+SELECT *
+FROM products
+WHERE user_id = 1 
+ORDER BY created_at DESC
+LIMIT 10 OFFSET 20;
 
 /*
   3. 내가 생성한 상품의 총 개수
   - 현재 로그인한 유저 id가 1이라고 가정
 */
+
+SELECT 
+  COUNT(*) AS created
+FROM products
+WHERE user_id = 1;
 
 
 /*
@@ -31,11 +43,22 @@
   - 10개씩 페이지네이션, 3번째 페이지
 */
 
+SELECT *
+FROM product_likes
+WHERE user_id = 1 
+ORDER BY created_at DESC
+LIMIT 10 OFFSET 20;
+
 
 /*
   5. 내가 좋아요 누른 상품의 총 개수
   - 현재 로그인한 유저 id가 1이라고 가정
 */
+
+SELECT 
+  COUNT(*) AS created
+FROM product_likes
+WHERE user_id = 1;
 
 
 /*
@@ -43,6 +66,10 @@
   - 현재 로그인한 유저 id가 1이라고 가정
 */
 
+INSERT INTO products (user_id, image, name, description, price)
+VALUES (1,'img_rainbow_doll.jpg','무지개 곰인형','파스텔 무지개톤의 귀여운 곰인형',39000);
+
+SELECT * FROM products WHERE name = '무지개 곰인형';
 
 /*
   7. 상품 목록 조회
@@ -52,11 +79,36 @@
   - 각 상품의 좋아요 개수를 포함해서 조회하기
 */
 
+-- 계산식으로 likeCount 가져오기 위해 
+-- DB의 컬럼 삭제
+ALTER TABLE products
+DROP COLUMN like_count;
+
+ALTER TABLE articles
+DROP COLUMN like_count;
+
+SELECT 
+  products.id,
+  products.name,
+  products.description,
+  Count(product_likes.user_id) total_like,
+  products.created_at
+FROM products JOIN product_likes
+ON products.id = product_likes.product_id
+GROUP BY products.id
+HAVING products.name LIKE 'test%'
+ORDER BY created_at DESC
+LIMIT 10;
+
+
 
 /*
   8. 상품 상세 조회
   - 1번 상품 조회
 */
+SELECT * 
+FROM products
+WHERE id = 1;
 
 
 /*
@@ -64,11 +116,16 @@
   - 1번 상품 수정
 */
 
+UPDATE products SET name='여름용 우산' WHERE id=1;
+
+
 
 /*
   10. 상품 삭제
   - 1번 상품 삭제
 */
+
+DELETE FROM products WHERE id =1;
 
 
 /*
@@ -76,17 +133,27 @@
   - 1번 유저가 2번 상품 좋아요
 */
 
+-- 이미 데이터가 있는 관계로 122번 상품을 좋아요 진행
+INSERT INTO product_likes (user_id, product_id)
+VALUES (1, 122);
+
+
 
 /*
   12. 상품 좋아요 취소
   - 1번 유저가 2번 상품 좋아요 취소
 */
 
+DELETE FROM product_likes WHERE user_id = 1 AND product_id = 2;
+
 
 /*
   13. 상품 댓글 작성
   - 1번 유저가 2번 상품에 댓글 작성
 */
+INSERT INTO product_comments ( user_id, product_id, content)
+VALUES (1,2,'너무너무너무너무 좋아요 bbbb');
+
 
 
 /*
@@ -95,3 +162,8 @@
   - 최신 순으로 정렬
   - 댓글 날짜 2025-03-25 기준일을 제외한 이전 데이터 10개
 */
+SELECT * 
+FROM product_comments
+WHERE product_id = 51 AND created_at < '2025-03-25 %'
+ORDER BY created_at DESC
+LIMIT 10;

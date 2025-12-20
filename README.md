@@ -21,6 +21,6 @@
 - [x] 14개의 SQL 쿼리 작성
 - [x] 예시가 필요한 경우 적당히 값을 채워 넣어 작성
 
-## 이미지 첨부
+## ERD
+<img width="993" height="692" alt="image" src="https://github.com/user-attachments/assets/82efffa6-e707-4ffb-ab38-e4c4d38fab1d" />
 
-ERD

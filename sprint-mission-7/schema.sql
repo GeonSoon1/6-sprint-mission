@@ -1,4 +1,3 @@
--- schema.sql (ID를 숫자(BIGSERIAL)로 변경)
 
 CREATE TABLE users (
   id BIGSERIAL PRIMARY KEY,

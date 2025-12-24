@@ -1,0 +1,47 @@
+@baseUrl = http://localhost:3000
+
+### 회원가입 (새 유저 만들 때 사용)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "nickname": "newuser",
+  "password": "password123"
+}
+
+### 로그인
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@example.com",
+  "password": "password123"
+}
+
+### 내 정보 조회 (쿠키에 access-token 필요)
+GET {{baseUrl}}/auth/me
+
+### 프로필 수정
+PATCH {{baseUrl}}/auth/profile
+Content-Type: application/json
+
+{
+  "nickname": "alice-renamed",
+  "image": "https://example.com/avatar.png"
+}
+
+### 비밀번호 변경
+PATCH {{baseUrl}}/auth/password
+Content-Type: application/json
+
+{
+  "currentPassword": "password123",
+  "newPassword": "password1234"
+}
+
+### 토큰 재발급
+POST {{baseUrl}}/auth/refresh
+
+### 로그아웃
+POST {{baseUrl}}/auth/logout

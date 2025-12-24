@@ -1,0 +1,37 @@
+@baseUrl = http://localhost:3000
+@commentId1 = 30000000-0000-0000-0000-000000000001
+@productId1 = 10000000-0000-0000-0000-000000000001
+@articleId1 = 20000000-0000-0000-0000-000000000001
+
+### 특정 상품에 달린 댓글 목록 조회
+GET {{baseUrl}}/comments/product/{{productId1}}?limit=10
+
+### 특정 게시글에 달린 댓글 목록 조회
+GET {{baseUrl}}/comments/article/{{articleId1}}?limit=10
+
+### 상품에 댓글 작성 (로그인 필요)
+POST {{baseUrl}}/comments/product/{{productId1}}
+Content-Type: application/json
+
+{
+  "content": "상품이 정말 좋아 보이네요!"
+}
+
+### 게시글에 댓글 작성 (로그인 필요)
+POST {{baseUrl}}/comments/article/{{articleId1}}
+Content-Type: application/json
+
+{
+  "content": "글 잘 읽었습니다!"
+}
+
+### 댓글 수정 
+PATCH {{baseUrl}}/comments/{{commentId1}}
+Content-Type: application/json
+
+{
+  "content": "댓글 내용을 수정했습니다."
+}
+
+### 댓글 삭제 
+DELETE {{baseUrl}}/comments/{{commentId1}}

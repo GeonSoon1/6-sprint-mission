@@ -1,0 +1,34 @@
+@baseUrl = http://localhost:3000
+@articleId1 = 20000000-0000-0000-0000-000000000001
+
+### 게시글 생성 (로그인 필요)
+POST {{baseUrl}}/articles
+Content-Type: application/json
+
+{
+  "title": "새 게시글 제목",
+  "content": "여기는 게시글 내용입니다."
+}
+
+### 게시글 전체 목록 조회
+GET {{baseUrl}}/articles
+
+### 게시글 상세 조회
+GET {{baseUrl}}/articles/{{articleId1}}
+
+### 내가 작성한 게시글 목록 조회
+GET {{baseUrl}}/articles/me
+
+### 게시글 수정 (작성자만)
+PATCH {{baseUrl}}/articles/{{articleId1}}
+Content-Type: application/json
+
+{
+  "content": "내용을 조금 수정했습니다."
+}
+
+### 게시글 삭제 (작성자만)
+DELETE {{baseUrl}}/articles/{{articleId1}}
+
+### 게시글 좋아요
+POST {{baseUrl}}/articles/{{articleId1}}/like

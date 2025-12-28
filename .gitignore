@@ -1,4 +1,7 @@
 images/
-*.Identifier
+mission7/mermaid.md
 pizza_place_sales.sql
 elect*
+pizza_place_sales*.*
+sprint-mission-6.sql
+README_mission6.md

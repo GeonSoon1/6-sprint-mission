@@ -1,0 +1,83 @@
+erDiagram
+    users {
+        SERIAL id PK
+        VARCHAR(254) email "UNIQUE"
+        VARCHAR(20) nickname "UNIQUE"
+        VARCHAR(200) image
+        TEXT password
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    products {
+        SERIAL id PK
+        VARCHAR(30) name
+        TEXT description
+        INTEGER price
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        INTEGER owner_id FK
+    }
+    
+    tags {
+        SERIAL id PK
+        VARCHAR(20) name "UNIQUE"
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+    
+    product_images {
+        SERIAL id PK
+        VARCHAR(200) url
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        INTEGER product_id FK
+    }
+    
+    articles {
+        SERIAL id PK
+        VARCHAR(50) title
+        TEXT content
+        VARCHAR(200) image
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        INTEGER writer_id FK
+    }
+    
+    comments {
+        SERIAL id PK
+        TEXT content
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+        INTEGER writer_id FK
+        INTEGER article_id FK
+        INTEGER product_id FK
+    }
+    
+    user_favorite_products {
+        INTEGER user_id PK, FK
+        INTEGER product_id PK, FK
+    }
+    
+    user_liked_articles {
+        INTEGER user_id PK, FK
+        INTEGER article_id PK, FK
+    }
+    
+    product_tags {
+        INTEGER product_id PK, FK
+        INTEGER tag_id PK, FK
+    }
+    
+    users ||--o{ products : "owns"
+    users ||--o{ articles : "writes"
+    users ||--o{ comments : "writes"
+    products ||--o{ product_images : "has"
+    products ||--o{ comments : "receives"
+    articles ||--o{ comments : "receives"
+    users ||--o{ user_favorite_products : "favorites"
+    user_favorite_products o{--|| products : "favorite by"
+    users ||--o{ user_liked_articles : "likes"
+    user_liked_articles o{--|| articles  : "liked"
+    products ||--o{ product_tags : "tagged"
+    tags ||--o{ product_tags : "tags"

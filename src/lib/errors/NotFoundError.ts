@@ -1,10 +1,7 @@
 class NotFoundError extends Error {
-  status: number;
-
-  constructor(message: string = '리소스를 찾을 수 없습니다.') {
-    super(message);
+  constructor(modelName: string, id: number) {
+    super(`${modelName} with id ${id} not found`);
     this.name = 'NotFoundError';
-    this.status = 404;
   }
 }
 

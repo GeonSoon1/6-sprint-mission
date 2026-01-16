@@ -1,21 +1,12 @@
 import dotenv from 'dotenv';
-
 dotenv.config();
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
-const PORT = process.env.PORT || 3000;
-const JWT_ACCESS_TOKEN_SECRET =
-  process.env.JWT_ACCESS_TOKEN_SECRET || 'your_jwt_access_token_secret';
-const JWT_REFRESH_TOKEN_SECRET =
-  process.env.JWT_REFRESH_TOKEN_SECRET || 'your_jwt_refresh_token_secret';
-const ACCESS_TOKEN_COOKIE_NAME = 'access-token';
-const REFRESH_TOKEN_COOKIE_NAME = 'refresh-token';
-
-export {
-  NODE_ENV,
-  PORT,
-  JWT_ACCESS_TOKEN_SECRET,
-  JWT_REFRESH_TOKEN_SECRET,
-  ACCESS_TOKEN_COOKIE_NAME,
-  REFRESH_TOKEN_COOKIE_NAME,
-};
+export const ACCESS_TOKEN_COOKIE_NAME = 'access-token';
+export const REFRESH_TOKEN_COOKIE_NAME = 'refresh-token';
+export const DATABASE_URL = process.env.DATABASE_URL || '';
+export const JWT_ACCESS_TOKEN_SECRET = process.env.JWT_ACCESS_TOKEN_SECRET || '';
+export const JWT_REFRESH_TOKEN_SECRET = process.env.JWT_REFRESH_TOKEN_SECRET || '';
+export const NODE_ENV = process.env.NODE_ENV || 'development';
+export const PORT = process.env.PORT || 3000;
+export const PUBLIC_PATH = './public';
+export const STATIC_PATH = '/public';

@@ -1,10 +1,7 @@
 class BadRequestError extends Error {
-  status: number;
-
-  constructor(message: string = '잘못된 요청입니다.') {
+  constructor(message: string) {
     super(message);
     this.name = 'BadRequestError';
-    this.status = 400;
   }
 }
 

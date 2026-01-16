@@ -4,21 +4,21 @@ import { Request, Response } from 'express';
 // 게시물 등록, 수정, 삭제: 토큰 인증된 유저만 가능
 async function post(req: Request, res: Response): Promise<void> {
   const article = await articleService.post(req.user!.id, req.body);
-  console.log(`Article_${article.id} posted successfully by user${req.user!.id}`);
+  console.log(`Article_${article.id} posted successfully by user${req.user.id}`);
   res.status(201).json(article);
 }
 
 // 게시물 수정
 async function patch(req: Request, res: Response): Promise<void> {
   const article = await articleService.patch(req.params.id, req.body);
-  console.log(`Article_${req.params.id} edited by user${req.user!.id}`);
+  console.log(`Article_${req.params.id} edited by user${req.user.id}`);
   res.status(200).json(article);
 }
 
 // 게시물 삭제
 async function erase(req: Request, res: Response): Promise<void> {
   await articleService.erase(req.params.id);
-  console.log(`Article_${req.params.id} deleted by user${req.user!.id}`);
+  console.log(`Article_${req.params.id} deleted by user${req.user.id}`);
   res.status(204).send({ message: '게시물이 삭제되었습니다' });
 }
 
@@ -38,7 +38,7 @@ async function getList(req: Request, res: Response): Promise<void> {
 // 게시물 상세 조회
 async function get(req: Request, res: Response): Promise<void> {
   const { id: articleId } = req.params;
-  const userId = req.user?.id;
+  const userId = req.user.id;
   const article = await articleService.get(userId, articleId);
   console.log('Article fetched (in detail)');
   res.status(200).json(article);
@@ -46,7 +46,7 @@ async function get(req: Request, res: Response): Promise<void> {
 
 // 게시물: 좋아요/좋아요-취소
 async function likeToggle(req: Request, res: Response): Promise<void> {
-  const article = await articleService.likeToggle(req.user!.id, req.params.id);
+  const article = await articleService.likeToggle(req.user.id, req.params.id);
   res.status(200).json(article);
 }
 

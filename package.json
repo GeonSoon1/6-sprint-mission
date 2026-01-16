@@ -31,7 +31,8 @@
   "main": "dist/app.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/app.js",
+    "start2": "node dist/app.js",
+    "start": "ts-node src/main.ts",
     "dev": "nodemon --watch src --exec ts-node src/app.ts"
   },
   "prisma": {

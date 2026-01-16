@@ -39,7 +39,7 @@ async function get(req: Request, res: Response, next: NextFunction): Promise<voi
 async function post(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { content } = req.body;
   const { id } = req.params;
-  const { id: userId } = req.user!;
+  const { id: userId } = req.user;
   const comment = await commentService.post(req.url, content, id, userId);
   console.log('Comment created');
   res.status(200).json(comment);
@@ -47,7 +47,7 @@ async function post(req: Request, res: Response, next: NextFunction): Promise<vo
 // async function postProduct(req: Request, res: Response, next: NextFunction): Promise<void> {
 //   const { content } = req.body;
 //   const { id: productId } = req.params;
-//   const { id: userId } = req.user!;
+//   const { id: userId } = req.user;
 //   const comment = await commentService.postProduct(content, productId, userId);
 //   console.log('Comment created');
 //   res.status(200).json(comment);
@@ -60,7 +60,7 @@ async function post(req: Request, res: Response, next: NextFunction): Promise<vo
 // async function postArticle(req: Request, res: Response, next: NextFunction): Promise<void> {
 //   const { content } = req.body;
 //   const { id: articleId } = req.params;
-//   const { id: userId } = req.user!;
+//   const { id: userId } = req.user;
 //   const comment = await commentService.postArticle(content, articleId, userId);
 //   console.log('Comment created');
 //   res.status(200).json(comment);
@@ -70,7 +70,7 @@ async function post(req: Request, res: Response, next: NextFunction): Promise<vo
 // req.params에 commentId 있어야 함
 // 입력 필드: content
 async function patch(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const comment = await commentService.patch(req.params.id, req.body, req.user!.id);
+  const comment = await commentService.patch(req.params.id, req.body, req.user.id);
   console.log('Comments edited.');
   res.status(201).json(comment);
 }

@@ -4,8 +4,8 @@ import { Request, Response, NextFunction } from 'express';
 // 상품 등록: 토큰 인증된 유저만 가능
 // 입력 필드: name, description, price, tags
 async function post(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const product = await productService.post(req.user!.id, req.body);
-  console.log(`Product_${product.id} posted by ${req.user!.nickname}`);
+  const product = await productService.post(req.user.id, req.body);
+  console.log(`Product_${product.id} posted by ${req.user.nickname}`);
   res.status(201).json(product);
 }
 
@@ -13,7 +13,7 @@ async function post(req: Request, res: Response, next: NextFunction): Promise<vo
 async function patch(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params;
   const product = await productService.patch(id, req.body);
-  console.log(`Product_${id} patched by ${req.user!.nickname}`);
+  console.log(`Product_${id} patched by ${req.user.nickname}`);
   res.status(200).json(product);
 }
 
@@ -21,7 +21,7 @@ async function patch(req: Request, res: Response, next: NextFunction): Promise<v
 async function erase(req: Request, res: Response, next: NextFunction): Promise<void> {
   const { id } = req.params;
   await productService.erase(id);
-  console.log(`Product_${id} deleted by ${req.user!.nickname}`);
+  console.log(`Product_${id} deleted by ${req.user.nickname}`);
   res.status(204).send({ message: '상품이 삭제되었습니다' });
 }
 
@@ -54,7 +54,7 @@ async function get(req: Request, res: Response, next: NextFunction): Promise<voi
 
 // 상품: 좋아요/좋아요-취소
 async function likeToggle(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const product = await productService.likeToggle(req.user!.id, req.params.id);
+  const product = await productService.likeToggle(req.user.id, req.params.id);
   res.status(200).json(product);
 }
 

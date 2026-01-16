@@ -10,7 +10,7 @@ import { print, isEmpty } from '../lib/myFuns';
 import { selectUserFields } from '../lib/selectFields';
 import { Request, Response } from 'express';
 import { CreateUserDto } from '../dto/dto';
-import { Prisma, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { SafeUser, SafeCompleteUser, TokenType } from '../dto/interfaceType';
 
 async function getList(): Promise<SafeCompleteUser[] | object> {

@@ -5,6 +5,7 @@ import { CursorPaginationParams, CursorPaginationResult } from '../types/paginat
 import BadRequestError from '../lib/errors/BadRequestError';
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import NotFoundError from '../lib/errors/NotFoundError';
+import * as notificationsService from './notificationsService';
 import Comment from '../types/Comment';
 
 type CreateCommentData = Omit<
@@ -20,11 +21,16 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
     throw new BadRequestError('Either articleId or productId must be provided');
   }
 
+  let articleOwnerId: number | null = null;
+  let articleTitle: string | null = null;
+
   if (data.articleId) {
     const article = await articlesRepository.getArticle(data.articleId);
     if (!article) {
       throw new NotFoundError('article', data.articleId);
     }
+    articleOwnerId = article.userId;
+    articleTitle = article.title;
   }
 
   if (data.productId) {
@@ -39,6 +45,20 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
     articleId: data.articleId ?? null,
     productId: data.productId ?? null,
   });
+
+  if (
+    data.articleId &&
+    articleOwnerId !== null &&
+    articleOwnerId !== data.userId &&
+    articleTitle
+  ) {
+    await notificationsService.notifyArticleComment(
+      articleOwnerId,
+      data.articleId,
+      comment.id,
+      articleTitle,
+    );
+  }
   return comment;
 }
 

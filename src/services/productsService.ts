@@ -1,6 +1,8 @@
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import NotFoundError from '../lib/errors/NotFoundError';
 import * as productsRepository from '../repositories/productsRepository';
+import * as favoritesRepository from '../repositories/favoritesRepository';
+import * as notificationsService from './notificationsService';
 import { PagePaginationParams, PagePaginationResult } from '../types/pagination';
 import Product from '../types/Product';
 
@@ -44,6 +46,16 @@ export async function updateProduct(id: number, data: UpdateProductData): Promis
     throw new ForbiddenError('Should be the owner of the product');
   }
   const updatedProduct = await productsRepository.updateProductWithFavorites(id, data);
+  if (data.price !== undefined && existingProduct.price !== data.price) {
+    const favoriteUserIds = await favoritesRepository.getFavoriteUserIdsByProductId(id);
+    await notificationsService.notifyPriceChange(
+      favoriteUserIds,
+      id,
+      updatedProduct.name,
+      existingProduct.price,
+      data.price,
+    );
+  }
   return updatedProduct;
 }
 

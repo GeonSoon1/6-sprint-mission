@@ -12,8 +12,14 @@ import cookieParser from 'cookie-parser';
 import { optionalAuth } from './middlewares/auth';
 import { PORT } from './libs/constants';
 import imageRouter from './routers/imageRouter';
+import http from 'http';
+import { setupSocket } from './socket';
 
 const app = express();
+
+const server = http.createServer(app);
+
+setupSocket(server)
 
 app.use(cors());
 app.use(cookieParser());
@@ -31,6 +37,6 @@ app.use('/images', imageRouter);
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log('Server running');
 });

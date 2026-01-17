@@ -6,6 +6,8 @@ import {
   ProductUpdateDto,
 } from '../dto/productDto';
 import { ProductRepository } from '../repogitories/productRepogitory';
+import { NotificationRepository } from '../repogitories/notificationRepogitory';
+import { NotificationService } from '../services/notificationService';
 
 export class ProductController {
   constructor(private service: ProductService) {}
@@ -64,5 +66,8 @@ export class ProductController {
 
 // router에서 사용할 수 있도록 조립
 const productRepository = new ProductRepository();
-const productService = new ProductService(productRepository);
+const notificationRepo = new NotificationRepository();
+const notificationService = new NotificationService(notificationRepo);
+const productService = new ProductService(productRepository, notificationService);
 export const productController = new ProductController(productService);
+

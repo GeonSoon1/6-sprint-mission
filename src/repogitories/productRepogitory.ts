@@ -79,4 +79,12 @@ export class ProductRepository {
   async findByUserId(userId: string): Promise<Product[]> {
     return prisma.product.findMany({ where: { userId } });
   }
+
+  async findLikers(productId: string) {
+    const likes = await prisma.likedProduct.findMany({
+      where: { productId },
+      select: { userId: true },
+    });
+    return likes.map((like) => like.userId);
+  }
 }

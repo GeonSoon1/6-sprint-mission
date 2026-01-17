@@ -11,11 +11,11 @@ Content-Type: application/json
 
 // 로그인
 ###
-POST http://localhost:4000/users/login
+POST http://localhost:3001/users/login
 Content-Type: application/json
 
 {
-    "email": "b@a.com",
+    "email": "a@a.com",
     "password": "password"
 }
 
@@ -48,7 +48,7 @@ GET http://localhost:4000/users/user/products
 
 // 상품 좋아요, 해제 버튼
 ###
-POST http://localhost:4000/users/products/94dba363-a076-4a9e-9fe0-dfb35ee12e91
+POST http://localhost:3001/users/products/2cbf05fc-b908-46bc-baed-8887a6d18c18
 
 // 게시글 좋아요, 해제 버튼
 ###

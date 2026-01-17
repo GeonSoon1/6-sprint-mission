@@ -73,4 +73,13 @@ export class ArticleRepogitory {
   async findByUserId(userId: string) {
     return prisma.article.findMany({ where: { userId } });
   }
+
+  // 게시글 작성자 ID 조회
+  async findUserId(id: string) {
+    const article = await prisma.article.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+    return article?.userId;
+  }
 }

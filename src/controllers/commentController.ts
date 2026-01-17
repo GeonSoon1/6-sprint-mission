@@ -6,6 +6,9 @@ import {
   CommentUpdateDto,
 } from '../dto/commentDto';
 import { CommentRepository } from '../repogitories/commentRepogitory';
+import { ArticleRepogitory } from '../repogitories/articleRepogitory';
+import { NotificationRepository } from '../repogitories/notificationRepogitory';
+import { NotificationService } from '../services/notificationService';
 
 export class CommentController {
   constructor(private service: CommentService) {}
@@ -76,5 +79,9 @@ export class CommentController {
 }
 
 const commentRepogitory = new CommentRepository();
-const commentService = new CommentService(commentRepogitory);
+const articleRepogitory = new ArticleRepogitory();
+const notificationRepo = new NotificationRepository();
+const notificationService = new NotificationService(notificationRepo);
+const commentService = new CommentService(commentRepogitory, articleRepogitory, notificationService);
 export const commentController = new CommentController(commentService);
+

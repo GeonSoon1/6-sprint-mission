@@ -1,15 +1,15 @@
 // 게시글 목록 조회
 ###
-GET http://localhost:4000/articles?sort=&search=
+GET http://localhost:3001/articles?sort=&search=
 
 // 게시글 생성
 ###
-POST http://localhost:4000/articles
+POST http://localhost:3001/articles
 Content-Type: application/json
 
 {
-    "title": "d",
-    "content": "d"
+    "title": "a의 게시글",
+    "content": "a"
 }
 
 // 게시글 상세 조회

@@ -1,8 +1,10 @@
 import express from 'express';
-import { asyncHandler } from '../libs/asyncHandler';
-import { verifyAccessToken, authorizeUser } from '../middlewares/auth';
-import { notificationController } from '../controllers/notificationController';
-import { validateNotificationIdParam } from '../middlewares/validates/validateId';
+import { asyncHandler } from '../../libs/asyncHandler';
+import { verifyAccessToken, authorizeUser } from '../../middlewares/auth';
+import { notificationController } from './notification.controller';
+import { validateNotificationIdParam } from '../../middlewares/validates/validateId';
+
+import { validateGetNotificationQuery } from '../../middlewares/validates/validateNotification';
 
 const notificationRouter = express.Router();
 
@@ -11,6 +13,7 @@ notificationRouter.get(
   '/',
   verifyAccessToken,
   authorizeUser,
+  validateGetNotificationQuery,
   asyncHandler(notificationController.getMyNotifications.bind(notificationController))
 );
 

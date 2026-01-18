@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { ProductService } from '../services/productService';
+import { ProductService } from '../products/product.service';
 import {
   ProductCreateDto,
   ProductQueryDto,
   ProductUpdateDto,
-} from '../dto/productDto';
-import { ProductRepository } from '../repogitories/productRepogitory';
-import { NotificationRepository } from '../repogitories/notificationRepogitory';
-import { NotificationService } from '../services/notificationService';
+} from '../products/product.dto';
+import { ProductRepository } from '../products/product.repository';
+import { NotificationRepository } from '../notifications/notification.repository';
+import { NotificationService } from '../notifications/notification.service';
 
 export class ProductController {
   constructor(private service: ProductService) {}

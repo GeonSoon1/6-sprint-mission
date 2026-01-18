@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import { NotificationService } from '../services/notificationService';
-import { NotificationRepository } from '../repogitories/notificationRepogitory';
+import { NotificationService } from '../notifications/notification.service';
+import { NotificationRepository } from '../notifications/notification.repository';
 
 export class NotificationController {
   constructor(private service: NotificationService) {}

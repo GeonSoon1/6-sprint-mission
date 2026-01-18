@@ -3,9 +3,9 @@ import {
   ProductCreateDto,
   ProductQueryDto,
   ProductUpdateDto,
-} from '../dto/productDto';
-import { ProductRepository } from '../repogitories/productRepogitory';
-import { NotificationService } from './notificationService';
+} from '../products/product.dto';
+import { ProductRepository } from '../products/product.repository';
+import { NotificationService } from '../notifications/notification.service';
 
 type GetProduct = Omit<
   Product,
@@ -50,7 +50,7 @@ export class ProductService {
   }
 
   async update(id: string, dto: ProductUpdateDto): Promise<Product> {
- // 1. 기존 상품 정보 가져오기 (가격 비교용)
+    // 1. 기존 상품 정보 가져오기 (가격 비교용)
     const oldProduct = await this.repo.findById(id);
     // 2. 상품 업데이트
     const updatedProduct = await this.repo.update(id, dto);

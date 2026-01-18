@@ -2,8 +2,8 @@ import {
   CommentCreateDto,
   CommentQueryDto,
   CommentUpdateDto,
-} from '../dto/commentDto';
-import prisma from '../libs/prismaClient';
+} from '../comments/comment.dto';
+import prisma from '../../libs/prismaClient';
 
 export class CommentRepository {
   async create(dto: CommentCreateDto) {

@@ -15,7 +15,7 @@
 ```
 [디렉토리 구조]
 
-6-sprint-mission
+8-sprint-mission (renamed from 6-sprint-mission)
 
 ├─ __http__/
 │ ├─ article.http
@@ -30,18 +30,6 @@
 │ ├─ migrations/
 │ └─ schema.prisma
 ├─ src/
-│ ├─ controllers/
-│ │ ├─ articleController.ts
-│ │ ├─ commentController.ts
-│ │ ├─ imageController.ts
-│ │ ├─ notificationController.ts
-│ │ ├─ productController.ts
-│ │ └─ userController.ts
-│ ├─ dto/
-│ │ ├─ articleDto.ts
-│ │ ├─ commentDto.ts
-│ │ ├─ productDto.ts
-│ │ └─ userDto.ts
 │ ├─ libs/
 │ │ ├─ asyncHandler.ts
 │ │ ├─ constants.ts
@@ -51,32 +39,26 @@
 │ │ ├─ errorHandler/
 │ │ ├─ validates/
 │ │ └─ auth.ts
+│ ├─ modules/
+│ │ ├─ articles/
+│ │ │ ├─ article.controller.ts
+│ │ │ ├─ article.dto.ts
+│ │ │ ├─ article.repository.ts
+│ │ │ ├─ article.router.ts
+│ │ │ └─ article.service.ts
+│ │ ├─ comments/
+│ │ │ ├─ comment.controller.ts
+│ │ │ ├─ ... (service, repo, router, dto)
+│ │ ├─ images/
+│ │ ├─ likes/
+│ │ ├─ notifications/
+│ │ ├─ products/
+│ │ └─ users/
 │ ├─ public/
 │ │ └─ socket-client-test.html
-│ ├─ repogitories/
-│ │ ├─ articleRepogitory.ts
-│ │ ├─ commentRepogitory.ts
-│ │ ├─ likeRepogitory.ts
-│ │ ├─ notificationRepogitory.ts
-│ │ ├─ productRepogitory.ts
-│ │ └─ userRepogitory.ts
-│ ├─ routers/
-│ │ ├─ articleRouter.ts
-│ │ ├─ commentRouter.ts
-│ │ ├─ imageRouter.ts
-│ │ ├─ notificationRouter.ts
-│ │ ├─ productRouter.ts
-│ │ └─ userRouter.ts
 │ ├─ seeds/
 │ │ ├─ mock.ts
 │ │ └─ seed.ts
-│ ├─ services/
-│ │ ├─ articleService.ts
-│ │ ├─ commentService.ts
-│ │ ├─ likeService.ts
-│ │ ├─ notificationService.ts
-│ │ ├─ productService.ts
-│ │ └─ userService.ts
 │ ├─ server.ts
 │ ├─ socket.ts
 │ └─ upload.ts

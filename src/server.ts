@@ -1,20 +1,20 @@
 import express from 'express';
 import cors from 'cors';
-import productRouters from './routers/productRouter';
-import articleRouters from './routers/articleRouter';
-import commentRouters from './routers/commentRouter';
+import productRouters from './modules/products/product.router';
+import articleRouters from './modules/articles/article.router';
+import commentRouters from './modules/comments/comment.router';
 import {
   globalErrorHandler,
   defaultNotFoundHandler,
 } from './middlewares/errorHandler/errorHandler';
-import userRouter from './routers/userRouter';
+import userRouter from './modules/users/user.router';
 import cookieParser from 'cookie-parser';
 import { optionalAuth } from './middlewares/auth';
 import { PORT, STATIC_PATH } from './libs/constants';
-import imageRouter from './routers/imageRouter';
+import imageRouter from './modules/images/image.router';
 import http from 'http';
 import { setupSocket } from './socket';
-import notificationRouter from './routers/notificationRouter';
+import notificationRouter from './modules/notifications/notification.router';
 
 const app = express();
 

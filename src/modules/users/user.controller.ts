@@ -1,15 +1,15 @@
-import { UserCreateDto } from '../dto/userDto';
-import { BadRequestError } from '../libs/error';
-import { ArticleRepogitory } from '../repogitories/articleRepogitory';
-import { LikeRepository } from '../repogitories/likeRepogitory';
-import { ProductRepository } from '../repogitories/productRepogitory';
-import { UserRepository } from '../repogitories/userRepogitory';
-import { ArticleService } from '../services/articleService';
-import { LikeService } from '../services/likeService';
-import { ProductService } from '../services/productService';
-import { UserService } from '../services/userService';
-import { NotificationRepository } from '../repogitories/notificationRepogitory';
-import { NotificationService } from '../services/notificationService';
+import { UserCreateDto } from '../users/user.dto';
+import { BadRequestError } from '../../libs/error';
+import { ArticleRepogitory } from '../articles/article.repository';
+import { LikeRepository } from '../likes/like.repository';
+import { ProductRepository } from '../products/product.repository';
+import { UserRepository } from '../users/user.repository';
+import { ArticleService } from '../articles/article.service';
+import { LikeService } from '../likes/like.service';
+import { ProductService } from '../products/product.service';
+import { UserService } from '../users/user.service';
+import { NotificationRepository } from '../notifications/notification.repository';
+import { NotificationService } from '../notifications/notification.service';
 import { Request, Response, NextFunction } from 'express';
 
 export class UserController {

@@ -1,5 +1,5 @@
 import { Article, Product } from '@prisma/client';
-import { LikeRepository } from '../repogitories/likeRepogitory';
+import { LikeRepository } from '../likes/like.repository';
 
 export class LikeService {
   constructor(private repo: LikeRepository) {}

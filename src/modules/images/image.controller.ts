@@ -1,4 +1,4 @@
-import { BadRequestError } from '../libs/error';
+import { BadRequestError } from '../../libs/error';
 import { Request, Response, NextFunction } from 'express';
 
 export function uploadSingleImage(

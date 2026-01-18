@@ -1,20 +1,20 @@
 import express from 'express';
-import { userController } from '../controllers/userController';
-import { asyncHandler } from '../libs/asyncHandler';
+import { userController } from './user.controller';
+import { asyncHandler } from '../../libs/asyncHandler';
 import {
   authorizeUser,
   verifyAccessToken,
   verifyRefreshToken,
-} from '../middlewares/auth';
+} from '../../middlewares/auth';
 import {
   validateCreateUser,
   validateLoginUser,
   validateUpdateUser,
-} from '../middlewares/validates/validateUser';
+} from '../../middlewares/validates/validateUser';
 import {
   validateArticleIdParam,
   validateProductIdParam,
-} from '../middlewares/validates/validateId';
+} from '../../middlewares/validates/validateId';
 
 const userRouter = express.Router();
 

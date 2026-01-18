@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
-import { CommentService } from '../services/commentService';
+import { CommentService } from '../comments/comment.service';
 import {
   CommentCreateDto,
   CommentQueryDto,
   CommentUpdateDto,
-} from '../dto/commentDto';
-import { CommentRepository } from '../repogitories/commentRepogitory';
-import { ArticleRepogitory } from '../repogitories/articleRepogitory';
-import { NotificationRepository } from '../repogitories/notificationRepogitory';
-import { NotificationService } from '../services/notificationService';
+} from '../comments/comment.dto';
+import { CommentRepository } from '../comments/comment.repository';
+import { ArticleRepogitory } from '../articles/article.repository';
+import { NotificationRepository } from '../notifications/notification.repository';
+import { NotificationService } from '../notifications/notification.service';
 
 export class CommentController {
   constructor(private service: CommentService) {}
@@ -78,10 +78,10 @@ export class CommentController {
   }
 }
 
-const commentRepogitory = new CommentRepository();
-const articleRepogitory = new ArticleRepogitory();
+const commentRepository = new CommentRepository();
+const articleRepository = new ArticleRepogitory();
 const notificationRepo = new NotificationRepository();
 const notificationService = new NotificationService(notificationRepo);
-const commentService = new CommentService(commentRepogitory, articleRepogitory, notificationService);
+const commentService = new CommentService(commentRepository, articleRepository, notificationService);
 export const commentController = new CommentController(commentService);
 

@@ -3,15 +3,15 @@ import {
   validateCreateProduct,
   validateGetListProduct,
   validateUpdateProduct,
-} from '../middlewares/validates/validateProduct';
-import { asyncHandler } from '../libs/asyncHandler';
-import { validateIdParam } from '../middlewares/validates/validateId';
-import { productController } from '../controllers/productController';
+} from '../../middlewares/validates/validateProduct';
+import { asyncHandler } from '../../libs/asyncHandler';
+import { validateIdParam } from '../../middlewares/validates/validateId';
+import { productController } from './product.controller';
 import {
   authorizeProduct,
   authorizeUser,
   verifyAccessToken,
-} from '../middlewares/auth';
+} from '../../middlewares/auth';
 
 const productRouter = express.Router();
 

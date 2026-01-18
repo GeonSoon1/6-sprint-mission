@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
-import { ArticleCreateDto } from '../dto/articleDto';
-import prisma from '../libs/prismaClient';
+import { ArticleCreateDto } from '../articles/article.dto';
+import prisma from '../../libs/prismaClient';
 
 export class ArticleRepogitory {
   // 게시글 생성

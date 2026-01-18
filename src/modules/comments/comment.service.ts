@@ -3,10 +3,10 @@ import {
   CommentCreateDto,
   CommentQueryDto,
   CommentUpdateDto,
-} from '../dto/commentDto';
-import { CommentRepository } from '../repogitories/commentRepogitory';
-import { ArticleRepogitory } from '../repogitories/articleRepogitory';
-import { NotificationService } from './notificationService';
+} from '../comments/comment.dto';
+import { CommentRepository } from '../comments/comment.repository';
+import { ArticleRepogitory } from '../articles/article.repository';
+import { NotificationService } from '../notifications/notification.service';
 
 type GetCommentData = Omit<
   Comment,

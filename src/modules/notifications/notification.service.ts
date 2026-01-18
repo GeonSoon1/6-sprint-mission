@@ -1,5 +1,5 @@
-import { NotificationRepository } from '../repogitories/notificationRepogitory';
-import { notifyUser } from '../socket';
+import { NotificationRepository } from '../notifications/notification.repository';
+import { notifyUser } from '../../socket';
 
 export class NotificationService {
   constructor(private repo: NotificationRepository) {}

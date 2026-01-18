@@ -2,6 +2,7 @@ import express from 'express';
 import { asyncHandler } from '../libs/asyncHandler';
 import { verifyAccessToken, authorizeUser } from '../middlewares/auth';
 import { notificationController } from '../controllers/notificationController';
+import { validateNotificationIdParam } from '../middlewares/validates/validateId';
 
 const notificationRouter = express.Router();
 
@@ -25,6 +26,7 @@ notificationRouter.get(
 notificationRouter.patch(
   '/:id/read',
   verifyAccessToken,
+  validateNotificationIdParam,
   authorizeUser,
   asyncHandler(notificationController.readNotification.bind(notificationController))
 );

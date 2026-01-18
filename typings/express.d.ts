@@ -71,5 +71,11 @@ declare global {
       validatedUserLogin?: Infer<typeof loginUserSchema>;
       validatedUserUpdate?: Infer<typeof updateUserProfileSchema>;
     }
+
+    interface Request {
+      // Notification 유효성 검증
+      validatedNotificationId?: Infer<typeof validateNotificationId>;
+      validatedNotificationQuery?: Infer<typeof getNotificationQuerySchema>;
+    }
   }
 }

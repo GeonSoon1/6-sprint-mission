@@ -8,7 +8,7 @@ export class NotificationController {
   // 내 알림 목록 조회
   async getMyNotifications(req: Request, res: Response) {
     const user = req.user!;
-    const query = req.query;
+    const query = req.validatedNotificationQuery;
 
     const notifications = await this.service.getMyNotifications(
       user,
@@ -27,9 +27,9 @@ export class NotificationController {
   // 알림 읽음 처리
   async readNotification(req: Request, res: Response) {
     const user = req.user!;
-    const { id } = req.params;
+    const params = req.validatedNotificationId;
     
-    await this.service.readNotification(id as string, user);
+    await this.service.readNotification(params.notificationId, user);
     res.json({ message: 'Notification read' });
   }
 }

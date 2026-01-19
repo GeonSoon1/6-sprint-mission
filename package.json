@@ -6,7 +6,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node ./src/app.js",
-    "dev": "nodemon .src/app.ts --watch ./src",
+    "dev": "nodemon --exec ts-node -r tsconfig-paths/register ./src/app.ts",
     "build": "tsc"
   },
   "dependencies": {

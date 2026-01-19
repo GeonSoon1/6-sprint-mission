@@ -1,14 +1,13 @@
 import * as articlesRepository from '@repository/articlesRepository';
 import * as commentsRepository from '@repository/commentsRepository';
 import * as productsRepository from '@repository/productsRepository';
-import {
-  CursorPaginationParams,
-  CursorPaginationResult,
-} from '@app-types/pagination';
+import * as notificationRepository from '@repository/notificationsRepository';
+import { CursorPaginationParams, CursorPaginationResult } from '@app-types/pagination';
 import BadRequestError from '@lib/errors/BadRequestError';
 import ForbiddenError from '@lib/errors/ForbiddenError';
 import NotFoundError from '@lib/errors/NotFoundError';
 import Comment from '@app-types/Comment';
+import { notifyToUser } from '@/lib/websocket';
 
 type CreateCommentData = Omit<
   Comment,
@@ -19,29 +18,67 @@ type CreateCommentData = Omit<
 };
 
 export async function createComment(data: CreateCommentData): Promise<Comment> {
-  if (!data.articleId && !data.productId) {
-    throw new BadRequestError('Either articleId or productId must be provided');
-  }
+  // notification 작업 추가
+  const { articleId, productId, userId } = data;
 
-  if (data.articleId) {
-    const article = await articlesRepository.getArticle(data.articleId);
-    if (!article) {
-      throw new NotFoundError('article', data.articleId);
-    }
-  }
+  // 1) 대상 검증 및 알림 정보 생성
+  const target = articleId
+    ? await (async () => {
+        const article = await articlesRepository.getArticle(articleId);
+        if (!article) throw new NotFoundError('article', articleId);
 
-  if (data.productId) {
-    const product = await productsRepository.getProduct(data.productId);
-    if (!product) {
-      throw new NotFoundError('product', data.productId);
-    }
-  }
+        return {
+          type: 'articleComment' as const,
+          targetUserId: article.userId,
+        };
+      })()
+    : await (async () => {
+        const product = await productsRepository.getProduct(productId!);
+        if (!product) throw new NotFoundError('product', productId!);
+        return {
+          type: 'productComment' as const,
+          targetUserId: product.userId,
+        };
+      })();
 
+  // 2) 댓글 생성
   const comment = await commentsRepository.createComment({
     ...data,
-    articleId: data.articleId ?? null,
-    productId: data.productId ?? null,
+    articleId: articleId ?? null,
+    productId: productId ?? null,
   });
+
+  // 3) 알림 생성
+  if (target.targetUserId !== userId) {
+    if (target.type === 'articleComment') {
+      await notificationRepository.createNotification({
+        userId: target.targetUserId,
+        type: target.type,
+        articleId: articleId!,
+      });
+
+      notifyToUser(target.targetUserId, 'comment', {
+        articleId: articleId!,
+        commentId: comment.id,
+        message: '댓글이 달렸습니다',
+      });
+    }
+
+    if (target.type === 'productComment') {
+      await notificationRepository.createNotification({
+        userId: target.targetUserId,
+        type: target.type,
+        productId: productId!,
+      });
+
+      notifyToUser(target.targetUserId, 'comment', {
+        productId: productId!,
+        commentId: comment.id,
+        message: '댓글이 달렸습니다',
+      });
+    }
+  }
+
   return comment;
 }
 
@@ -79,11 +116,7 @@ export async function getCommentListByProductId(
   return result;
 }
 
-export async function updateComment(
-  id: number,
-  userId: number,
-  content: string
-): Promise<Comment> {
+export async function updateComment(id: number, userId: number, content: string): Promise<Comment> {
   const comment = await commentsRepository.getComment(id);
   if (!comment) {
     throw new NotFoundError('comment', id);

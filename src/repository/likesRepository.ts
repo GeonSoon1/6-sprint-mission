@@ -1,9 +1,7 @@
 import { Like } from '@prisma/client';
 import { prismaClient } from '@lib/prismaClient';
 
-export async function createLike(
-  data: Omit<Like, 'id' | 'createdAt' | 'updatedAt'>
-) {
+export async function createLike(data: Omit<Like, 'id' | 'createdAt' | 'updatedAt'>) {
   const createdLike = await prismaClient.like.create({
     data,
   });

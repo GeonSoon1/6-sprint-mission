@@ -1,5 +1,25 @@
 import { prismaClient } from '@lib/prismaClient';
 
+export type NotificationType = 'priceChange' | 'productComment' | 'articleComment';
+
+export async function createNotification(data: {
+  userId: number;
+  type: NotificationType;
+  articleId?: number;
+  productId?: number;
+}) {
+  const { userId, type, articleId, productId } = data;
+
+  return await prismaClient.notification.create({
+    data: {
+      type,
+      userId,
+      articleId: articleId ?? null,
+      productId: productId ?? null,
+    },
+  });
+}
+
 export async function getNotificationList(userId: number) {
   const [notifications, unReadTotal] = await prismaClient.$transaction([
     prismaClient.notification.findMany({

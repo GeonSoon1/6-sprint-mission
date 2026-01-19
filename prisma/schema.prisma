@@ -102,7 +102,7 @@ model Notification {
   message String
   user    User    @relation(fields: [userId], references: [id])
   userId  Int
-  isRead  Boolean
+  isRead  Boolean @default(false)
 
   product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int?

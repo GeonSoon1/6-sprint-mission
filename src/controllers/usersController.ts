@@ -5,7 +5,7 @@ import {
   UpdatePasswordBodyStruct,
   GetMyProductListParamsStruct,
   GetMyFavoriteListParamsStruct,
-} from '../structs/usersStructs';
+} from '@structs/usersStructs';
 import * as usersService from '@service/usersService';
 import * as authService from '@service/authService';
 import userResponseDTO from '@dto/userResponseDTO';

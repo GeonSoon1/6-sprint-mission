@@ -11,6 +11,7 @@ import commentsRouter from '@routers/commentsRouter';
 import imagesRouter from '@routers/imagesRouter';
 import authRouter from '@routers/authRouter';
 import usersRouter from '@routers/usersRouter';
+import notificationRouter from '@routers/notificationRouter';
 import {
   defaultNotFoundHandler,
   globalErrorHandler,
@@ -19,7 +20,6 @@ import {
 const app = express();
 const server = http.createServer(app);
 setupWebSocket(server); // 웹소켓 연결
-
 
 app.use(cors());
 app.use(express.json());
@@ -32,6 +32,7 @@ app.use('/comments', commentsRouter);
 app.use('/images', imagesRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/notifications', notificationRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);

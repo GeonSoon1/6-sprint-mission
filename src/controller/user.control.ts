@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { assert } from 'superstruct';
-import { CreateUser } from '../struct/structs';
+import { CreateUser } from '../struct/userStruct';
 import userService from '../service/user.service';
 import { SafeCompleteUser } from '../dto/interfaceType';
 import { REFRESH_TOKEN_COOKIE_NAME, NODE_ENV, REFRESH_TOKEN_MAXAGE } from '../lib/constants';

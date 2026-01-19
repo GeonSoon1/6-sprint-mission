@@ -1,11 +1,11 @@
 import bcrypt from 'bcrypt';
 import BadRequestError from '../middleware/errors/BadRequestError';
-import userRepo from '../repository/user.repo';
+import userRepo from './user.repo';
 import { ACCESS_TOKEN_COOKIE_NAME, NODE_ENV, REFRESH_TOKEN_COOKIE_NAME } from '../lib/constants';
 import { generateTokens, verifyRefreshToken } from '../lib/token';
 import NotFoundError from '../middleware/errors/NotFoundError';
 import { assert } from 'superstruct';
-import { CreateUser, PatchUser } from '../struct/structs';
+import { CreateUser, PatchUser } from '../struct/userStruct';
 import { print, isEmpty } from '../lib/myFuns';
 import { selectUserFields } from '../lib/selectFields';
 import { Request, Response } from 'express';

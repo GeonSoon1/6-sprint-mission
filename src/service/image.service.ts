@@ -1,6 +1,6 @@
 import path from 'path';
 import { PUBLIC_IMG_PATH, STATIC_IMG_PATH } from '../lib/constants';
-import userRepo from '../repository/user.repo';
+import userRepo from './user.repo';
 import articleRepo from '../repository/article.repo';
 import productRepo from '../repository/product.repo';
 import { selectFields, selectUserFields } from '../lib/selectFields';

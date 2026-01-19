@@ -18,7 +18,8 @@ import {
 
 const app = express();
 const server = http.createServer(app);
-setupWebSocket(server);
+setupWebSocket(server); // 웹소켓 연결
+
 
 app.use(cors());
 app.use(express.json());
@@ -36,5 +37,5 @@ app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
 
 app.listen(PORT, () => {
-  console.log(`🚀Server started on port ${PORT}🚀`);
+  console.log(`🚀 Server started on port ${PORT} 🚀`);
 });

@@ -8,7 +8,14 @@ import { emitToUser } from '../lib/socket';
 type CreateNotificationData = Omit<Notification, 'id' | 'createdAt' | 'updatedAt'>;
 
 async function createAndEmit(data: CreateNotificationData) {
-  const notification = await notificationsRepository.createNotification(data);
+  const normalizedData = {
+    ...data,
+    readAt: data.readAt ?? null,
+    articleId: data.articleId ?? null,
+    productId: data.productId ?? null,
+    commentId: data.commentId ?? null,
+  };
+  const notification = await notificationsRepository.createNotification(normalizedData);
   emitToUser(data.userId, 'notification', notification);
   return notification;
 }

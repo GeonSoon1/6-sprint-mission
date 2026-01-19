@@ -1,7 +1,6 @@
 import bcrypt from 'bcrypt';
 import BadRequestError from '../middleware/errors/BadRequestError';
 import userRepo from '../repository/user.repo';
-import notificationRepo from '../repository/notification.repo';
 import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../lib/constants';
 import { generateTokens, verifyRefreshToken } from '../lib/token';
 import NotFoundError from '../middleware/errors/NotFoundError';
@@ -9,7 +8,7 @@ import { assert } from 'superstruct';
 import { CreateUser } from '../struct/userStruct';
 import { Request, Response } from 'express';
 import { CreateUserDto } from '../dto/dto';
-import { Notification, NotificationType, User } from '@prisma/client';
+import { User } from '@prisma/client';
 import { SafeUser, TokenType } from '../dto/interfaceType';
 import { getIO } from '../websocket/socketIO';
 
@@ -75,23 +74,6 @@ function viewTokens(tokenData: Record<string, string | undefined>): TokenType {
   return { accessToken, refreshToken };
 }
 
-async function getNotifications(id: number): Promise<Notification[]> {
-  return await notificationRepo.findMany(id);
-}
-
-async function countUnreadNotifications(id: number): Promise<number> {
-  return await notificationRepo.countUnreadNotifications(id);
-}
-
-async function patchNotification(id: number): Promise<Notification> {
-  let notification = await notificationRepo.findById(id);
-  if (!notification) throw new NotFoundError('notification', id);
-
-  if (notification.isRead == false) notification = await notificationRepo.patchNotification(id);
-
-  return notification;
-}
-
 //------------------------------------ local functions
 
 export function filterPassword(userData: User | User[]): SafeUser | SafeUser[] {
@@ -152,8 +134,5 @@ export default {
   verifyUserExist,
   filterPassword,
   hashingPassword,
-  check_passwordValidity,
-  getNotifications,
-  countUnreadNotifications,
-  patchNotification
+  check_passwordValidity
 };

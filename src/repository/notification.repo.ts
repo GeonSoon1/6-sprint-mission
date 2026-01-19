@@ -9,11 +9,11 @@ async function findMany(userId: number): Promise<Notification[]> {
   return prisma.notification.findMany({ where: { userId } });
 }
 
-async function countUnreadNotifications(userId: number): Promise<number> {
+async function countUnread(userId: number): Promise<number> {
   return prisma.notification.count({ where: { userId, isRead: false } });
 }
 
-async function patchNotification(id: number): Promise<Notification> {
+async function patch(id: number): Promise<Notification> {
   return prisma.notification.update({
     where: { id },
     data: { isRead: true }
@@ -23,6 +23,6 @@ async function patchNotification(id: number): Promise<Notification> {
 export default {
   findById,
   findMany,
-  countUnreadNotifications,
-  patchNotification
+  countUnread,
+  patch
 };

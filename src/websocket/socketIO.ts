@@ -1,13 +1,13 @@
 import { Server } from 'socket.io';
 import type http from 'http';
 import { verifyAccessToken } from '../lib/token';
-import NotFoundError from '../middleware/errors/NotFoundError';
+import { PORT } from '../lib/constants';
 
 let io: Server;
 
 export function setupSocket(server: http.Server) {
   io = new Server(server, {
-    cors: { origin: 'http://localhost:3000' }
+    cors: { origin: `http://localhost:${PORT}` }
   });
 
   io.use((socket, next) => {

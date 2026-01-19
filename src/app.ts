@@ -13,6 +13,7 @@ import productRouter from './router/product.router';
 import articleRouter from './router/article.router';
 import commentRouter from './router/comment.router';
 import imageRouter from './router/image.router';
+import notiRouter from './router/notification.router';
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use(path.join(PUBLIC_IMG_PATH, 'user'), express.static(path.join(STATIC_IMG_
 
 app.use('/auth', authRouter);
 app.use('/users', userRouter);
+app.use('/notifications', notiRouter);
 app.use('/products', productRouter);
 app.use('/articles', articleRouter);
 app.use('/comments', commentRouter);

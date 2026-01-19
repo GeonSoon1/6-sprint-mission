@@ -1,8 +1,9 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { assert } from 'superstruct';
 import { CreateUser } from '../struct/userStruct';
 import { REFRESH_TOKEN_COOKIE_NAME, NODE_ENV, REFRESH_TOKEN_MAXAGE } from '../lib/constants';
 import authService from '../service/auth.service';
+import path from 'path';
 
 async function register(req: Request, res: Response): Promise<void> {
   assert(req.body, CreateUser);
@@ -44,23 +45,9 @@ async function issueTokens(req: Request, res: Response): Promise<void> {
   res.status(201).send({ accessToken });
 }
 
-async function getNotifications(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const notifications = await authService.getNotifications(req.user.id);
-  res.status(200).send(notifications);
-}
-
-async function countUnreadNotifications(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
-  const notification = await authService.countUnreadNotifications(req.user.id);
-  res.status(200).send(notification);
-}
-
-async function patchNotification(req: Request, res: Response, next: NextFunction): Promise<void> {
-  const notification = await authService.patchNotification(Number(req.params.id));
-  res.status(200).send(notification);
+async function connectSocketIO(req: Request, res: Response): Promise<void> {
+  const filePath = path.join(__dirname, '../../public/socket-client-test.html');
+  res.sendFile(filePath);
 }
 
 //-------------------------------------------------- local functions
@@ -90,7 +77,5 @@ export default {
   logout,
   viewTokens,
   issueTokens,
-  getNotifications,
-  countUnreadNotifications,
-  patchNotification
+  connectSocketIO
 };

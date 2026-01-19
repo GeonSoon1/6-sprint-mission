@@ -1,36 +1,36 @@
 import express from 'express';
-import cookieParser from 'cookie-parser';
-
 import cors from 'cors';
-import errorHandler from './middleware/errorhandler';
-import { PORT } from './lib/constants';
-
-import imgRouter from './routers/imgRoute';
-import authRoute from './routers/authRoute';
-import productRoute from './routers/productRoute';
-import articleRoute from './routers/articleRoute';
-import userRoute from './routers/userRoute';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import { PORT, PUBLIC_PATH, STATIC_PATH } from '@lib/constants';
+import articlesRouter from '@routers/articlesRouter';
+import productsRouter from '@routers/productsRouter';
+import commentsRouter from '@routers/commentsRouter';
+import imagesRouter from '@routers/imagesRouter';
+import authRouter from '@routers/authRouter';
+import usersRouter from '@routers/usersRouter';
+import {
+  defaultNotFoundHandler,
+  globalErrorHandler,
+} from '@controllers/errorController';
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
-
-// 쿠키 작업
 app.use(cookieParser());
+app.use(STATIC_PATH, express.static(path.resolve(process.cwd(), PUBLIC_PATH)));
 
-// 이미지 Multer 먼저 실행
-app.use('/files', imgRouter);
-app.use('/files', express.static('files'));
+app.use('/articles', articlesRouter);
+app.use('/products', productsRouter);
+app.use('/comments', commentsRouter);
+app.use('/images', imagesRouter);
+app.use('/auth', authRouter);
+app.use('/users', usersRouter);
 
-// 각각 route 작업
-app.use('/auth', authRoute);
-app.use('/articles', articleRoute);
-app.use('/products', productRoute);
-app.use('/mypage', userRoute);
-
-app.use(errorHandler);
+app.use(defaultNotFoundHandler);
+app.use(globalErrorHandler);
 
 app.listen(PORT, () => {
-  console.log('localhost 3000🚀');
+  console.log(`Server started on port ${PORT}`);
 });

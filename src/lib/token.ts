@@ -1,52 +1,31 @@
 import jwt from 'jsonwebtoken';
-import { JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_SECRET } from './constants';
+import {
+  JWT_ACCESS_TOKEN_SECRET,
+  JWT_REFRESH_TOKEN_SECRET,
+} from '@lib/constants';
 
-// 토큰 생성
-function createTokens(userId: number) {
-  const payload = { id: userId };
-  const accessExpiresIn: object = { expiresIn: '1h' };
-  const refreshExpiresIn: object = { expiresIn: '7d' };
-
-  const accessToken = jwt.sign(
-    payload,
-    JWT_ACCESS_TOKEN_SECRET,
-    accessExpiresIn
-  );
-
-  const refreshToken = jwt.sign(
-    payload,
-    JWT_REFRESH_TOKEN_SECRET,
-    refreshExpiresIn
-  );
-
+export function generateTokens(userId: number) {
+  const accessToken = jwt.sign({ id: userId }, JWT_ACCESS_TOKEN_SECRET, {
+    expiresIn: '1h',
+  });
+  const refreshToken = jwt.sign({ id: userId }, JWT_REFRESH_TOKEN_SECRET, {
+    expiresIn: '7d',
+  });
   return { accessToken, refreshToken };
 }
 
-interface TokenPayloadId {
-  id: number;
-}
-
-// 토큰 검증
-function verifyAccessToken(token: string) {
-  // Type assertion 형식
-  const decodedUser = jwt.verify(
-    token,
-    JWT_ACCESS_TOKEN_SECRET
-  ) as TokenPayloadId;
-
-  return { userId: decodedUser.id };
-}
-
-// Refresh Token을 활용하여 토큰 재발급
-function verifyRefreshToken(token: string) {
-  // Type Guard 형식
-  const decodedUser = jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
-
-  if (typeof decodedUser === 'string') {
-    throw new Error('Invalid token payload');
+export function verifyAccessToken(token: string) {
+  const decoded = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
+  if (typeof decoded === 'string') {
+    throw new Error('Invalid token');
   }
-
-  return { userId: decodedUser.id };
+  return { userId: decoded.id };
 }
 
-export { createTokens, verifyAccessToken, verifyRefreshToken };
+export function verifyRefreshToken(token: string) {
+  const decoded = jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
+  if (typeof decoded === 'string') {
+    throw new Error('Invalid token');
+  }
+  return { userId: decoded.id };
+}

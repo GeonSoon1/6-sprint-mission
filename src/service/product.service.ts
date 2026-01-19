@@ -1,5 +1,5 @@
 import { assert } from 'superstruct';
-import { isEmpty, includedOk } from '../lib/myFuns';
+import { includedOk } from '../lib/myFuns';
 import productRepo from '../repository/product.repo';
 import { PatchProduct } from '../struct/userStruct';
 import { selectFields } from '../lib/selectFields';
@@ -9,13 +9,7 @@ import {
   CreateNotificationDto,
   CreateProductPriceHistoryDto
 } from '../dto/dto';
-import {
-  Prisma,
-  Product,
-  ProductPriceHistory,
-  Notification,
-  NotificationType
-} from '@prisma/client';
+import { Prisma, Product, ProductPriceHistory, NotificationType } from '@prisma/client';
 import NotFoundError from '../middleware/errors/NotFoundError';
 import { ProductListToShow, ProductToShow } from '../dto/interfaceType';
 import prisma from '../lib/prismaClient';
@@ -24,6 +18,7 @@ import {
   CreateProductPriceHistory,
   CreateNotification
 } from '../struct/productStruct';
+import { getIO } from '../websocket/socketIO';
 
 async function post(data: CreateProductDto): Promise<[Product, ProductPriceHistory]> {
   assert(data, CreateProduct);
@@ -75,7 +70,7 @@ async function patch(productId: number, productData: UpdateProductDto): Promise<
 
     // 그 상품에 좋아요를 누른 사람이 있는 경우 알림 생성
     if (product.likedUsers.length !== 0) {
-      const message = `The price of product_${productId} changed from ${prevPrice} to ${productData.price}`;
+      const message = `상품${productId} 가격 변동 알림: (${prevPrice} --> ${productData.price})`;
 
       for (let likedUser of product.likedUsers) {
         let notificationData = {
@@ -101,15 +96,18 @@ async function patch(productId: number, productData: UpdateProductDto): Promise<
       [priceRecord, newProduct, ...notifications] = await prisma.$transaction([
         prisma.productPriceHistory.create({ data: priceDataToRepo }),
         prisma.product.update({ data: productData, where: { id: productId } }),
-        // 여기에 socket.io로 알림 전송 기능 추가 예정
         ...notificationQueries
       ]);
+
+      const io = getIO();
+      for (const likeUser of product.likedUsers) {
+        io.to(`user:${likeUser.id}`).emit('notification', { message });
+      }
     } else {
       // 좋아요를 누른 유저가 없는 상품인 경우 알림 없음
       [priceRecord, newProduct] = await prisma.$transaction([
         prisma.productPriceHistory.create({ data: priceDataToRepo }),
         prisma.product.update({ data: productData, where: { id: productId } })
-        // 여기에 socket.io로 알림 전송 기능 추가 예정
       ]);
     }
   } else {

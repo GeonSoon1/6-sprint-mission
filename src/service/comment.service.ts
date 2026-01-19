@@ -13,6 +13,7 @@ import { CreateNotification } from '../struct/productStruct';
 import prisma from '../lib/prismaClient';
 import articleRepo from '../repository/article.repo';
 import NotFoundError from '../middleware/errors/NotFoundError';
+import { getIO } from '../websocket/socketIO';
 
 async function getList(
   limit: number,
@@ -67,10 +68,11 @@ async function postArticle(
   const article = await articleRepo.findById(id);
   if (!article) throw new NotFoundError('article', id);
 
+  const message = `게시글${id}에 사용자${userId}가 댓글을 남겼습니다 (${content})`;
   const notificationData = {
     userId: article.userId,
     type: NotificationType.ARTICLE,
-    message: `New comment on your article_${id} by user_${userId}: ${content}`,
+    message,
     articleId: id,
     productId: null
   } as CreateNotificationDto;
@@ -87,9 +89,10 @@ async function postArticle(
   const [comment, notification] = await prisma.$transaction([
     prisma.comment.create({ data: commentDataToRepo }),
     prisma.notification.create({ data: notificationDataToRepo })
-    // socket.io 푸시 알림은 여기서 처리
   ]);
 
+  const io = getIO();
+  io.to(`user:${article.userId}`).emit('notification', { message });
   return [comment, notification];
 }
 

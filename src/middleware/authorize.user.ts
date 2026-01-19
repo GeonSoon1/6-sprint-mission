@@ -1,5 +1,5 @@
 import BadRequestError from './errors/BadRequestError';
-import userRepo from '../service/user.repo';
+import userRepo from '../repository/user.repo';
 import articleRepo from '../repository/article.repo';
 import productRepo from '../repository/product.repo';
 import commentRepo from '../repository/comment.repo';

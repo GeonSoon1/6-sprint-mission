@@ -14,59 +14,67 @@ datasource db {
 }
 
 model Article {
-  id             Int       @id @default(autoincrement())
-  title          String
-  content        String
-  image          String?
-  comments Comment[]
-  user           User      @relation(fields: [userId], references: [id])
-  userId         Int
-  likes           Like[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id      Int     @id @default(autoincrement())
+  title   String
+  content String
+  image   String?
+
+  comments      Comment[]
+  user          User           @relation(fields: [userId], references: [id])
+  userId        Int
+  likes         Like[]
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Product {
-  id             Int       @id @default(autoincrement())
-  name           String
-  description    String
-  price          Int
-  tags           String[]
-  images         String[]
-  comments       Comment[]
-  user           User      @relation(fields: [userId], references: [id])
-  userId         Int
-  favorites      Favorite[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Int
+  tags        String[]
+  images      String[]
+
+  comments      Comment[]
+  user          User           @relation(fields: [userId], references: [id])
+  userId        Int
+  favorites     Favorite[]
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Comment {
   id        Int      @id @default(autoincrement())
   content   String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
   product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId Int?
   article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
   articleId Int?
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-  nickname String
-  image    String?
-  password String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  articles   Article[]
-  products   Product[]
-  comments   Comment[]
-  favorites  Favorite[]
-  likes      Like[]
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  nickname  String
+  password  String
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articles      Article[]
+  products      Product[]
+  comments      Comment[]
+  favorites     Favorite[]
+  likes         Like[]
+  notifications Notification[]
 }
 
 model Favorite {
@@ -85,6 +93,22 @@ model Like {
   articleId Int
   user      User     @relation(fields: [userId], references: [id])
   userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id      Int     @id @default(autoincrement())
+  message String
+  user    User    @relation(fields: [userId], references: [id])
+  userId  Int
+  isRead  Boolean
+
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int?
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId Int?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

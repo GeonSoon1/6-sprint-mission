@@ -5,3 +5,4 @@ export * from './likeService';
 export * from './productCommentService';
 export * from './productService';
 export * from './userService';
+export * from './notificationService';

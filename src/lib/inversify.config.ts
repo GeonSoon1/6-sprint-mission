@@ -12,6 +12,7 @@ import {
   ProductCommentRepository,
   ProductRepository,
   UserRepository,
+  NotificationRepository,
 } from '../repositories';
 
 // Services
@@ -23,6 +24,7 @@ import {
   ProductCommentService,
   ProductService,
   UserService,
+  NotificationService,
 } from '../services';
 
 // Controllers
@@ -53,6 +55,7 @@ container
   .to(ProductCommentRepository);
 container.bind<ProductRepository>(TYPES.ProductRepository).to(ProductRepository);
 container.bind<UserRepository>(TYPES.UserRepository).to(UserRepository);
+container.bind<NotificationRepository>(TYPES.NotificationRepository).to(NotificationRepository);
 
 // Services
 container.bind<ArticleCommentService>(TYPES.ArticleCommentService).to(ArticleCommentService);
@@ -62,6 +65,7 @@ container.bind<LikeService>(TYPES.LikeService).to(LikeService);
 container.bind<ProductCommentService>(TYPES.ProductCommentService).to(ProductCommentService);
 container.bind<ProductService>(TYPES.ProductService).to(ProductService);
 container.bind<UserService>(TYPES.UserService).to(UserService);
+container.bind<NotificationService>(TYPES.NotificationService).to(NotificationService);
 
 // Controllers
 container

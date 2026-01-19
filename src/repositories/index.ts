@@ -5,3 +5,4 @@ export * from './likeRepository';
 export * from './productCommentRepository';
 export * from './productRepository';
 export * from './userRepository';
+export * from './notificationRepository';

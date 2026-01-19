@@ -10,6 +10,7 @@ const TYPES = {
   ArticleCommentRepository: Symbol.for('ArticleCommentRepository'),
   ProductCommentRepository: Symbol.for('ProductCommentRepository'),
   AuthRepository: Symbol.for('AuthRepository'),
+  NotificationRepository: Symbol.for('NotificationRepository'),
 
   // Services
   UserService: Symbol.for('UserService'),
@@ -19,6 +20,7 @@ const TYPES = {
   ArticleCommentService: Symbol.for('ArticleCommentService'),
   ProductCommentService: Symbol.for('ProductCommentService'),
   AuthService: Symbol.for('AuthService'),
+  NotificationService: Symbol.for('NotificationService'),
 
   // Controllers
   UserController: Symbol.for('UserController'),
@@ -28,6 +30,7 @@ const TYPES = {
   ArticleCommentController: Symbol.for('ArticleCommentController'),
   ProductCommentController: Symbol.for('ProductCommentController'),
   AuthController: Symbol.for('AuthController'),
+  NotificationController: Symbol.for('NotificationController'),
 };
 
 export { TYPES };

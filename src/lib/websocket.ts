@@ -3,6 +3,7 @@ import http from 'http';
 import * as cookie from 'cookie';
 import jwt from 'jsonwebtoken';
 import BadRequestError from './errors/BadRequestError';
+import { JWT_ACCESS_TOKEN_SECRET } from '@lib/constants';
 
 // 외부에서 io를 사용하기 위한 설정
 let ioRef: Server;
@@ -13,7 +14,9 @@ export function setupWebSocket(server: http.Server) {
   const io = new Server(server, {
     path: '/chat',
     cors: {
-      origin: 'http://localhost:3000',
+      // origin: 'http://localhost:3000',
+      origin: '*', // 모든 origin 허용
+      credentials: true,
       methods: ['GET', 'POST'],
     },
   });
@@ -21,37 +24,28 @@ export function setupWebSocket(server: http.Server) {
   // 외부에서 io를 사용하기 위한 설정
   ioRef = io;
 
-  io.use((socket: Socket, next) => {
-    const cookieHeader = socket.handshake.headers.cookie;
-    if (!cookieHeader) {
-      throw new BadRequestError('인증정보(JWT 토큰)가 없습니다.');
-    }
-
-    const cookies = cookie.parse(cookieHeader);
-    const token = cookies['access-token'];
-    if (!token) {
-      throw new BadRequestError('로그인이 필요합니다.');
-    }
+  io.use((socket, next) => {
+    const token = socket.handshake.auth.accessToken;
+    if (!token) return next(new Error('로그인 필요'));
 
     try {
-      // JWT 검증 (비밀키는 환경변수 등에서 관리)
-      const payload = jwt.verify(token, 'YOUR_SECRET_KEY');
-      // socket에 원하는 값 저장 가능
+      const payload = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
       (socket as any).user = payload;
       next();
-    } catch (err) {
+    } catch {
       next(new Error('JWT 인증 실패'));
     }
   });
 
   io.on('connection', (socket) => {
-    console.log('Connecting 📈');
+    console.log('Connecting ☑️');
 
     // 연결 후 유저 id로 room 접속
     socket.join(String((socket as any).user.id));
+    console.log('Joined rooms:', Array.from(socket.rooms));
 
+    // 연결되지 않는 경우
     socket.on('disconnect', () => {
-      // 연결되지 않는 경우, 표기 될 메세지
       console.log('Client disconnected');
     });
   });

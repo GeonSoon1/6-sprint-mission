@@ -7,12 +7,14 @@ export async function createNotification(data: {
   type: NotificationType;
   articleId?: number;
   productId?: number;
+  message: string;
 }) {
-  const { userId, type, articleId, productId } = data;
+  const { userId, type, message, articleId, productId } = data;
 
   return await prismaClient.notification.create({
     data: {
       type,
+      message,
       userId,
       articleId: articleId ?? null,
       productId: productId ?? null,

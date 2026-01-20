@@ -51,13 +51,19 @@ export async function updateProduct(id: number, data: UpdateProductData): Promis
   const productId = existingProduct.id;
   const likeProductMember = await favoriteRepository.getFavoriteMember(productId);
 
+  const originName = existingProduct.name;
+  const cutName = originName.substring(0, 10);
+
   if (data.price && data.price !== existingProduct.price) {
+    const priceUpdate = data.price > existingProduct.price ? '상승하였습니다' : '하락하였습니다';
+
     await Promise.all(
       likeProductMember.map((user) =>
         notificationRepository.createNotification({
           userId: user.id,
           type: 'priceChange',
           productId,
+          message: `상품 "${cutName}"의 가격이 ${priceUpdate}`,
         })
       )
     );
@@ -65,7 +71,7 @@ export async function updateProduct(id: number, data: UpdateProductData): Promis
     likeProductMember.forEach((user) => {
       notifyToUser(user.id, 'priceChange', {
         productId,
-        message: '상품 가격이 변동되었습니다',
+        message: `상품 "${cutName}"의 가격이 ${priceUpdate}`,
       });
     });
   }

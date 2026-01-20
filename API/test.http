@@ -1,0 +1,27 @@
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email" : "user3@test.com",
+    "password" : "qwer1234"
+}
+
+
+###
+PATCH http://localhost:3000/products/3
+Content-Type: application/json
+
+{
+    "price" : 400
+}
+
+
+###
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email" : "user2@test.com",
+    "password" : "qwer1234"
+}
+

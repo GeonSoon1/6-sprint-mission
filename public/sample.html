@@ -21,6 +21,7 @@
         e.preventDefault();
         const accessToken = tokenInput.value;
         const socket = io('http://localhost:3000', {
+          path: '/chat',
           auth: {
             accessToken,
           },
@@ -28,6 +29,11 @@
         socket.on('connect', () => {
           console.log('connected');
         });
+
+        socket.on('connect_error', (err) => {
+          console.error('connect_error ❌', err.message);
+        });
+
         socket.on('notification', (data) => {
           console.log('notification', data);
         });

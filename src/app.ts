@@ -12,10 +12,7 @@ import imagesRouter from '@routers/imagesRouter';
 import authRouter from '@routers/authRouter';
 import usersRouter from '@routers/usersRouter';
 import notificationRouter from '@routers/notificationRouter';
-import {
-  defaultNotFoundHandler,
-  globalErrorHandler,
-} from '@controllers/errorController';
+import { defaultNotFoundHandler, globalErrorHandler } from '@controllers/errorController';
 
 const app = express();
 const server = http.createServer(app);
@@ -37,6 +34,6 @@ app.use('/notifications', notificationRouter);
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`🚀 Server started on port ${PORT} 🚀`);
 });

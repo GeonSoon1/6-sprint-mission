@@ -6,10 +6,7 @@ import {
   GetProductListParamsStruct,
   UpdateProductBodyStruct,
 } from '@structs/productsStruct';
-import {
-  CreateCommentBodyStruct,
-  GetCommentListParamsStruct,
-} from '@structs/commentsStruct';
+import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '@structs/commentsStruct';
 import * as productsService from '@service/productsService';
 import * as commentsService from '@service/commentsService';
 import * as favoritesService from '@service/favoritesService';
@@ -54,9 +51,11 @@ export async function getProductList(req: Request, res: Response) {
 }
 
 export async function createComment(req: Request, res: Response) {
-  const data = create(req.body, CreateCommentBodyStruct);
+  const { id: productId } = create(req.params, IdParamsStruct);
+  const { content } = create(req.body, CreateCommentBodyStruct);
   const createdComment = await commentsService.createComment({
-    ...data,
+    productId,
+    content,
     userId: req.user.id,
   });
   res.status(201).send(createdComment);
@@ -65,10 +64,7 @@ export async function createComment(req: Request, res: Response) {
 export async function getCommentList(req: Request, res: Response) {
   const { id: productId } = create(req.params, IdParamsStruct);
   const params = create(req.query, GetCommentListParamsStruct);
-  const result = await commentsService.getCommentListByProductId(
-    productId,
-    params
-  );
+  const result = await commentsService.getCommentListByProductId(productId, params);
   res.send(result);
 }
 

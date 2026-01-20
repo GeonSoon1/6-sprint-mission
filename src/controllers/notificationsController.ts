@@ -1,4 +1,6 @@
 import { Request, Response } from 'express';
+import { create } from 'superstruct';
+import { IdParamsStruct } from '@structs/commonStructs';
 import * as notificationService from '@service/notificationsService';
 
 export async function getNotifications(req: Request, res: Response) {
@@ -9,8 +11,9 @@ export async function getNotifications(req: Request, res: Response) {
 }
 
 export async function updateNotification(req: Request, res: Response) {
-  const notificationId = Number(req.params);
-  const updateNotificationInfo = await notificationService.updateNotificationInfo(notificationId);
+  const { id } = create(req.params, IdParamsStruct);
+  console.log(id);
+  const updateNotificationInfo = await notificationService.updateNotificationInfo(id);
 
   res.status(200).send(updateNotificationInfo);
 }

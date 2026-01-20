@@ -30,6 +30,7 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
         return {
           type: 'articleComment' as const,
           targetUserId: article.userId,
+          targetName: article.content,
         };
       })()
     : await (async () => {
@@ -38,6 +39,7 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
         return {
           type: 'productComment' as const,
           targetUserId: product.userId,
+          targetName: product.name,
         };
       })();
 
@@ -48,6 +50,9 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
     productId: productId ?? null,
   });
 
+  const originName = target.targetName;
+  const cutName = originName.substring(0, 10);
+
   // 3) 알림 생성
   if (target.targetUserId !== userId) {
     if (target.type === 'articleComment') {
@@ -55,12 +60,13 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
         userId: target.targetUserId,
         type: target.type,
         articleId: articleId!,
+        message: `게시글 "${cutName}"에 댓글이 생겼습니다`,
       });
 
       notifyToUser(target.targetUserId, 'comment', {
         articleId: articleId!,
         commentId: comment.id,
-        message: '댓글이 달렸습니다',
+        message: `게시글 "${cutName}"에 댓글이 생겼습니다`,
       });
     }
 
@@ -69,12 +75,13 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
         userId: target.targetUserId,
         type: target.type,
         productId: productId!,
+        message: `상품 "${cutName}"에 댓글이 생겼습니다`,
       });
 
       notifyToUser(target.targetUserId, 'comment', {
         productId: productId!,
         commentId: comment.id,
-        message: '댓글이 달렸습니다',
+        message: `상품 "${cutName}"에 댓글이 생겼습니다`,
       });
     }
   }

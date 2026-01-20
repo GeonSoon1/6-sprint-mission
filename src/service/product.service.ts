@@ -2,22 +2,22 @@ import { assert } from 'superstruct';
 import { includedOk } from '../lib/myFuns';
 import productRepo from '../repository/product.repo';
 import { selectFields } from '../lib/selectFields';
+import { ProductListToShow, ProductToShow } from '../types/interfaceType';
 import {
   CreateProductDto,
   UpdateProductDto,
   CreateNotificationDto,
   CreateProductPriceHistoryDto
-} from '../dto/dto';
+} from '../types/dto';
 import { Prisma, Product, ProductPriceHistory, NotificationType } from '@prisma/client';
 import NotFoundError from '../middleware/errors/NotFoundError';
-import { ProductListToShow, ProductToShow } from '../dto/interfaceType';
 import prisma from '../lib/prismaClient';
 import {
   CreateProduct,
   PatchProduct,
   CreateProductPriceHistory,
   CreateNotification
-} from '../struct/productStruct';
+} from '../struct/product.struct';
 import { getIO } from '../websocket/socketIO';
 
 async function post(data: CreateProductDto): Promise<[Product, ProductPriceHistory]> {

@@ -1,5 +1,5 @@
 import * as s from 'superstruct';
-import { CreateCommentDto } from '../dto/dto';
+import { CreateCommentDto } from '../types/dto';
 
 export const CreateUser = s.object({
   email: s.string(),

@@ -1,15 +1,15 @@
 import { assert } from 'superstruct';
-import { CreateComment, PatchComment } from '../struct/commentStruct';
+import { CreateComment, PatchComment } from '../struct/comment.struct';
+import { CreateNotification } from '../struct/product.struct';
 import commentRepo from '../repository/comment.repo';
 import {
   UpdateCommentDto,
   ArticleCommentDto,
   ProductCommentDto,
   CreateNotificationDto
-} from '../dto/dto';
-import { Comment2show, CommentWithNextCursor } from '../dto/interfaceType';
+} from '../types/dto';
+import { Comment2show, CommentWithNextCursor } from '../types/interfaceType';
 import { Comment, Notification, NotificationType, Prisma } from '@prisma/client';
-import { CreateNotification } from '../struct/productStruct';
 import prisma from '../lib/prismaClient';
 import articleRepo from '../repository/article.repo';
 import NotFoundError from '../middleware/errors/NotFoundError';

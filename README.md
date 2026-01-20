@@ -17,11 +17,17 @@
 ### 2. 알림 전송
 
 - [x] 좋아요한 상품의 가격이 변동되었을 때 알림을 보내주세요.
+      ![favorite notification](./sprint-mission-readme/sprint-mission-8_favorite.png)
+      <br>
+      <br>
+
 - [x] 자신이 작성한 게시글에 댓글이 달렸을 때 알림을 보내주세요.
+      ![article notification](./sprint-mission-readme/sprint-mission-8_article.png)
 
 ### 2. 심화 요구사항
 
 (없음, 다만 게시글 댓글 알림과 상품 댓글 알림이 유사하여 두가지 모두 구현하였습니다)
+![product notification](./sprint-mission-readme/sprint-mission-8_product.png)
 
 <br><br><br><br>
 

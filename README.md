@@ -42,18 +42,18 @@
 ### 알림 기능 로직
 
 - 사용자 로그인, 토큰 발급
-  --> 토큰 이용하며 Socket.IO 연결 --> 사용자 id로 된 방에 넣고 --> 안 읽은 알림 수 실시간 공지
+  ---> 토큰 이용하여 Socket.IO 연결 --> 사용자 id로 된 방에 넣고 --> 안 읽은 알림 수 실시간 공지
 
 - 상품의 가격이 update될 때 트렌젝션으로 묶어 (1)~(3) 시행하고, 이후 (4) 실시간 알림 날림
-  (1) 상품 update: prisma.product.update
-  (2) 좋아요를 누른 사람들 (likedUsers)에게 보내는 알림 생성: prisma.notification.create
-  (3) 상품 가격 기록 생성: prisma.productPriceHistory.creatae
-  (4) likedUsers의 userId로 된 socket.IO room에 실시간 알림 날림
+  -(1) 상품 update: prisma.product.update
+  -(2) 좋아요를 누른 사람들 (likedUsers)에게 보내는 알림 생성: prisma.notification.create
+  -(3) 상품 가격 기록 생성: prisma.productPriceHistory.creatae
+  -(4) likedUsers의 userId로 된 socket.IO room에 실시간 알림 날림
 
 - 게시글에 댓글이 달리면 아래 (1)(2)를 트렌젝션으로 묶어 실시하고, 이후 (3) 실시
-  (1) 댓글 생성: prisma.comment.create
-  (2) 게시글 저자에게 보내는 알림 생성: prisma.notification.create
-  (3) 게시글 저자의 id로 된 socket.IO room에 실시간 알림 날림
+  -(1) 댓글 생성: prisma.comment.create
+  -(2) 게시글 저자에게 보내는 알림 생성: prisma.notification.create
+  -(3) 게시글 저자의 id로 된 socket.IO room에 실시간 알림 날림
 
 ### 상품 가격 기록 로직
 

@@ -23,7 +23,8 @@
 ### 추가로 구현한 기능
 
 - [x] 사용자가 로그인 하면 읽지 않은 알림의 갯수가 실시간 전송됨
-- [x] 상품의 가격 기록을 남기기 위한 모델 추가 (ProductPriceHistory)
+- [x] 특정 상품의 가격 변동 기록을 모두 조회할 수 있음
+- [x] 특정 가격 변동 기록을 조회할 수 있음
 
 ## 기능 구현
 
@@ -35,8 +36,9 @@
 ### 알림 Notification 모델
 
 - Notification 모델
+- enum 필드인 type은 'ARTICLE' 또는 'PRODUCT'. 각기 게시글에 댓글 달릴 때와 상품 가격 변동 시의 알림에 해당
 - 알림 생성 시에는 isRead = false, readAt = null
-- 알림 변경하면 isRead = true, readAt = now()
+- 알림을 읽으면 isRead = true, readAt = now()
 
 ### 알림 기능 로직
 
@@ -66,12 +68,9 @@
 
 ## 스크린샷
 
-토큰 갱신
-<img width="1939" height="1093" alt="image1" src="https://github.com/user-attachments/assets/13604e4f-0809-4d32-95fd-260ff124db27" />
-사용자2가 좋아요를 누른 게시물 조회
-<img width="2294" height="1289" alt="image" src="https://github.com/user-attachments/assets/42cb0f34-5c34-4f6b-b822-32711de14f69" />
+Socket-client-test.html 브라우져의 dev tool
 
-## 폴더 구조
+안 읽은 알림 목록 조회
 
 ## 폴더 구조
 

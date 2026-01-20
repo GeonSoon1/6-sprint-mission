@@ -35,7 +35,6 @@
 
 ### 알림 Notification 모델
 
-- Notification 모델
 - enum 필드인 type은 'ARTICLE' 또는 'PRODUCT'. 각기 게시글에 댓글 달릴 때와 상품 가격 변동 시의 알림에 해당
 - 알림 생성 시에는 isRead = false, readAt = null
 - 알림을 읽으면 isRead = true, readAt = now()
@@ -63,14 +62,16 @@
 - 상품 가격이 변동되면, prevPrice(전 가격)과 price(변동 가격) 모두 있는 기록 생성
 
 ## ERD
+<img width="1214" height="1280" alt="image" src="https://github.com/user-attachments/assets/f225c6b9-98a2-4077-a36b-8c9996f0ba37" />
 
-<img width="1013" height="1073" alt="image" src="https://github.com/user-attachments/assets/b331bb3b-c692-4ebf-ac90-663ad86d5a1a" />
 
 ## 스크린샷
 
 Socket-client-test.html 브라우져의 dev tool
+<img width="947" height="1099" alt="image" src="https://github.com/user-attachments/assets/cbe7143e-79c2-43f0-92da-6909c8124c10" />
 
 안 읽은 알림 목록 조회
+<img width="2140" height="1343" alt="image" src="https://github.com/user-attachments/assets/673f9070-26ab-4ae5-9709-d05742b83768" />
 
 ## 폴더 구조
 

@@ -13,32 +13,77 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Article {
-  id             Int       @id @default(autoincrement())
-  title          String
-  content        String
-  image          String?
-  comments Comment[]
-  user           User      @relation(fields: [userId], references: [id])
-  userId         Int
-  likes           Like[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String
+  nickname  String   @unique
+  image     String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  productlikes  ProductLike[]
+  articlelikes  ArticleLike[]
+  products      Product[]
+  articles      Article[]
+  comments      Comment[]
+  notifications Notification[]
 }
 
 model Product {
-  id             Int       @id @default(autoincrement())
-  name           String
-  description    String
-  price          Int
-  tags           String[]
-  images         String[]
-  comments       Comment[]
-  user           User      @relation(fields: [userId], references: [id])
-  userId         Int
-  favorites      Favorite[]
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id          Int      @id @default(autoincrement()) // Auto default(increment())
+  name        String
+  description String
+  category    Category
+  price       Float
+  stock       Int
+  tags        String
+  likeCount   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?
+
+  comments Comment[]
+  likes    ProductLike[]
+}
+
+model Article {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  likeCount Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?
+
+  comments Comment[]
+  likes    ArticleLike[]
+}
+
+model ArticleLike {
+  id     Int @id @default(autoincrement())
+  userId Int
+
+  user      User    @relation(fields: [userId], references: [id])
+  Article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
+
+  @@unique([userId, articleId])
+}
+
+model ProductLike {
+  id     Int @id @default(autoincrement())
+  userId Int
+
+  user      User    @relation(fields: [userId], references: [id])
+  Product   Product @relation(fields: [productId], references: [id])
+  productId Int
+
+  @@unique([userId, productId])
 }
 
 model Comment {
@@ -48,43 +93,57 @@ model Comment {
   productId Int?
   article   Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
   articleId Int?
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  userId Int?
+  user   User? @relation(fields: [userId], references: [id])
 }
 
-model User {
-  id       Int       @id @default(autoincrement())
-  email    String    @unique
-  nickname String
-  image    String?
-  password String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  articles   Article[]
-  products   Product[]
-  comments   Comment[]
-  favorites  Favorite[]
-  likes      Like[]
-}
-
-model Favorite {
-  id        Int      @id @default(autoincrement())
-  product   Product  @relation(fields: [productId], references: [id])
-  productId Int
-  user      User     @relation(fields: [userId], references: [id])
+model Notification {
+  id        Int              @id @default(autoincrement())
   userId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  targetId  Int
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  readAt    DateTime?
+
+  @@index([userId, isRead, createdAt])
 }
 
-model Like {
-  id        Int      @id @default(autoincrement())
-  article   Article  @relation(fields: [articleId], references: [id])
-  articleId Int
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+enum NotificationType {
+  COMMENT_CREATED //targetId: Comment.id
+  PRICE_CHANGED //targetId: Product.id
+}
+
+// model CommentToProduct {
+//   id        Int      @id @default(autoincrement())
+//   content   String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+//   productId Int
+// }
+
+// model CommentToArticle {
+//   id        Int      @id @default(autoincrement())
+//   content   String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+//   articleId Int
+// }
+
+enum Category {
+  FASHION
+  BEAUTY
+  SPORTS
+  ELECTRONICS
+  HOME_INTERIOR
+  HOUSEHOLD_SUPPLIES
+  KITCHENWARE
 }

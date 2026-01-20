@@ -1,17 +1,13 @@
 import { Request, Response } from 'express';
 import { create } from 'superstruct';
-import { UpdateCommentBodyStruct } from '@structs/commentsStruct';
-import { IdParamsStruct } from '@structs/commonStructs';
-import * as commentsService from '@service/commentsService';
+import { UpdateCommentBodyStruct } from '@/structs/comment.struct';
+import { IdParamsStruct } from '@/structs/common.structs';
+import * as commentsService from '@/service/comment.service';
 
 export async function updateComment(req: Request, res: Response) {
   const { id } = create(req.params, IdParamsStruct);
   const { content } = create(req.body, UpdateCommentBodyStruct);
-  const updatedComment = await commentsService.updateComment(
-    id,
-    req.user.id,
-    content
-  );
+  const updatedComment = await commentsService.updateComment(id, req.user.id, content);
   res.send(updatedComment);
 }
 

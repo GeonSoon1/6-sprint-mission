@@ -1,13 +1,9 @@
 import { Request, Response } from 'express';
 import { create } from 'superstruct';
-import {
-  ACCESS_TOKEN_COOKIE_NAME,
-  REFRESH_TOKEN_COOKIE_NAME,
-  NODE_ENV,
-} from '../lib/constants';
-import { LoginBodyStruct, RegisterBodyStruct } from '@structs/authStructs';
-import * as authService from '@service/authService';
-import userResponseDTO from '@dto/userResponseDTO';
+import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME, NODE_ENV } from '../lib/constants';
+import { LoginBodyStruct, RegisterBodyStruct } from '@/structs/auth.structs';
+import * as authService from '@/service/auth.service';
+import userResponseDTO from '@/dto/userResponse.dto';
 
 export async function register(req: Request, res: Response) {
   const data = create(req.body, RegisterBodyStruct);
@@ -35,11 +31,7 @@ export async function refreshToken(req: Request, res: Response) {
   res.status(200).send();
 }
 
-function setTokenCookies(
-  res: Response,
-  accessToken: string,
-  refreshToken: string
-) {
+function setTokenCookies(res: Response, accessToken: string, refreshToken: string) {
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
     secure: NODE_ENV === 'production',

@@ -10,7 +10,7 @@ import {
   getCommentList,
   createLike,
   deleteLike,
-} from '@controllers/articlesController';
+} from '@/controllers/article.controller';
 import authenticate from '@middleware/authenticate';
 
 const articlesRouter = express.Router();

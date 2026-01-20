@@ -1,7 +1,7 @@
-import * as articlesRepository from '@repository/articlesRepository';
-import * as commentsRepository from '@repository/commentsRepository';
-import * as productsRepository from '@repository/productsRepository';
-import * as notificationRepository from '@repository/notificationsRepository';
+import * as articlesRepository from '@/repository/article.repo';
+import * as commentsRepository from '@/repository/comment.repo';
+import * as productsRepository from '@/repository/product.repo';
+import * as notificationRepository from '@/repository/notification.repo';
 import { CursorPaginationParams, CursorPaginationResult } from '@app-types/pagination';
 import BadRequestError from '@lib/errors/BadRequestError';
 import ForbiddenError from '@lib/errors/ForbiddenError';

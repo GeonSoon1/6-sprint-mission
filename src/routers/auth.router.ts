@@ -4,7 +4,7 @@ import {
   login,
   logout,
   refreshToken,
-} from '@controllers/authController';
+} from '@/controllers/auth.controller';
 import { withAsync } from '@lib/withAsync';
 
 const authRouter = express.Router();

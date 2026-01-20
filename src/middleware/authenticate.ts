@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from 'express';
 import { ACCESS_TOKEN_COOKIE_NAME } from '@lib/constants';
-import * as authService from '@service/authService';
+import * as authService from '@/service/auth.service';
 
 function authenticate(options = { optional: false }): RequestHandler {
   return async (req: Request, res: Response, next: NextFunction) => {

@@ -1,12 +1,8 @@
 import bcrypt from 'bcrypt';
-import * as usersRepository from '@repository/usersRepository';
+import * as usersRepository from '@/repository/user.repo';
 import BadRequestError from '@lib/errors/BadRequestError';
 import NotFoundError from '@lib/errors/NotFoundError';
-import {
-  generateTokens,
-  verifyAccessToken,
-  verifyRefreshToken,
-} from '@lib/token';
+import { generateTokens, verifyAccessToken, verifyRefreshToken } from '@lib/token';
 import UnauthorizedError from '@lib/errors/UnauthorizedError';
 import User from '@app-types/User';
 
@@ -77,11 +73,7 @@ export async function refreshToken(refreshToken?: string) {
   };
 }
 
-export async function updateMyPassword(
-  userId: User['id'],
-  password: string,
-  newPassword: string
-) {
+export async function updateMyPassword(userId: User['id'], password: string, newPassword: string) {
   const user = await usersRepository.getUser(userId);
   if (!user) {
     throw new NotFoundError('user', userId);

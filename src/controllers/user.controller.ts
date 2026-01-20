@@ -5,10 +5,10 @@ import {
   UpdatePasswordBodyStruct,
   GetMyProductListParamsStruct,
   GetMyFavoriteListParamsStruct,
-} from '@structs/usersStructs';
-import * as usersService from '@service/usersService';
-import * as authService from '@service/authService';
-import userResponseDTO from '@dto/userResponseDTO';
+} from '@/structs/user.structs';
+import * as usersService from '@/service/user.service';
+import * as authService from '@/service/auth.service';
+import userResponseDTO from '@/dto/userResponse.dto';
 
 export async function getMe(req: Request, res: Response) {
   const user = await usersService.getUser(req.user.id);
@@ -28,19 +28,13 @@ export async function updateMyPassword(req: Request, res: Response) {
 }
 
 export async function getMyProductList(req: Request, res: Response) {
-  const { page, pageSize, orderBy, keyword } = create(
-    req.query,
-    GetMyProductListParamsStruct
-  );
-  const { list, totalCount } = await usersService.getMyProductList(
-    req.user.id,
-    {
-      page,
-      pageSize,
-      orderBy,
-      keyword,
-    }
-  );
+  const { page, pageSize, orderBy, keyword } = create(req.query, GetMyProductListParamsStruct);
+  const { list, totalCount } = await usersService.getMyProductList(req.user.id, {
+    page,
+    pageSize,
+    orderBy,
+    keyword,
+  });
 
   res.send({
     list,
@@ -49,19 +43,13 @@ export async function getMyProductList(req: Request, res: Response) {
 }
 
 export async function getMyFavoriteList(req: Request, res: Response) {
-  const { page, pageSize, orderBy, keyword } = create(
-    req.query,
-    GetMyFavoriteListParamsStruct
-  );
-  const { list, totalCount } = await usersService.getMyFavoriteList(
-    req.user.id,
-    {
-      page,
-      pageSize,
-      orderBy,
-      keyword,
-    }
-  );
+  const { page, pageSize, orderBy, keyword } = create(req.query, GetMyFavoriteListParamsStruct);
+  const { list, totalCount } = await usersService.getMyFavoriteList(req.user.id, {
+    page,
+    pageSize,
+    orderBy,
+    keyword,
+  });
 
   res.send({
     list,

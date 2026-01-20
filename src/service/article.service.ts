@@ -1,16 +1,10 @@
-import * as articlesRepository from '@repository/articlesRepository';
-import {
-  PagePaginationParams,
-  PagePaginationResult,
-} from '@app-types/pagination';
+import * as articlesRepository from '@/repository/article.repo';
+import { PagePaginationParams, PagePaginationResult } from '@app-types/pagination';
 import ForbiddenError from '@lib/errors/ForbiddenError';
 import NotFoundError from '@lib/errors/NotFoundError';
 import Article from '@app-types/Article';
 
-type CreateArticleData = Omit<
-  Article,
-  'id' | 'createdAt' | 'updatedAt' | 'likeCount' | 'isLiked'
->;
+type CreateArticleData = Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'likeCount' | 'isLiked'>;
 type UpdateArticleData = Partial<CreateArticleData> & { userId: number };
 
 export async function createArticle(data: CreateArticleData): Promise<Article> {
@@ -37,10 +31,7 @@ export async function getArticleList(
   return articles;
 }
 
-export async function updateArticle(
-  id: number,
-  data: UpdateArticleData
-): Promise<Article> {
+export async function updateArticle(id: number, data: UpdateArticleData): Promise<Article> {
   const existingArticle = await articlesRepository.getArticle(id);
   if (!existingArticle) {
     throw new NotFoundError('article', id);
@@ -50,10 +41,7 @@ export async function updateArticle(
     throw new ForbiddenError('Should be the owner of the article');
   }
 
-  const updatedArticle = await articlesRepository.updateArticleWithLikes(
-    id,
-    data
-  );
+  const updatedArticle = await articlesRepository.updateArticleWithLikes(id, data);
   return updatedArticle;
 }
 

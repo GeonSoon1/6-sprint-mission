@@ -1,8 +1,8 @@
 import ForbiddenError from '@lib/errors/ForbiddenError';
 import NotFoundError from '@lib/errors/NotFoundError';
-import * as productsRepository from '@repository/productsRepository';
-import * as favoriteRepository from '@repository/favoritesRepository';
-import * as notificationRepository from '@repository/notificationsRepository';
+import * as productsRepository from '@/repository/product.repo';
+import * as favoriteRepository from '@/repository/favorite.repo';
+import * as notificationRepository from '@/repository/notification.repo';
 import { PagePaginationParams, PagePaginationResult } from '@app-types/pagination';
 import Product from '@app-types/Product';
 import { notifyToUser } from '@/lib/websocket';

@@ -1,5 +1,5 @@
-import * as favoritesRepository from '@repository/favoritesRepository';
-import * as productsRepository from '@repository/productsRepository';
+import * as favoritesRepository from '@/repository/favorite.repo';
+import * as productsRepository from '@/repository/product.repo';
 import NotFoundError from '@lib/errors/NotFoundError';
 import BadRequestError from '@lib/errors/BadRequestError';
 
@@ -9,10 +9,7 @@ export async function createFavorite(productId: number, userId: number) {
     throw new NotFoundError('product', productId);
   }
 
-  const existingFavorite = await favoritesRepository.getFavorite(
-    productId,
-    userId
-  );
+  const existingFavorite = await favoritesRepository.getFavorite(productId, userId);
   if (existingFavorite) {
     throw new BadRequestError('Already favorited');
   }
@@ -26,10 +23,7 @@ export async function deleteFavorite(productId: number, userId: number) {
     throw new NotFoundError('product', productId);
   }
 
-  const existingFavorite = await favoritesRepository.getFavorite(
-    productId,
-    userId
-  );
+  const existingFavorite = await favoritesRepository.getFavorite(productId, userId);
   if (!existingFavorite) {
     throw new BadRequestError('Not favorited');
   }

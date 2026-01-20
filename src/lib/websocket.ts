@@ -1,8 +1,6 @@
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import http from 'http';
-import * as cookie from 'cookie';
 import jwt from 'jsonwebtoken';
-import BadRequestError from './errors/BadRequestError';
 import { JWT_ACCESS_TOKEN_SECRET } from '@lib/constants';
 
 // 외부에서 io를 사용하기 위한 설정

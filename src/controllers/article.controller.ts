@@ -1,18 +1,15 @@
 import { Request, Response } from 'express';
 import { create } from 'superstruct';
-import { IdParamsStruct } from '@structs/commonStructs';
+import { IdParamsStruct } from '@/structs/common.structs';
 import {
   CreateArticleBodyStruct,
   UpdateArticleBodyStruct,
   GetArticleListParamsStruct,
-} from '@structs/articlesStructs';
-import {
-  CreateCommentBodyStruct,
-  GetCommentListParamsStruct,
-} from '@structs/commentsStruct';
-import * as articlesService from '@service/articlesService';
-import * as commentsService from '@service/commentsService';
-import * as likesService from '@service/likesService';
+} from '@/structs/article.structs';
+import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '@/structs/comment.struct';
+import * as articlesService from '@/service/article.service';
+import * as commentsService from '@/service/comment.service';
+import * as likesService from '@/service/like.service';
 
 export async function createArticle(req: Request, res: Response) {
   const data = create(req.body, CreateArticleBodyStruct);

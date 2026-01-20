@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
 import { create } from 'superstruct';
-import { IdParamsStruct } from '@structs/commonStructs';
+import { IdParamsStruct } from '@/structs/common.structs';
 import {
   CreateProductBodyStruct,
   GetProductListParamsStruct,
   UpdateProductBodyStruct,
-} from '@structs/productsStruct';
-import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '@structs/commentsStruct';
-import * as productsService from '@service/productsService';
-import * as commentsService from '@service/commentsService';
-import * as favoritesService from '@service/favoritesService';
+} from '@/structs/product.struct';
+import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '@/structs/comment.struct';
+import * as productsService from '@/service/product.service';
+import * as commentsService from '@/service/comment.service';
+import * as favoritesService from '@/service/favorite.service';
 
 export async function createProduct(req: Request, res: Response) {
   const data = create(req.body, CreateProductBodyStruct);

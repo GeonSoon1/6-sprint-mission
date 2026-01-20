@@ -1,5 +1,5 @@
 import NotFoundError from '@lib/errors/NotFoundError';
-import * as notificationsRepository from '@repository/notificationsRepository';
+import * as notificationsRepository from '@/repository/notification.repo';
 
 export async function getNotificationList(userId: number) {
   const notificationList = await notificationsRepository.getNotificationList(userId);

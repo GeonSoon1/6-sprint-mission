@@ -10,7 +10,7 @@ import {
   getCommentList,
   createFavorite,
   deleteFavorite,
-} from '@controllers/productsController';
+} from '@/controllers/product.controller';
 import authenticate from '@middleware/authenticate';
 
 const productsRouter = express.Router();

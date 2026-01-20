@@ -6,7 +6,7 @@ import {
   updateMyPassword,
   getMyProductList,
   getMyFavoriteList,
-} from '@controllers/usersController';
+} from '@/controllers/user.controller';
 import authenticate from '@middleware/authenticate';
 
 const usersRouter = express.Router();

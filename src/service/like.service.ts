@@ -1,5 +1,5 @@
-import * as likesRepository from '@repository/likesRepository';
-import * as articlesRepository from '@repository/articlesRepository';
+import * as likesRepository from '@/repository/like.repo';
+import * as articlesRepository from '@/repository/article.repo';
 import NotFoundError from '@lib/errors/NotFoundError';
 import BadRequestError from '@lib/errors/BadRequestError';
 

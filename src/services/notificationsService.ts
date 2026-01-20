@@ -56,7 +56,8 @@ export async function notifyPriceChange(
   if (userIds.length === 0) {
     return;
   }
-  const content = `Price changed for "${productName}" from ${previousPrice} to ${currentPrice}.`;
+  const direction = currentPrice > previousPrice ? '상승' : '하락';
+  const content = `상품 "${productName}"의 가격이 ${direction}했습니다.`;
   await Promise.all(
     userIds.map((userId) =>
       createAndEmit({
@@ -79,7 +80,7 @@ export async function notifyArticleComment(
   commentId: number,
   articleTitle: string,
 ) {
-  const content = `New comment on your article "${articleTitle}".`;
+  const content = `내 게시글 "${articleTitle}"에 댓글이 달렸습니다.`;
   await createAndEmit({
     userId,
     type: 'ARTICLE_COMMENT',

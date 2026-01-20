@@ -1,12 +1,10 @@
 import { Router } from 'express';
-import { asyncHandler } from '../middlewares/asyncHandler';
-import { isLoggedIn } from '../middlewares/isLoggedIn';
-import { validator } from '../middlewares/validator';
-import { CreateArticleCommentParamDTO, UpdateArticleCommentParamDTO } from '../dto';
-import { ArticleCommentController } from '../controllers';
+import { asyncHandler, isLoggedIn, validator } from '@middlewares';
+import { CreateArticleCommentDTO, UpdateArticleCommentDTO, ArticleIdParamDTO } from '@dto';
+import { ArticleCommentController } from '@controllers';
 
-import { container } from '../lib/inversify.config';
-import { TYPES } from '../types/di';
+import { container } from '@lib';
+import { TYPES } from '@types';
 
 const articleCommentController = container.get<ArticleCommentController>(
   TYPES.ArticleCommentController,
@@ -15,10 +13,10 @@ const articleCommentController = container.get<ArticleCommentController>(
 const router = Router();
 
 router
-  .route('/articles/:id/comments')
+  .route('/articles/:articleId/comments')
   .post(
     isLoggedIn,
-    validator({ params: CreateArticleCommentParamDTO }),
+    validator({ params: ArticleIdParamDTO, body: CreateArticleCommentDTO }),
     asyncHandler(articleCommentController.createComment),
   )
   .get(asyncHandler(articleCommentController.getCommentsByArticleId));
@@ -27,7 +25,7 @@ router
   .route('/comments/:id')
   .patch(
     isLoggedIn,
-    validator({ params: UpdateArticleCommentParamDTO }),
+    validator({ params: ArticleIdParamDTO, body: UpdateArticleCommentDTO }),
     asyncHandler(articleCommentController.updateComment),
   )
   .delete(isLoggedIn, asyncHandler(articleCommentController.deleteComment));

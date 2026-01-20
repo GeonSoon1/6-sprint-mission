@@ -1,16 +1,16 @@
 import 'reflect-metadata';
-
+import http from 'http';
 import cors from 'cors';
 import express from 'express';
 import cookieParser from 'cookie-parser';
-
-import { PORT } from './lib/constants';
-import { uploadPath } from './middlewares/imageUploader';
-import { errorHandler } from './middlewares/errorHandler';
+import { PORT, initSocket } from '@lib';
+import { uploadPath, errorHandler } from '@middlewares';
 
 import router from './routers';
 
 const app = express();
+const httpServer = http.createServer(app);
+initSocket(httpServer);
 
 app.use(cors());
 app.use(cookieParser());
@@ -20,4 +20,5 @@ app.use(router);
 app.use('/upload', express.static(uploadPath));
 app.use(errorHandler);
 
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+// app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+httpServer.listen(PORT, () => console.log(`Server listening on port ${PORT}`));

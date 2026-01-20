@@ -1,8 +1,8 @@
 import type { Product, Article, User } from '@prisma/client';
-import { ProductRepository, ArticleRepository, LikeRepository } from '../repositories';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
-import { NotFoundError } from '../lib/errors';
+import { ProductRepository, ArticleRepository, LikeRepository } from '@repositories';
+import { TYPES } from '@types';
+import { NotFoundError } from '@lib';
 
 @injectable()
 export class LikeService {

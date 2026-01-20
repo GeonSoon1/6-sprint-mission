@@ -1,6 +1,6 @@
 import type { Prisma, PrismaClient, User, Product, ProductComment } from '@prisma/client';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
+import { TYPES } from '@types';
 
 @injectable()
 export class ProductCommentRepository {

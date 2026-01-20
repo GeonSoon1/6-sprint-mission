@@ -5,3 +5,4 @@ export * from './likeController';
 export * from './productCommentController';
 export * from './productController';
 export * from './userController';
+export * from './notificationController';

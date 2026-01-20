@@ -1,6 +1,6 @@
 import type { Prisma, PrismaClient, Product } from '@prisma/client';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
+import { TYPES } from '@types';
 
 @injectable()
 export class ProductRepository {
@@ -39,5 +39,16 @@ export class ProductRepository {
    */
   async deleteProduct(id: Product['id']) {
     return this.prisma.product.delete({ where: { id } });
+  }
+
+  /**
+   * 상품을 좋아요(favorite)안 유저 ID 목록 조회
+   */
+  async findFavoriteUserIds(productId: Product['id']) {
+    const favorites = await this.prisma.favorite.findMany({
+      where: { productId },
+      select: { userId: true },
+    });
+    return favorites.map((f) => f.userId);
   }
 }

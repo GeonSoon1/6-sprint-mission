@@ -1,8 +1,8 @@
 import { plainToInstance, ClassConstructor } from 'class-transformer';
 import { validate, ValidatorOptions } from 'class-validator';
 import { Request, Response, NextFunction } from 'express';
-import { BadRequestError } from '../lib/errors';
-import { ValidationSchemas } from '../types/validator';
+import { BadRequestError } from '@lib';
+import { ValidationSchemas } from '@types';
 
 const defaultValidatorOptions: ValidatorOptions = {
   whitelist: true,

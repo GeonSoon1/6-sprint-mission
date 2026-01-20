@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
-import { TYPES } from '../types/di';
-import { NotificationService } from '../services/notificationService';
+import { TYPES } from '@types';
+import { NotificationService } from '@services';
 
 @injectable()
 export class NotificationController {
@@ -32,5 +32,10 @@ export class NotificationController {
       userId,
     );
     return res.status(200).json(updatedNotification);
+  };
+
+  // 안읽은 알림 숫자 확인
+  getUnreadCount = async (req: Request, res: Response) => {
+    return this.notificationService.getUnreadCount(req.user!.id);
   };
 }

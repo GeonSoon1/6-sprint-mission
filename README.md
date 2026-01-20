@@ -38,18 +38,15 @@ Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통
 본 프로젝트는 **DI 컨테이너**가 계층별 객체 생성을 책임지고, **Express 라우터**가 HTTP 요청을 처리하는 역할을 명확히 분리한 아키텍처를 따릅니다.
 
 1.  **DI 컨테이너 설정 (`src/lib/inversify.config.ts`)**
-
     - 프로젝트의 모든 서비스, 리포지토리, 컨트롤러 등 각 계층의 구현체를 식별자(`TYPES`)에 바인딩(연결)하는 **설정의 중심**입니다.
     - 애플리케이션에 필요한 모든 객체(인스턴스)는 이곳에서 생성되고 관리됩니다.
 
 2.  **라우터 계층 (`src/routers/`)**
-
     - 각 기능(auth, users, products 등)별로 라우터 파일을 분리하여 관리합니다.
     - 각 라우터 파일은 DI 컨테이너(`inversify.config.ts`)에서 필요한 **컨트롤러 인스턴스를 주입**받습니다. (`container.get<MyController>(...)`)
     - 주입받은 컨트롤러의 메서드를 Express 경로(`router.get(...)`, `router.post(...)` 등)에 **수동으로 바인딩**하여 어떤 요청을 어떤 로직이 처리할지 결정합니다.
 
 3.  **애플리케이션 진입점 (`src/main.ts`)**
-
     - Express 애플리케이션의 시작점입니다.
     - CORS, JSON 파서 등 **글로벌 미들웨어를 설정**합니다.
     - `src/routers/index.ts`에 통합된 **메인 라우터를 애플리케이션에 등록**하여 API 엔드포인트를 활성화합니다.
@@ -189,7 +186,7 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 ```
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
 PORT=3000
-JWT_SECRET=your_jwt_secret
+JWT_SECRET_KEY=your_jwt_secret_key
 ```
 
 ### 데이터베이스 초기화 및 시드

@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
-import { AuthService } from '../services';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
-import { UnauthorizedError } from '../lib/errors';
+import { AuthService } from '@services';
+import { TYPES } from '@types';
+import { UnauthorizedError } from '@lib';
 
 @injectable()
 export class AuthController {

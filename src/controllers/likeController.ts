@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
-import { LikeService } from '../services';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
+import { LikeService } from '@services';
+import { TYPES } from '@types';
 
 @injectable()
 export class LikeController {

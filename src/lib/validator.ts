@@ -3,7 +3,7 @@ import {
   ValidationOptions,
   ValidatorConstraintInterface,
 } from 'class-validator';
-import { prisma } from '../constants'; // export된 prisma 인스턴스를 가져옵니다.
+import { prisma } from '@lib'; // export된 prisma 인스턴스를 가져옵니다.
 
 // --- 이메일 중복 검사 ---
 ({ async: true });

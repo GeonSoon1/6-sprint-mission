@@ -1,14 +1,9 @@
 import { Router } from 'express';
-import { isLoggedIn } from '../middlewares/isLoggedIn';
-import { pagination } from '../middlewares/pagination';
-import { asyncHandler } from '../middlewares/asyncHandler';
-import { validator } from '../middlewares/validator';
-
-import { CreateProductDTO, UpdateProductDTO, ProductIdParamDTO } from '../dto';
-import { ProductController, LikeController } from '../controllers';
-
-import { container } from '../lib/inversify.config';
-import { TYPES } from '../types/di';
+import { isLoggedIn, pagination, asyncHandler, validator } from '@middlewares';
+import { CreateProductDTO, UpdateProductDTO, ProductIdParamDTO } from '@dto';
+import { ProductController, LikeController } from '@controllers';
+import { container } from '@lib';
+import { TYPES } from '@types';
 
 const productController = container.get<ProductController>(TYPES.ProductController);
 const likeController = container.get<LikeController>(TYPES.LikeController);

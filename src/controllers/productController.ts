@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
-import { CreateProductDTO } from '../dto';
-import { ProductService } from '../services';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
+import { CreateProductDTO } from '@dto';
+import { ProductService } from '@services';
+import { TYPES } from '@types';
 
 @injectable()
 export class ProductController {

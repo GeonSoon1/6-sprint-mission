@@ -1,10 +1,7 @@
 import { Router } from 'express';
-import { pagination } from '../middlewares/pagination';
-import { isLoggedIn } from '../middlewares/isLoggedIn';
-import { asyncHandler } from '../middlewares/asyncHandler';
-import { validator } from '../middlewares/validator';
-import { CreateArticleDTO, UpdateArticleDTO, ArticleIdParamDTO } from '../dto';
-import { ArticleController, LikeController } from '../controllers';
+import { asyncHandler, isLoggedIn, validator, pagination } from '@middlewares';
+import { CreateArticleDTO, UpdateArticleDTO, ArticleIdParamDTO } from '@dto';
+import { ArticleController, LikeController } from '@controllers';
 
 import { container } from '../lib/inversify.config';
 import { TYPES } from '../types/di';

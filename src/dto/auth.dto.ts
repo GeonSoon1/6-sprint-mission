@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
-import { IsEmailUnique, IsNicknameUnique } from '../lib/validators.ts/user.validator';
 import { User } from '@prisma/client';
+import { IsEmailUnique, IsNicknameUnique } from '@lib';
 
 export class SignUpDTO {
   @IsNotEmpty({ message: '이메일 주소를 입력해주세요.' })

@@ -1,9 +1,10 @@
-import { ProductRepository } from '../repositories';
 import { Prisma, User, Product } from '@prisma/client';
-import type { CreateProductDTO } from '../dto';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
-import { NotFoundError, ForbiddenError } from '../lib/errors';
+import { ProductRepository } from '@repositories';
+import type { CreateProductDTO } from '@dto';
+import { TYPES } from '@types';
+import { NotFoundError, ForbiddenError } from '@lib';
+import { NotificationService } from '@services';
 
 @injectable()
 export class ProductService {
@@ -11,6 +12,8 @@ export class ProductService {
   constructor(
     @inject(TYPES.ProductRepository)
     private productRepository: ProductRepository,
+    @inject(TYPES.NotificationService)
+    private notificationService: NotificationService,
   ) {}
 
   /**
@@ -75,8 +78,28 @@ export class ProductService {
     userId: User['id'],
     data: Prisma.ProductUpdateInput,
   ) {
-    await this.checkProductOwnership(productId, userId);
-    return this.productRepository.updateProduct(productId, data);
+    // 권한 확인
+    const product = await this.checkProductOwnership(productId, userId);
+    const oldPrice = product.price;
+    const newPrice = data.price;
+    const isPriceChanged = typeof newPrice === 'number' && oldPrice !== newPrice;
+
+    const updatedProduct = await this.productRepository.updateProduct(productId, data);
+
+    // 정보 업데이트
+    if (isPriceChanged) {
+      const userIds = await this.productRepository.findFavoriteUserIds(productId);
+      const notifications = userIds.map((targetUserId) =>
+        this.notificationService.createNotification(targetUserId, {
+          title: '관심상품 가격변동',
+          content: `찜하신 '${product.name}' 상품가격이 ${oldPrice}원에서 ${newPrice}으로 변경되었습니다.`,
+          type: 'NOTICE',
+          link: `/product/${productId}`,
+        }),
+      );
+      await Promise.all(notifications);
+    }
+    return updatedProduct;
   }
 
   /**
@@ -102,5 +125,7 @@ export class ProductService {
     if (product.authorId !== userId) {
       throw new ForbiddenError('삭제 권한이 없습니다.');
     }
+
+    return product;
   }
 }

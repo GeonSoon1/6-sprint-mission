@@ -1,9 +1,9 @@
-import { ArticleRepository } from '../repositories';
 import { Prisma, User, Article } from '@prisma/client';
-import { CreateArticleDTO } from '../dto';
+import { ArticleRepository } from '@repositories';
+import { CreateArticleDTO } from '@dto';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
-import { NotFoundError, ForbiddenError } from '../lib/errors';
+import { TYPES } from '@types';
+import { NotFoundError, ForbiddenError } from '@lib';
 
 @injectable()
 export class ArticleService {

@@ -1,11 +1,9 @@
 import { Router } from 'express';
-import { asyncHandler } from '../middlewares/asyncHandler';
-import { isLoggedIn } from '../middlewares/isLoggedIn';
-import { validator } from '../middlewares/validator';
-import { AuthController } from '../controllers';
-import { SignUpDTO, AuthDTO } from '../dto';
-import { container } from '../lib/inversify.config';
-import { TYPES } from '../types/di';
+import { asyncHandler, isLoggedIn, validator } from '@middlewares';
+import { AuthController } from '@controllers';
+import { SignUpDTO, AuthDTO } from '@dto';
+import { container } from '@lib';
+import { TYPES } from '@types';
 
 const authController = container.get<AuthController>(TYPES.AuthController);
 

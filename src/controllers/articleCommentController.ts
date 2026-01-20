@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { ArticleCommentService } from '../services';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
+import { ArticleCommentService } from '@services';
+import { TYPES } from '@types';
 
 @injectable()
 export class ArticleCommentController {

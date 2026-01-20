@@ -1,26 +1,45 @@
 import { Article, ArticleComment, User, Prisma } from '@prisma/client';
-import { ArticleCommentRepository } from '../repositories';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
-import { NotFoundError, UnauthorizedError } from '../lib/errors';
+import { ArticleCommentRepository, ArticleRepository } from '@repositories';
+import { TYPES } from '@types';
+import { NotFoundError, UnauthorizedError } from '@lib';
+import { NotificationService } from '@services';
 
 @injectable()
 export class ArticleCommentService {
   constructor(
     @inject(TYPES.ArticleCommentRepository)
     private articleCommentRepository: ArticleCommentRepository,
+    @inject(TYPES.ArticleRepository) private articleRepository: ArticleRepository,
+    @inject(TYPES.NotificationService) private notificationService: NotificationService,
   ) {}
 
   /**
    * 댓글 작성
    */
   async createComment(articleId: Article['id'], authorId: User['id'], content: string) {
-    const data: Prisma.ArticleCommentCreateInput = {
+    const article = await this.articleRepository.findArticleById(articleId);
+    if (!article) {
+      throw new NotFoundError('게시글을 찾을 수 없습니다.');
+    }
+    // 댓글 생성
+    const comment = await this.articleCommentRepository.create({
       article: { connect: { id: articleId } },
       author: { connect: { id: authorId } },
       content,
-    };
-    return this.articleCommentRepository.create(data);
+    });
+
+    // 알림 발송
+    if (article.authorId !== authorId) {
+      await this.notificationService.createNotification(article.authorId, {
+        title: '새 댓글 알림',
+        content: `회원님의 게시글 '${article.title}'에 새 댓글이 달렸습니다.`,
+        type: 'NOTICE',
+        link: `/articles/${articleId}`,
+      });
+    }
+
+    return comment;
   }
 
   /**

@@ -26,5 +26,5 @@ export class UpdateArticleDTO {
 export class ArticleIdParamDTO {
   @IsNotEmpty({ message: '게시글 ID는 필수 항목입니다.' })
   @IsUUID('4', { message: '유효하지 않은 게시글 ID 입니다.' })
-  id!: Article['id'];
+  articleId!: Article['id'];
 }

@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
-import type { Prisma, User } from '@prisma/client';
-import { UserRepository } from '../repositories';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
-import { NotFoundError, ForbiddenError } from '../lib/errors';
+import type { Prisma, User } from '@prisma/client';
+import { UserRepository } from '@repositories';
+import { TYPES } from '@types';
+import { NotFoundError, ForbiddenError } from '@lib';
 
 @injectable()
 export class UserService {

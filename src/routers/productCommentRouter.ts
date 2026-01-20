@@ -1,9 +1,7 @@
 import { Router } from 'express';
-import { asyncHandler } from '../middlewares/asyncHandler';
-import { isLoggedIn } from '../middlewares/isLoggedIn';
-import { validator } from '../middlewares/validator';
-import { CreateProductCommentParamDTO, UpdateProductCommentParamDTO } from '../dto';
-import { ProductCommentController } from '../controllers';
+import { asyncHandler, isLoggedIn, validator } from '@middlewares';
+import { CreateProductCommentParamDTO, UpdateProductCommentParamDTO } from '@dto';
+import { ProductCommentController } from '@controllers';
 
 import { container } from '../lib/inversify.config';
 import { TYPES } from '../types/di';

@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { UserService } from '../services';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../types/di';
-import { NotFoundError, ForbiddenError } from '../lib/errors';
+import { UserService } from '@services';
+import { TYPES } from '@types';
+import { NotFoundError } from '@lib';
 
 @injectable()
 export class UserController {

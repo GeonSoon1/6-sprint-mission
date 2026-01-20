@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { Container } from 'inversify';
 import { PrismaClient } from '@prisma/client';
-import { TYPES } from '../types/di';
+import { TYPES } from '@types';
 
 // Repositories
 import {
@@ -13,7 +13,7 @@ import {
   ProductRepository,
   UserRepository,
   NotificationRepository,
-} from '../repositories';
+} from '@repositories';
 
 // Services
 import {
@@ -25,7 +25,7 @@ import {
   ProductService,
   UserService,
   NotificationService,
-} from '../services';
+} from '@services';
 
 // Controllers
 import {
@@ -36,7 +36,8 @@ import {
   ProductCommentController,
   ProductController,
   UserController,
-} from '../controllers';
+  NotificationController,
+} from '@controllers';
 
 const container = new Container();
 
@@ -79,5 +80,6 @@ container
   .to(ProductCommentController);
 container.bind<ProductController>(TYPES.ProductController).to(ProductController);
 container.bind<UserController>(TYPES.UserController).to(UserController);
+container.bind<NotificationController>(TYPES.NotificationController).to(NotificationController);
 
 export { container };

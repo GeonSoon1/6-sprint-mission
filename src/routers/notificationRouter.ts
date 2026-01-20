@@ -1,9 +1,8 @@
 import { Router } from 'express';
-import { container } from '../lib/inversify.config';
-import { TYPES } from '../types/di';
-import { NotificationController } from '../controllers/notificationController';
-import { isLoggedIn } from '../middlewares/isLoggedIn';
-import { asyncHandler } from '../middlewares/asyncHandler';
+import { container } from '@lib';
+import { TYPES } from '@types';
+import { NotificationController } from '@controllers';
+import { isLoggedIn, asyncHandler } from '@middlewares';
 
 // 컨트롤러 인스턴스 가져오기
 const notificationController = container.get<NotificationController>(TYPES.NotificationController);
@@ -16,5 +15,7 @@ router
   .post(isLoggedIn, asyncHandler(notificationController.createNotification));
 
 router.route('/:id/read').patch(isLoggedIn, asyncHandler(notificationController.readNotification));
+
+router.route('/:id/unread').get(isLoggedIn, asyncHandler(notificationController.getUnreadCount));
 
 export default router;

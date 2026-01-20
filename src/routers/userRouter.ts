@@ -1,9 +1,7 @@
 import { Router } from 'express';
-import { asyncHandler } from '../middlewares/asyncHandler';
-import { isLoggedIn } from '../middlewares/isLoggedIn';
-import { validator } from '../middlewares/validator';
-import { UserWithdrawalDTO } from '../dto';
-import { UserController } from '../controllers';
+import { asyncHandler, isLoggedIn, validator } from '@middlewares';
+import { UserWithdrawalDTO } from '@dto';
+import { UserController } from '@controllers';
 
 import { container } from '../lib/inversify.config';
 import { TYPES } from '../types/di';

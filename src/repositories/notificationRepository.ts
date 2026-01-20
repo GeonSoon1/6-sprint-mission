@@ -1,6 +1,6 @@
-import type { Prisma, PrismaClient } from '@prisma/client';
-import { TYPES } from '../types/di';
+import type { Prisma, PrismaClient, User, Notification } from '@prisma/client';
 import { injectable, inject } from 'inversify';
+import { TYPES } from '@types';
 
 @injectable()
 export class NotificationRepository {
@@ -15,12 +15,17 @@ export class NotificationRepository {
   }
 
   // 알림 상세 조회
-  async findNotificationById(id: string) {
+  async findNotificationById(id: Notification['id']) {
     return this.prisma.notification.findUnique({ where: { id } });
   }
 
+  // 안읽은 알림개수 조회
+  async countUnreadByUserId(userId: User['id']) {
+    return this.prisma.notification.count({ where: { userId, readAt: null } });
+  }
+
   // 읽음 처리(수정)
-  async updateNotification(id: string, data: Prisma.NotificationUpdateInput) {
+  async updateNotification(id: Notification['id'], data: Prisma.NotificationUpdateInput) {
     return this.prisma.notification.update({ where: { id }, data });
   }
 }

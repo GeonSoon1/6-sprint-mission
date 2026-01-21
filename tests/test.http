@@ -142,7 +142,8 @@ Content-Type: application/json
 
     "email": "testuser@example.com",
     "nickname": "testuser",
-    "password": "testpassword"
+    "password": "testpassword",
+    "image": null
 }
 
 ### 로그인 테스트

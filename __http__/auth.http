@@ -1,0 +1,65 @@
+@host=http://localhost:3000
+@accessToken={{login.response.body.accessToken}}
+
+###
+# @name login
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "sadqueen300@naver.com",
+  "password": "password1234"
+}
+
+###
+POST {{host}}/auth/signUp
+Content-Type: application/json
+
+{
+  "email": "sadqueen300@naver.com",
+  "nickname": "빠삐용",
+  "password": "password1234"
+}
+
+###
+POST {{host}}/auth/refresh
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI5MDE5OTkwMy0zODcxLTRjNGMtODI3Ni02NWZiMTE5MWFjYmUiLCJpYXQiOjE3Njg5OTg2MDEsImV4cCI6MTc2OTYwMzQwMX0.lxdsmpl87MCtUXefOEEv1yOAxUdBaVBF4UIqOTZDfDg"
+}
+
+###
+POST {{host}}/articles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "아티클 제목 테스트",
+  "content": "test contents1"
+}
+
+###
+GET {{host}}/articles/e4cdc970-5c04-4812-8480-1638afc8d6d8
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+###
+PATCH {{host}}/articles/e4cdc970-5c04-4812-8480-1638afc8d6d8
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "아티클 제목 테스트 수정",
+  "content": "test contents1"
+}
+
+###
+POST {{host}}/articles/e4cdc970-5c04-4812-8480-1638afc8d6d8/like
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+###
+
+

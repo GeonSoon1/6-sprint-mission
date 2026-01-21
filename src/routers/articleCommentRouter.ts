@@ -1,6 +1,11 @@
 import { Router } from 'express';
 import { asyncHandler, isLoggedIn, validator } from '@middlewares';
-import { CreateArticleCommentDTO, UpdateArticleCommentDTO, ArticleIdParamDTO } from '@dto';
+import {
+  CreateArticleCommentDTO,
+  UpdateArticleCommentDTO,
+  ArticleIdParamDTO,
+  ArticleCommentParamDTO,
+} from '@dto';
 import { ArticleCommentController } from '@controllers';
 
 import { container } from '@lib';
@@ -16,7 +21,7 @@ router
   .route('/articles/:articleId/comments')
   .post(
     isLoggedIn,
-    validator({ params: ArticleIdParamDTO, body: CreateArticleCommentDTO }),
+    validator({ params: ArticleCommentParamDTO, body: CreateArticleCommentDTO }),
     asyncHandler(articleCommentController.createComment),
   )
   .get(asyncHandler(articleCommentController.getCommentsByArticleId));

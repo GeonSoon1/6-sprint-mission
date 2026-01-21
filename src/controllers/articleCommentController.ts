@@ -13,7 +13,7 @@ export class ArticleCommentController {
   public createComment = async (req: Request, res: Response) => {
     const { articleId } = req.params;
     const authorId = req.user!.id;
-    const content = req.body;
+    const { content } = req.body;
 
     const newComment = await this.articleCommentService.createComment(articleId, authorId, content);
     res.status(201).json(newComment);
@@ -28,7 +28,7 @@ export class ArticleCommentController {
   public updateComment = async (req: Request, res: Response) => {
     const { commentId } = req.params;
     const authorId = req.user!.id;
-    const content = req.body;
+    const { content } = req.body;
 
     const updateComment = await this.articleCommentService.updateComment(
       commentId,

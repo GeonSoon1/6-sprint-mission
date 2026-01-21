@@ -47,7 +47,7 @@ export class NotificationService {
   }
 
   // 알림 읽음 처리
-  async readNotification(userId: User['id'], id: string) {
+  async readNotification(id: Notification['id'], userId: User['id']) {
     const notification = await this.notificationRepository.findNotificationById(id);
     if (!notification) {
       throw new NotFoundError('알림을 찾을 수 없습니다.');

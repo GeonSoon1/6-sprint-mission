@@ -16,6 +16,7 @@ Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통
 - **인증:** JWT (jsonwebtoken), bcrypt
 - **Validation:** class-validator, class-transformer
 - **파일 업로드:** Multer
+- **WebSocket:** Socket.io
 
 ### 주요 라이브러리
 
@@ -30,6 +31,7 @@ Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통
 - **`bcrypt`**: 비밀번호 해싱
 - **`class-validator`**, **`class-transformer`**: DTO 클래스 기반의 데이터 유효성 검사 및 변환
 - **`multer`**: 파일 업로드(multipart/form-data) 처리
+- **`socket.io`**: 실시간 양방향 통신 (알림 기능)
 
 ---
 
@@ -66,6 +68,11 @@ Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통
 - **게시글(Article) 관리**: 게시글 등록, 조회, 수정, 삭제 (CRUD)
 - **댓글(Comment) 관리**: 상품 및 게시글에 대한 댓글 CRUD
 - **좋아요**: 게시글 좋아요/취소 토글 기능
+- **실시간 알림**:
+  - 관심 상품(좋아요) 가격 변동 시 알림 발송
+  - 자신이 작성한 게시글에 댓글이 달렸을 때 알림 발송
+  - 실시간 웹소켓(Socket.io) 기반 알림 전송
+  - 알림 목록 조회 및 읽음 처리
 
 ---
 
@@ -119,6 +126,15 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 | `POST`   | `/:articleId/comments`            |  O   | 특정 게시글에 댓글 작성              |
 | `PATCH`  | `/:articleId/comments/:commentId` |  O   | 게시글 댓글 수정                     |
 | `DELETE` | `/:articleId/comments/:commentId` |  O   | 게시글 댓글 삭제                     |
+
+#### 🔔 알림 (Notifications) - `/notifications`
+
+| Method  | Endpoint    | 인증 | 설명                     |
+| :------ | :---------- | :--: | :----------------------- |
+| `GET`   | `/`         |  O   | 내 알림 목록 조회        |
+| `POST`  | `/`         |  O   | 알림 생성 (테스트용)     |
+| `GET`   | `/unread`   |  O   | 읽지 않은 알림 개수 조회 |
+| `PATCH` | `/:id/read` |  O   | 알림 읽음 처리           |
 
 ---
 

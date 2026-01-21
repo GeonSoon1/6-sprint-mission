@@ -36,6 +36,7 @@ export class NotificationController {
 
   // 안읽은 알림 숫자 확인
   getUnreadCount = async (req: Request, res: Response) => {
-    return this.notificationService.getUnreadCount(req.user!.id);
+    const count = await this.notificationService.getUnreadCount(req.user!.id);
+    res.status(200).json({ count });
   };
 }

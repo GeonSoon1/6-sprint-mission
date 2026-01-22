@@ -1,4 +1,5 @@
 import express from 'express';
+import http from 'http';
 import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
@@ -9,7 +10,9 @@ import commentsRouter from './routers/commentsRouter.js';
 import imagesRouter from './routers/imagesRouter.js';
 import authRouter from './routers/authRouter.js';
 import usersRouter from './routers/usersRouter.js';
+import notificationsRouter from './routers/notificationsRouter.js';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController.js';
+import { initializeSocketServer } from './lib/socket.js';
 
 const app = express();
 
@@ -24,10 +27,14 @@ app.use('/comments', commentsRouter);
 app.use('/images', imagesRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/notifications', notificationsRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+initializeSocketServer(server);
+
+server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });

@@ -2,6 +2,8 @@ import { Comment } from '@prisma/client';
 import { productRepository } from '../repositories/productRepository.js';
 import { commentRepository } from '../repositories/commentRepository.js';
 import { favoriteRepository } from '../repositories/favoriteRepository.js';
+import { notificationService } from './notificationService.js';
+import { NOTIFICATION_TYPES } from '../types/notification.js';
 import NotFoundError from '../lib/errors/NotFoundError.js';
 import ForbiddenError from '../lib/errors/ForbiddenError.js';
 import BadRequestError from '../lib/errors/BadRequestError.js';
@@ -45,7 +47,19 @@ export class ProductService {
       throw new ForbiddenError('Should be the owner of the product');
     }
 
-    return productRepository.update(id, data);
+    const priceChanged = data.price !== undefined && data.price !== existingProduct.price;
+    const updatedProduct = await productRepository.update(id, data);
+
+    if (priceChanged) {
+      const userIds = existingProduct.favorites.map((favorite) => favorite.userId);
+      await notificationService.createNotificationsForUsers(userIds, {
+        type: NOTIFICATION_TYPES.PRICE_CHANGED,
+        content: `Price changed for ${existingProduct.name}.`,
+        productId: existingProduct.id,
+      });
+    }
+
+    return updatedProduct;
   }
 
   async deleteProduct(id: number, userId: number): Promise<void> {

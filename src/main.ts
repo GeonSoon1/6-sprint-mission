@@ -10,8 +10,13 @@ import imagesRouter from './routers/imagesRouter';
 import authRouter from './routers/authRouter';
 import usersRouter from './routers/usersRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
+import http from 'http';
+import { setupWebSocket } from './lib/websocket';
 
 const app = express();
+const server = http.createServer(app);
+
+setupWebSocket(server);
 
 app.use(cors());
 app.use(express.json());
@@ -28,6 +33,6 @@ app.use('/users', usersRouter);
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });

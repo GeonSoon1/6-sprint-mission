@@ -40,7 +40,6 @@ class CommentService {
       const notice = await notificationService.notifyCommentCreated(comment.id);
 
       if (notice !== null) {
-        console.log('알림이 성공적으로 생성되었습니다:', notice);
         notifyUser(notice.userId, 'notification', notice);
       } else {
         console.log('알림이 생성되지 않았습니다 (작성자가 본인인 경우).');

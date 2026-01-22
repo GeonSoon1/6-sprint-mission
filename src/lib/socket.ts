@@ -1,9 +1,11 @@
 import http from 'http';
-import { Server as SocketIOServer } from 'socket.io';
-import { verifyAccessToken } from './token.js';
-import { ACCESS_TOKEN_COOKIE_NAME } from './constants.js';
+import { Server as SocketIOServer, type Socket } from 'socket.io';
+import { verifyAccessToken } from './token';
+import { ACCESS_TOKEN_COOKIE_NAME } from './constants';
 
 type CookieMap = Record<string, string>;
+
+type AuthenticatedSocket = Socket & { data: { userId: number } };
 
 let ioInstance: SocketIOServer | null = null;
 const userSockets = new Map<number, Set<string>>();
@@ -37,7 +39,7 @@ export function initializeSocketServer(server: http.Server) {
     },
   });
 
-  io.use((socket, next) => {
+  io.use((socket: Socket, next: (err?: Error) => void) => {
     try {
       const tokenFromAuth = socket.handshake.auth?.accessToken;
       const cookies = parseCookies(socket.handshake.headers.cookie);
@@ -48,16 +50,16 @@ export function initializeSocketServer(server: http.Server) {
         return next(new Error('Unauthorized'));
       }
 
-      const { id } = verifyAccessToken(accessToken);
-      socket.data.userId = id;
+      const { userId } = verifyAccessToken(accessToken);
+      (socket as AuthenticatedSocket).data.userId = userId;
       return next();
     } catch (error) {
       return next(new Error('Unauthorized'));
     }
   });
 
-  io.on('connection', (socket) => {
-    const userId = socket.data.userId as number;
+  io.on('connection', (socket: Socket) => {
+    const userId = (socket as AuthenticatedSocket).data.userId;
     const existingSockets = userSockets.get(userId) ?? new Set<string>();
     existingSockets.add(socket.id);
     userSockets.set(userId, existingSockets);
@@ -79,6 +81,10 @@ export function initializeSocketServer(server: http.Server) {
 }
 
 export function emitNotificationToUser(userId: number, payload: unknown) {
+  emitToUser(userId, 'notification', payload);
+}
+
+export function emitToUser(userId: number, event: string, payload: unknown) {
   if (!ioInstance) {
     return;
   }
@@ -87,6 +93,6 @@ export function emitNotificationToUser(userId: number, payload: unknown) {
     return;
   }
   sockets.forEach((socketId) => {
-    ioInstance?.to(socketId).emit('notification', payload);
+    ioInstance?.to(socketId).emit(event, payload);
   });
 }

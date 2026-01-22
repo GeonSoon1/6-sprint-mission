@@ -4,3 +4,16 @@ export const NOTIFICATION_TYPES = {
 } as const;
 
 export type NotificationType = (typeof NOTIFICATION_TYPES)[keyof typeof NOTIFICATION_TYPES];
+
+interface Notification {
+  id: number;
+  type: NotificationType;
+  content: string;
+  isRead: boolean;
+  userId: number;
+  productId: number | null;
+  articleId: number | null;
+  createdAt: Date;
+}
+
+export default Notification;

@@ -3,16 +3,16 @@ import http from 'http';
 import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import { PORT, PUBLIC_PATH, STATIC_PATH } from './lib/constants.js';
-import articlesRouter from './routers/articlesRouter.js';
-import productsRouter from './routers/productsRouter.js';
-import commentsRouter from './routers/commentsRouter.js';
-import imagesRouter from './routers/imagesRouter.js';
-import authRouter from './routers/authRouter.js';
-import usersRouter from './routers/usersRouter.js';
-import notificationsRouter from './routers/notificationsRouter.js';
-import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController.js';
-import { initializeSocketServer } from './lib/socket.js';
+import { PORT, PUBLIC_PATH, STATIC_PATH } from './lib/constants';
+import articlesRouter from './routers/articlesRouter';
+import productsRouter from './routers/productsRouter';
+import commentsRouter from './routers/commentsRouter';
+import imagesRouter from './routers/imagesRouter';
+import authRouter from './routers/authRouter';
+import usersRouter from './routers/usersRouter';
+import notificationsRouter from './routers/notificationsRouter';
+import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
+import { initializeSocketServer } from './lib/socket';
 
 const app = express();
 

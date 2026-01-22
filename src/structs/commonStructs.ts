@@ -1,7 +1,7 @@
 import { coerce, integer, object, string, defaulted, optional, enums, nonempty } from 'superstruct';
 
 /** Convert string to integer then validate it */
-const integerString = coerce(integer(), string(), (value) => parseInt(value as string, 10));
+const integerString = coerce(integer(), string(), (value) => parseInt(value));
 
 export const IdParamsStruct = object({
   id: integerString,
@@ -20,5 +20,3 @@ export const CursorParamsStruct = object({
   orderBy: optional(enums(['recent'])),
   keyword: optional(nonempty(string())),
 });
-
-

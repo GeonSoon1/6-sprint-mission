@@ -1,11 +1,11 @@
 import express from 'express';
-import { withAsync } from '../lib/withAsync.js';
-import authenticate from '../middlewares/authenticate.js';
+import { withAsync } from '../lib/withAsync';
+import authenticate from '../middlewares/authenticate';
 import {
   getNotificationList,
   getUnreadNotificationCount,
   markNotificationRead,
-} from '../controllers/notificationsController.js';
+} from '../controllers/notificationsController';
 
 const notificationsRouter = express.Router();
 

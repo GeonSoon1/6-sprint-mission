@@ -1,3 +1,3 @@
-import { PageParamsStruct } from './commonStructs.js';
+import { CursorParamsStruct } from './commonStructs';
 
-export const GetNotificationListParamsStruct = PageParamsStruct;
+export const GetNotificationListParamsStruct = CursorParamsStruct;

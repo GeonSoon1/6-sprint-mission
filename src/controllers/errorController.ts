@@ -1,20 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import { StructError } from 'superstruct';
-import BadRequestError from '../lib/errors/BadRequestError.js';
-import NotFoundError from '../lib/errors/NotFoundError.js';
-import UnauthorizedError from '../lib/errors/UnauthorizedError.js';
-import ForbiddenError from '../lib/errors/ForbiddenError.js';
+import BadRequestError from '../lib/errors/BadRequestError';
+import NotFoundError from '../lib/errors/NotFoundError';
+import UnauthorizedError from '../lib/errors/UnauthorizedError';
+import ForbiddenError from '../lib/errors/ForbiddenError';
 
-export function defaultNotFoundHandler(_req: Request, res: Response, _next: NextFunction): void {
+export function defaultNotFoundHandler(req: Request, res: Response, next: NextFunction) {
   res.status(404).send({ message: 'Not found' });
 }
 
-export function globalErrorHandler(
-  err: unknown,
-  _req: Request,
-  res: Response,
-  _next: NextFunction,
-): void {
+export function globalErrorHandler(err: Error, req: Request, res: Response, next: NextFunction) {
   /** From superstruct or application error */
   if (err instanceof StructError || err instanceof BadRequestError) {
     res.status(400).send({ message: err.message });
@@ -22,13 +17,13 @@ export function globalErrorHandler(
   }
 
   /** From express.json middleware */
-  if (err instanceof SyntaxError && 'status' in err && err.status === 400 && 'body' in err) {
+  if (err instanceof SyntaxError && 'body' in err) {
     res.status(400).send({ message: 'Invalid JSON' });
     return;
   }
 
   /** Prisma error codes */
-  if (err && typeof err === 'object' && 'code' in err && err.code) {
+  if ('code' in err) {
     console.error(err);
     res.status(500).send({ message: 'Failed to process data' });
     return;

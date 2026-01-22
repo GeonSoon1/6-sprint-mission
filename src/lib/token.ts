@@ -1,25 +1,28 @@
 import jwt from 'jsonwebtoken';
-import { JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_SECRET } from './constants.js';
-import { TokenPayload, TokenPair } from '../types/index.js';
+import { JWT_ACCESS_TOKEN_SECRET, JWT_REFRESH_TOKEN_SECRET } from './constants';
 
-export function generateTokens(userId: number): TokenPair {
-  const accessToken = jwt.sign({ id: userId }, JWT_ACCESS_TOKEN_SECRET as string, {
+export function generateTokens(userId: number) {
+  const accessToken = jwt.sign({ id: userId }, JWT_ACCESS_TOKEN_SECRET, {
     expiresIn: '1h',
   });
-  const refreshToken = jwt.sign({ id: userId }, JWT_REFRESH_TOKEN_SECRET as string, {
+  const refreshToken = jwt.sign({ id: userId }, JWT_REFRESH_TOKEN_SECRET, {
     expiresIn: '7d',
   });
   return { accessToken, refreshToken };
 }
 
-export function verifyAccessToken(token: string): TokenPayload {
-  const decoded = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET as string) as TokenPayload;
-  return { id: decoded.id };
+export function verifyAccessToken(token: string) {
+  const decoded = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
+  if (typeof decoded === 'string') {
+    throw new Error('Invalid token');
+  }
+  return { userId: decoded.id };
 }
 
-export function verifyRefreshToken(token: string): TokenPayload {
-  const decoded = jwt.verify(token, JWT_REFRESH_TOKEN_SECRET as string) as TokenPayload;
-  return { id: decoded.id };
+export function verifyRefreshToken(token: string) {
+  const decoded = jwt.verify(token, JWT_REFRESH_TOKEN_SECRET);
+  if (typeof decoded === 'string') {
+    throw new Error('Invalid token');
+  }
+  return { userId: decoded.id };
 }
-
-

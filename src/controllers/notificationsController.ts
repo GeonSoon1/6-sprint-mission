@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
 import { create } from 'superstruct';
-import UnauthorizedError from '../lib/errors/UnauthorizedError.js';
-import { notificationService } from '../services/notificationService.js';
-import { GetNotificationListParamsStruct } from '../structs/notificationsStructs.js';
-import { IdParamsStruct } from '../structs/commonStructs.js';
+import UnauthorizedError from '../lib/errors/UnauthorizedError';
+import * as notificationsService from '../services/notificationsService';
+import { GetNotificationListParamsStruct } from '../structs/notificationsStructs';
+import { IdParamsStruct } from '../structs/commonStructs';
 
 export async function getNotificationList(req: Request, res: Response): Promise<void> {
   if (!req.user) {
@@ -11,7 +11,7 @@ export async function getNotificationList(req: Request, res: Response): Promise<
   }
 
   const query = create(req.query, GetNotificationListParamsStruct);
-  const result = await notificationService.getNotificationList(req.user.id, query);
+  const result = await notificationsService.getMyNotifications(req.user.id, query);
   res.send(result);
 }
 
@@ -20,7 +20,7 @@ export async function getUnreadNotificationCount(req: Request, res: Response): P
     throw new UnauthorizedError('Unauthorized');
   }
 
-  const count = await notificationService.getUnreadCount(req.user.id);
+  const count = await notificationsService.getMyUnreadCount(req.user.id);
   res.send({ count });
 }
 
@@ -30,6 +30,6 @@ export async function markNotificationRead(req: Request, res: Response): Promise
   }
 
   const { id } = create(req.params, IdParamsStruct);
-  const notification = await notificationService.markRead(id, req.user.id);
+  const notification = await notificationsService.markAsRead(id, req.user.id);
   res.send(notification);
 }

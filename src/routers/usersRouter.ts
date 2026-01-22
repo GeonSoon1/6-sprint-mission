@@ -1,12 +1,20 @@
 import express from 'express';
-import { authenticate } from '../middlewares/authenticate';
-import * as usersController from '../controllers/usersController';
+import { withAsync } from '../lib/withAsync';
+import {
+  getMe,
+  updateMe,
+  updateMyPassword,
+  getMyProductList,
+  getMyFavoriteList,
+} from '../controllers/usersController';
+import authenticate from '../middlewares/authenticate';
 
-const router = express.Router();
+const usersRouter = express.Router();
 
-router.get('/me', authenticate, usersController.getMyInfo);
-router.patch('/me', authenticate, usersController.updateMyInfo);
-router.patch('/me/password', authenticate, usersController.updatePassword);
-router.get('/me/products', authenticate, usersController.getMyProducts);
-router.get('/me/likes/products', authenticate, usersController.getMyLikedProducts);
-export default router;
+usersRouter.get('/me', authenticate(), withAsync(getMe));
+usersRouter.patch('/me', authenticate(), withAsync(updateMe));
+usersRouter.patch('/me/password', authenticate(), withAsync(updateMyPassword));
+usersRouter.get('/me/products', authenticate(), withAsync(getMyProductList));
+usersRouter.get('/me/favorites', authenticate(), withAsync(getMyFavoriteList));
+
+export default usersRouter;

@@ -1,100 +1,79 @@
-import { RequestHandler } from 'express';
-import { articlesService } from '../services/articlesService';
-import { Prisma } from '@prisma/client';
-import { ErrorWithStatus } from '../utils/types';
+import { Request, Response } from 'express';
+import { create } from 'superstruct';
+import { IdParamsStruct } from '../structs/commonStructs';
+import {
+  CreateArticleBodyStruct,
+  UpdateArticleBodyStruct,
+  GetArticleListParamsStruct,
+} from '../structs/articlesStructs';
+import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '../structs/commentsStruct';
+import * as articlesService from '../services/articlesService';
+import * as commentsService from '../services/commentsService';
+import * as likesService from '../services/likesService';
 
-export const createArticle: RequestHandler = async (req, res) => {
-  const { title, content }: Prisma.ArticleCreateInput = req.body;
-  const userId = req.user!.id;
-
-  const newArticle = await articlesService.createArticleInDb(title, content, userId);
-
-  res.status(201).json({
-    message: '게시글이 성공적으로 등록되었습니다.',
-    data: newArticle,
+export async function createArticle(req: Request, res: Response) {
+  const data = create(req.body, CreateArticleBodyStruct);
+  const article = await articlesService.createArticle({
+    ...data,
+    userId: req.user.id,
   });
-};
+  res.status(201).send(article);
+}
 
-export const getArticles: RequestHandler = async (req, res) => {
-  const { sort, search } = req.query;
-  const { offset = 0, limit } = req.paginationParams!;
-  const userId = req.user?.id;
+export async function getArticle(req: Request, res: Response) {
+  const { id } = create(req.params, IdParamsStruct);
+  const article = await articlesService.getArticle(id);
+  res.send(article);
+}
 
-  const { articles, totalArticles } = await articlesService.findArticles(
-    {
-      sort: sort as string,
-      search: search as string,
-      offset,
-      limit,
-    },
-    userId,
-  );
-
-  if (search && totalArticles === 0) {
-    return res.status(200).json({
-      message: `${search}와 일치하는 게시물을 찾을 수 없습니다.`,
-      data: [],
-      pagination: {},
-    });
-  }
-
-  const totalPages = Math.ceil(totalArticles / limit);
-  const currentPage = Math.floor(offset / limit) + 1;
-
-  res.status(200).json({
-    message: '게시판 목록을 조회했습니다.',
-    data: articles,
-    pagination: {
-      totalItems: totalArticles,
-      totalPages,
-      currentPage,
-      itemsPerPage: limit,
-    },
+export async function updateArticle(req: Request, res: Response) {
+  const { id } = create(req.params, IdParamsStruct);
+  const data = create(req.body, UpdateArticleBodyStruct);
+  const updatedArticle = await articlesService.updateArticle(id, {
+    ...data,
+    userId: req.user.id,
   });
-};
+  res.send(updatedArticle);
+}
 
-export const getArticle: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.user?.id;
-  const article = await articlesService.findArticleById(id, userId);
+export async function deleteArticle(req: Request, res: Response) {
+  const { id } = create(req.params, IdParamsStruct);
+  await articlesService.deleteArticle(id, req.user.id);
+  res.status(204).send();
+}
 
-  res.status(200).send(article);
-};
+export async function getArticleList(req: Request, res: Response) {
+  const params = create(req.query, GetArticleListParamsStruct);
+  const result = await articlesService.getArticleList(params);
+  res.send(result);
+}
 
-export const patchArticle: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-  const { title, content } = req.body;
-  const userId = req.user!.id;
-
-  const updateData: Prisma.ArticleUpdateInput = {
-    title,
+export async function createComment(req: Request, res: Response) {
+  const { id: articleId } = create(req.params, IdParamsStruct);
+  const { content } = create(req.body, CreateCommentBodyStruct);
+  const createdComment = await commentsService.createComment({
+    articleId,
     content,
-  };
-
-  const hasUpdateValues = Object.values(updateData).some((value) => value !== undefined);
-
-  if (!hasUpdateValues) {
-    const emptyBodyError: ErrorWithStatus = new Error('수정할 내용이 비어 있습니다.');
-    emptyBodyError.status = 400;
-    throw emptyBodyError;
-  }
-
-  const article = await articlesService.updateArticleInDb(id, updateData, userId);
-
-  res.status(200).json({
-    message: '게시글이 성공적으로 수정되었습니다.',
-    data: article,
+    userId: req.user.id,
   });
-};
+  res.status(201).send(createdComment);
+}
 
-export const deleteArticle: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.user!.id;
+export async function getCommentList(req: Request, res: Response) {
+  const { id: articleId } = create(req.params, IdParamsStruct);
+  const { cursor, limit } = create(req.query, GetCommentListParamsStruct);
+  const result = await commentsService.getCommentListByArticleId(articleId, { cursor, limit });
+  res.send(result);
+}
 
-  const article = await articlesService.deleteArticleInDb(id, userId);
+export async function createLike(req: Request, res: Response) {
+  const { id: articleId } = create(req.params, IdParamsStruct);
+  await likesService.createLike(articleId, req.user.id);
+  res.status(201).send();
+}
 
-  res.status(200).json({
-    message: '게시글이 성공적으로 삭제되었습니다.',
-    data: article,
-  });
-};
+export async function deleteLike(req: Request, res: Response) {
+  const { id: articleId } = create(req.params, IdParamsStruct);
+  await likesService.deleteLike(articleId, req.user.id);
+  res.status(204).send();
+}

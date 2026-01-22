@@ -1,41 +1,50 @@
-import { prisma } from '../utils/prisma';
-import { Prisma } from '@prisma/client';
+import { Comment } from '@prisma/client';
+import { prismaClient } from '../lib/prismaClient';
+import { CursorPaginationParams } from '../types/pagination';
 
-const createComment = async (data: Prisma.CommentCreateInput, select?: Prisma.CommentSelect) => {
-  return prisma.comment.create({
+export async function createComment(data: Omit<Comment, 'id' | 'createdAt' | 'updatedAt'>) {
+  const createdComment = await prismaClient.comment.create({
     data,
-    select,
   });
-};
+  return createdComment;
+}
 
-const findComments = async (params: Prisma.CommentFindManyArgs) => {
-  return prisma.comment.findMany(params);
-};
-
-const findCommentById = async (id: string, select?: Prisma.CommentSelect) => {
-  return prisma.comment.findUniqueOrThrow({
-    where: { id },
-    select,
-  });
-};
-
-const updateComment = async (id: string, content: string) => {
-  return prisma.comment.update({
-    where: { id },
-    data: { content },
-  });
-};
-
-const deleteComment = async (id: string) => {
-  return prisma.comment.delete({
+export async function getComment(id: number) {
+  const comment = await prismaClient.comment.findUnique({
     where: { id },
   });
-};
+  return comment;
+}
 
-export const commentsRepository = {
-  createComment,
-  findComments,
-  findCommentById,
-  updateComment,
-  deleteComment,
-};
+export async function getCommentList(
+  where: { articleId?: number; productId?: number },
+  { cursor, limit }: CursorPaginationParams,
+) {
+  const commentsWithCursor = await prismaClient.comment.findMany({
+    cursor: cursor ? { id: cursor } : undefined,
+    take: limit + 1,
+    where,
+    orderBy: { createdAt: 'desc' },
+  });
+  const comments = commentsWithCursor.slice(0, limit);
+  const cursorComment = commentsWithCursor[commentsWithCursor.length - 1];
+  const nextCursor = cursorComment ? cursorComment.id : null;
+
+  return {
+    list: comments,
+    nextCursor,
+  };
+}
+
+export async function updateComment(id: number, data: Partial<Comment>) {
+  return prismaClient.comment.update({
+    where: { id },
+    data,
+  });
+}
+
+export async function deleteComment(id: number) {
+  return prismaClient.comment.delete({
+    where: { id },
+  });
+}

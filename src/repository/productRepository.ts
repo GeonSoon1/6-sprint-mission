@@ -29,35 +29,6 @@ class ProductRepository {
   delete(id: number) {
     return prisma.product.delete({ where: { id } });
   }
-
-  createComment(productId: number, content: string) {
-    return prisma.comment.create({
-      data: {
-        content,
-        product: { connect: { id: productId } },
-      },
-      include: { product: true },
-    });
-  }
-
-  getComments(productId: number, cursor: number | undefined, limit: number) {
-    return prisma.comment.findMany({
-      where: { productId },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-      },
-      take: limit,
-      ...(cursor
-        ? {
-            skip: 1,
-            cursor: { id: cursor },
-          }
-        : {}),
-      orderBy: { createdAt: 'desc' },
-    });
-  }
 }
 
 export default new ProductRepository();

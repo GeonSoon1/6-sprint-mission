@@ -17,6 +17,8 @@ class NotificationService {
       // 작성자가 본인의 글에 댓글을 단 경우 알림을 보내지 않음
       return null;
     }
+    console.log('알림을 보낼 대상 사용자 ID:', articleAuthorId);
+    console.log('댓글 작성 사용자 ID:', commentAuthorId);
 
     const notification = await notificationRepository.createNotification({
       userId: articleAuthorId,

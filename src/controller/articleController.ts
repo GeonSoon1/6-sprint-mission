@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { assert } from 'superstruct';
 import { CreateArticle, PatchArticle } from '../structs/articleStructs';
-import { CreateComment } from '../structs/commentStructs';
 import { AuthenticatedRequest } from '../types/auth';
 import articleService from '../service/articleService';
 
@@ -53,26 +52,6 @@ class ArticleController {
 
     await articleService.deleteArticle(articleId, req.user.id);
     res.sendStatus(204);
-  }
-
-  async createComment(req: Request, res: Response) {
-    assert(req.body, CreateComment);
-
-    const articleId = Number(req.params.id);
-    const content = req.body.content;
-
-    const comment = await articleService.createComment(articleId, content);
-    res.status(201).send(comment);
-  }
-
-  async getComment(req: Request, res: Response) {
-    const articleId = Number(req.params.id);
-    const cursor = req.query.cursor ? Number(req.query.cursor) : undefined;
-    const limit = String(req.query.limit ?? '10');
-
-    const result = await articleService.getComments(articleId, cursor, limit);
-
-    res.send(result);
   }
 }
 

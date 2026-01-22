@@ -64,19 +64,6 @@ class ProductService {
     await productRepository.delete(id);
   }
 
-  createComment(productId: number, content: string) {
-    return productRepository.createComment(productId, content);
-  }
-
-  async getComments(productId: number, cursor: number | undefined, limit: number) {
-    const comments = await productRepository.getComments(productId, cursor, limit);
-
-    return {
-      data: comments,
-      nextCursor: comments.length > 0 ? comments[comments.length - 1].id : null,
-    };
-  }
-
   private validateCategory(category: unknown) {
     if (!Object.values(Category).includes(category as Category)) {
       throw new ForbiddenError('유효하지 않은 카테고리입니다.');

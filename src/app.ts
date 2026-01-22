@@ -17,6 +17,7 @@ const app = express();
 
 const server = http.createServer(app);
 initializeSocketServer(server);
+app.use(express.static('public'));
 
 app.use(cors());
 app.use(cookieParser());
@@ -51,4 +52,7 @@ app.use('/notifications', notificationRouter);
 app.use(defaultNotFoundHandler);
 app.use(errorHandler);
 
-app.listen(PORT || 3000, () => console.log('Server started'));
+//app.listen(PORT || 3000, () => console.log('Server started'));
+server.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

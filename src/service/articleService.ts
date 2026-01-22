@@ -47,19 +47,6 @@ class ArticleService {
     if (!article) throw new NotFoundError('해당 게시글이 없습니다.');
     return article;
   }
-
-  createComment(articleId: number, content: string) {
-    return articleRepository.createComment(articleId, content);
-  }
-
-  async getComments(articleId: number, cursor?: number, limit = '10') {
-    const comments = await articleRepository.findComments(articleId, cursor, parseInt(limit));
-
-    return {
-      data: comments,
-      nextCursor: comments.length > 0 ? comments[comments.length - 1].id : null,
-    };
-  }
 }
 
 export default new ArticleService();

@@ -2,8 +2,8 @@ import NotFoundError from '../lib/errors/NotFoundError';
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import * as notificationsRepository from '../repositories/notificationsRepository';
 import { CursorPaginationParams, CursorPaginationResult } from '../types/pagination';
-import Notification from '../types/notification';
 import { emitToUser } from '../lib/socket';
+import Notification from '../types/notification';
 
 type CreateNotificationData = Omit<Notification, 'id' | 'createdAt'>;
 

@@ -51,10 +51,12 @@ export async function getProductList(req: Request, res: Response) {
 }
 
 export async function createComment(req: Request, res: Response) {
+  const { id: productId } = create(req.params, IdParamsStruct);
   const data = create(req.body, CreateCommentBodyStruct);
   const createdComment = await commentsService.createComment({
     ...data,
     userId: req.user.id,
+    productId,
   });
   res.status(201).send(createdComment);
 }

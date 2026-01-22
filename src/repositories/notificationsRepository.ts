@@ -1,17 +1,29 @@
-import { Notification } from '@prisma/client';
 import { prismaClient } from '../lib/prismaClient';
 import { CursorPaginationParams } from '../types/pagination';
+import Notification from '../types/notification';
+
+type NotificationCreateData = Omit<Notification, 'id' | 'createdAt'>;
+type NotificationDelegate = {
+  create: (args: { data: NotificationCreateData }) => Promise<Notification>;
+  findUnique: (args: { where: { id: number } }) => Promise<Notification | null>;
+  findMany: (args: Record<string, unknown>) => Promise<Notification[]>;
+  count: (args: Record<string, unknown>) => Promise<number>;
+  update: (args: { where: { id: number }; data: Partial<Notification> }) => Promise<Notification>;
+};
+
+const notificationClient = (prismaClient as unknown as { notification: NotificationDelegate })
+  .notification;
 
 export async function createNotification(
-  data: Omit<Notification, 'id' | 'createdAt'>,
+  data: NotificationCreateData,
 ) {
-  return prismaClient.notification.create({
+  return notificationClient.create({
     data,
   });
 }
 
 export async function getNotification(id: number) {
-  return prismaClient.notification.findUnique({
+  return notificationClient.findUnique({
     where: { id },
   });
 }
@@ -21,7 +33,7 @@ export async function getNotificationList(
   { cursor, limit }: CursorPaginationParams,
 ) {
   const take = limit + 1;
-  const notificationsWithCursor = await prismaClient.notification.findMany({
+  const notificationsWithCursor = await notificationClient.findMany({
     where: { userId },
     orderBy: { id: 'desc' },
     ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
@@ -39,13 +51,13 @@ export async function getNotificationList(
 }
 
 export async function getUnreadCount(userId: number) {
-  return prismaClient.notification.count({
+  return notificationClient.count({
     where: { userId, isRead: false },
   });
 }
 
 export async function updateNotification(id: number, data: Partial<Notification>) {
-  return prismaClient.notification.update({
+  return notificationClient.update({
     where: { id },
     data,
   });

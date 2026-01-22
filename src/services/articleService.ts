@@ -1,9 +1,9 @@
-import { articleRepository } from '../repositories/articleRepository.js';
-import { commentRepository } from '../repositories/commentRepository.js';
-import { likeRepository } from '../repositories/likeRepository.js';
-import NotFoundError from '../lib/errors/NotFoundError.js';
-import ForbiddenError from '../lib/errors/ForbiddenError.js';
-import BadRequestError from '../lib/errors/BadRequestError.js';
+import { articleRepository } from '../repositories/articleRepository';
+import { commentRepository } from '../repositories/commentRepository';
+import { likeRepository } from '../repositories/likeRepository';
+import NotFoundError from '../lib/errors/NotFoundError';
+import ForbiddenError from '../lib/errors/ForbiddenError';
+import BadRequestError from '../lib/errors/BadRequestError';
 import {
   CreateArticleDTO,
   UpdateArticleDTO,
@@ -11,8 +11,10 @@ import {
   ArticleResponseDTO,
   CreateCommentDTO,
   CommentListQueryDTO,
-} from '../types/dto.js';
+} from '../types/dto';
 import { Comment } from '@prisma/client';
+import { notificationService } from './notificationService';
+import { NOTIFICATION_TYPES } from '../types/notification';
 
 export class ArticleService {
   async createArticle(userId: number, data: CreateArticleDTO) {
@@ -84,7 +86,18 @@ export class ArticleService {
       throw new NotFoundError('article', articleId);
     }
 
-    return commentRepository.create({ ...data, userId, articleId });
+    const createdComment = await commentRepository.create({ ...data, userId, articleId });
+
+    if (existingArticle.userId !== userId) {
+      await notificationService.createNotification({
+        userId: existingArticle.userId,
+        type: NOTIFICATION_TYPES.NEW_COMMENT,
+        content: `New comment on your article "${existingArticle.title}".`,
+        articleId: existingArticle.id,
+      });
+    }
+
+    return createdComment;
   }
 
   async getCommentList(articleId: number, query: CommentListQueryDTO): Promise<{ list: Comment[]; nextCursor: number | null }> {

@@ -2,18 +2,16 @@ import NotFoundError from '../lib/errors/NotFoundError';
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import * as notificationsRepository from '../repositories/notificationsRepository';
 import { CursorPaginationParams, CursorPaginationResult } from '../types/pagination';
-import Notification from '../types/Notification';
+import Notification from '../types/notification';
 import { emitToUser } from '../lib/socket';
 
-type CreateNotificationData = Omit<Notification, 'id' | 'createdAt' | 'updatedAt'>;
+type CreateNotificationData = Omit<Notification, 'id' | 'createdAt'>;
 
 async function createAndEmit(data: CreateNotificationData) {
   const normalizedData = {
     ...data,
-    readAt: data.readAt ?? null,
     articleId: data.articleId ?? null,
     productId: data.productId ?? null,
-    commentId: data.commentId ?? null,
   };
   const notification = await notificationsRepository.createNotification(normalizedData);
   emitToUser(data.userId, 'notification', notification);
@@ -43,7 +41,7 @@ export async function markAsRead(id: number, userId: number): Promise<Notificati
   if (notification.isRead) {
     return notification;
   }
-  return notificationsRepository.updateNotification(id, { isRead: true, readAt: new Date() });
+  return notificationsRepository.updateNotification(id, { isRead: true });
 }
 
 export async function notifyPriceChange(
@@ -62,13 +60,11 @@ export async function notifyPriceChange(
     userIds.map((userId) =>
       createAndEmit({
         userId,
-        type: 'PRODUCT_PRICE_CHANGE',
+        type: 'PRICE_CHANGED',
         content,
         isRead: false,
-        readAt: null,
         productId,
         articleId: null,
-        commentId: null,
       }),
     ),
   );
@@ -77,18 +73,15 @@ export async function notifyPriceChange(
 export async function notifyArticleComment(
   userId: number,
   articleId: number,
-  commentId: number,
   articleTitle: string,
 ) {
   const content = `내 게시글 "${articleTitle}"에 댓글이 달렸습니다.`;
   await createAndEmit({
     userId,
-    type: 'ARTICLE_COMMENT',
+    type: 'NEW_COMMENT',
     content,
     isRead: false,
-    readAt: null,
     articleId,
-    commentId,
     productId: null,
   });
 }

@@ -1,6 +1,6 @@
-import { prismaClient } from '../lib/prismaClient.js';
+import { prismaClient } from '../lib/prismaClient';
 import { Product, Favorite } from '@prisma/client';
-import { CreateProductDTO, UpdateProductDTO, ProductListQueryDTO } from '../types/dto.js';
+import { CreateProductDTO, UpdateProductDTO, ProductListQueryDTO } from '../types/dto';
 
 export class ProductRepository {
   async findById(id: number): Promise<(Product & { favorites: Favorite[] }) | null> {

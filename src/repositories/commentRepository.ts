@@ -1,6 +1,6 @@
-import { prismaClient } from '../lib/prismaClient.js';
+import { prismaClient } from '../lib/prismaClient';
 import { Comment } from '@prisma/client';
-import { CreateCommentDTO, UpdateCommentDTO, CommentListQueryDTO } from '../types/dto.js';
+import { CreateCommentDTO, UpdateCommentDTO, CommentListQueryDTO } from '../types/dto';
 
 export class CommentRepository {
   async findById(id: number): Promise<Comment | null> {

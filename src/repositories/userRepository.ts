@@ -1,6 +1,6 @@
-import { prismaClient } from '../lib/prismaClient.js';
+import { prismaClient } from '../lib/prismaClient';
 import { User } from '@prisma/client';
-import { CreateUserDTO, UpdateUserDTO } from '../types/dto.js';
+import { CreateUserDTO, UpdateUserDTO } from '../types/dto';
 
 export class UserRepository {
   async findByEmail(email: string): Promise<User | null> {

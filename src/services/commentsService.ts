@@ -52,12 +52,7 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
     articleOwnerId !== data.userId &&
     articleTitle
   ) {
-    await notificationsService.notifyArticleComment(
-      articleOwnerId,
-      data.articleId,
-      comment.id,
-      articleTitle,
-    );
+    await notificationsService.notifyArticleComment(articleOwnerId, data.articleId, articleTitle);
   }
   return comment;
 }

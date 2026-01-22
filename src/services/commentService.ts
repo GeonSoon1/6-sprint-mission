@@ -1,7 +1,7 @@
-import { commentRepository } from '../repositories/commentRepository.js';
-import NotFoundError from '../lib/errors/NotFoundError.js';
-import ForbiddenError from '../lib/errors/ForbiddenError.js';
-import { UpdateCommentDTO } from '../types/dto.js';
+import { commentRepository } from '../repositories/commentRepository';
+import NotFoundError from '../lib/errors/NotFoundError';
+import ForbiddenError from '../lib/errors/ForbiddenError';
+import { UpdateCommentDTO } from '../types/dto';
 
 export class CommentService {
   async updateComment(id: number, userId: number, data: UpdateCommentDTO) {

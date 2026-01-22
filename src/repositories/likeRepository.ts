@@ -1,6 +1,6 @@
-import { prismaClient } from '../lib/prismaClient.js';
+import { prismaClient } from '../lib/prismaClient';
 import { Like } from '@prisma/client';
-import { CreateLikeDTO } from '../types/dto.js';
+import { CreateLikeDTO } from '../types/dto';
 
 export class LikeRepository {
   async findByArticleIdAndUserId(articleId: number, userId: number): Promise<Like | null> {

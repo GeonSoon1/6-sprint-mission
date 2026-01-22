@@ -1,6 +1,6 @@
-import { prismaClient } from '../lib/prismaClient.js';
+import { prismaClient } from '../lib/prismaClient';
 import { Favorite } from '@prisma/client';
-import { CreateFavoriteDTO } from '../types/dto.js';
+import { CreateFavoriteDTO } from '../types/dto';
 
 export class FavoriteRepository {
   async findByProductIdAndUserId(productId: number, userId: number): Promise<Favorite | null> {

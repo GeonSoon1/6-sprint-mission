@@ -3,7 +3,7 @@ import { prismaClient } from '../lib/prismaClient';
 import { CursorPaginationParams } from '../types/pagination';
 
 export async function createNotification(
-  data: Omit<Notification, 'id' | 'createdAt' | 'updatedAt'>,
+  data: Omit<Notification, 'id' | 'createdAt'>,
 ) {
   return prismaClient.notification.create({
     data,

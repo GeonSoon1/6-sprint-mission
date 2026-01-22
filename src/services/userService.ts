@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt';
-import { userRepository } from '../repositories/userRepository.js';
-import { productRepository } from '../repositories/productRepository.js';
-import NotFoundError from '../lib/errors/NotFoundError.js';
-import UnauthorizedError from '../lib/errors/UnauthorizedError.js';
-import { UpdateUserDTO, UpdatePasswordDTO, ProductListQueryDTO, ProductResponseDTO, UserWithoutPassword } from '../types/index.js';
+import { userRepository } from '../repositories/userRepository';
+import { productRepository } from '../repositories/productRepository';
+import NotFoundError from '../lib/errors/NotFoundError';
+import UnauthorizedError from '../lib/errors/UnauthorizedError';
+import { UpdateUserDTO, UpdatePasswordDTO, ProductListQueryDTO, ProductResponseDTO, UserWithoutPassword } from '../types/index';
 
 export class UserService {
   async getMe(userId: number): Promise<UserWithoutPassword> {

@@ -1,10 +1,12 @@
 import { Comment } from '@prisma/client';
-import { productRepository } from '../repositories/productRepository.js';
-import { commentRepository } from '../repositories/commentRepository.js';
-import { favoriteRepository } from '../repositories/favoriteRepository.js';
-import NotFoundError from '../lib/errors/NotFoundError.js';
-import ForbiddenError from '../lib/errors/ForbiddenError.js';
-import BadRequestError from '../lib/errors/BadRequestError.js';
+import { productRepository } from '../repositories/productRepository';
+import { commentRepository } from '../repositories/commentRepository';
+import { favoriteRepository } from '../repositories/favoriteRepository';
+import { notificationService } from './notificationService';
+import { NOTIFICATION_TYPES } from '../types/notification';
+import NotFoundError from '../lib/errors/NotFoundError';
+import ForbiddenError from '../lib/errors/ForbiddenError';
+import BadRequestError from '../lib/errors/BadRequestError';
 import {
   CreateProductDTO,
   UpdateProductDTO,
@@ -12,7 +14,7 @@ import {
   ProductResponseDTO,
   CreateCommentDTO,
   CommentListQueryDTO,
-} from '../types/dto.js';
+} from '../types/dto';
 
 export class ProductService {
   async createProduct(userId: number, data: CreateProductDTO) {
@@ -45,7 +47,19 @@ export class ProductService {
       throw new ForbiddenError('Should be the owner of the product');
     }
 
-    return productRepository.update(id, data);
+    const priceChanged = data.price !== undefined && data.price !== existingProduct.price;
+    const updatedProduct = await productRepository.update(id, data);
+
+    if (priceChanged) {
+      const userIds = existingProduct.favorites.map((favorite) => favorite.userId);
+      await notificationService.createNotificationsForUsers(userIds, {
+        type: NOTIFICATION_TYPES.PRICE_CHANGED,
+        content: `Price changed for ${existingProduct.name}.`,
+        productId: existingProduct.id,
+      });
+    }
+
+    return updatedProduct;
   }
 
   async deleteProduct(id: number, userId: number): Promise<void> {

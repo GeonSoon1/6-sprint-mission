@@ -5,33 +5,26 @@ import { CursorPaginationParams, CursorPaginationResult } from '../types/paginat
 import BadRequestError from '../lib/errors/BadRequestError';
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import NotFoundError from '../lib/errors/NotFoundError';
-import Comment from '../types/Comment';
-
-type CreateCommentData = Omit<
-  Comment,
-  'id' | 'productId' | 'articleId' | 'createdAt' | 'updatedAt'
-> & {
-  productId?: number;
-  articleId?: number;
-};
+import Comment, { CreateCommentData } from '../types/Comment';
+import * as notificationService from './notificationService';
 
 export async function createComment(data: CreateCommentData): Promise<Comment> {
   if (!data.articleId && !data.productId) {
     throw new BadRequestError('Either articleId or productId must be provided');
   }
 
+  let receiverId: number | undefined;
+
   if (data.articleId) {
     const article = await articlesRepository.getArticle(data.articleId);
-    if (!article) {
-      throw new NotFoundError('article', data.articleId);
-    }
+    if (!article) throw new NotFoundError('article', data.articleId);
+    receiverId = article.userId;
   }
 
   if (data.productId) {
     const product = await productsRepository.getProduct(data.productId);
-    if (!product) {
-      throw new NotFoundError('product', data.productId);
-    }
+    if (!product) throw new NotFoundError('product', data.productId);
+    receiverId = product.userId;
   }
 
   const comment = await commentsRepository.createComment({
@@ -39,6 +32,13 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
     articleId: data.articleId ?? null,
     productId: data.productId ?? null,
   });
+
+  if (receiverId && receiverId !== data.userId) {
+    notificationService
+      .notifyNewComment(receiverId, data.userId, data.content, data.articleId, data.productId)
+      .catch((err) => console.error('알림 발송 실패:', err));
+  }
+
   return comment;
 }
 
@@ -59,8 +59,7 @@ export async function getCommentListByArticleId(
     throw new NotFoundError('article', articleId);
   }
 
-  const result = commentsRepository.getCommentList({ articleId }, params);
-  return result;
+  return commentsRepository.getCommentList({ articleId }, params);
 }
 
 export async function getCommentListByProductId(
@@ -72,8 +71,7 @@ export async function getCommentListByProductId(
     throw new NotFoundError('product', productId);
   }
 
-  const result = commentsRepository.getCommentList({ productId }, params);
-  return result;
+  return commentsRepository.getCommentList({ productId }, params);
 }
 
 export async function updateComment(id: number, userId: number, content: string): Promise<Comment> {

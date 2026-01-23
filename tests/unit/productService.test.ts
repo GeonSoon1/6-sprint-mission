@@ -1,6 +1,7 @@
 import * as productsService from '../../src/services/productsService.js';
 import * as productsRepository from '../../src/repositories/productsRepository.js';
 import * as notificationsService from '../../src/services/notificationsService.js';
+import * as favoritesRepository from '../../src/repositories/favoritesRepository.js';
 
 describe('ProductService.updateProduct', () => {
   beforeEach(() => {
@@ -39,6 +40,7 @@ describe('ProductService.updateProduct', () => {
     const notifySpy = jest
       .spyOn(notificationsService, 'notifyPriceChange')
       .mockResolvedValue();
+    jest.spyOn(favoritesRepository, 'getFavoriteUserIdsByProductId').mockResolvedValue([2, 3]);
 
     await productsService.updateProduct(1, { userId: 1, price: 200 });
 

@@ -22,6 +22,7 @@ describe('Auth API', () => {
       email: 'test@example.com',
       nickname: 'tester',
       password: 'password',
+      image: null,
     });
 
     expect(res.status).toBe(201);

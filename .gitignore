@@ -11,3 +11,4 @@ dist
 
 REST API test/**
 .env
+.env.test

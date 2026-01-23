@@ -15,5 +15,6 @@ module.exports = {
     '^@service/(.*)$': '<rootDir>/src/service/$1',
     '^@structs/(.*)$': '<rootDir>/src/structs/$1',
     '^@app-types/(.*)$': '<rootDir>/src/types/$1',
+    '^@test/(.*)$': '<rootDir>/test/$1',
   },
 };

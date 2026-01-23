@@ -10,7 +10,7 @@ export const IdParamsStruct = object({
 export const PageParamsStruct = object({
   page: defaulted(integerString, 1),
   pageSize: defaulted(integerString, 10),
-  orderBy: optional(enums(['recent'])),
+  orderBy: optional(enums(['recent', 'oldest'])),
   keyword: optional(nonempty(string())),
 });
 

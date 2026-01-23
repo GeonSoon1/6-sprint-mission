@@ -23,7 +23,7 @@ export async function createProduct(req: Request, res: Response) {
 export async function getProduct(req: Request, res: Response) {
   const { id } = create(req.params, IdParamsStruct);
   const product = await productsService.getProduct(id);
-  res.send(product);
+  res.status(200).send(product);
 }
 
 export async function updateProduct(req: Request, res: Response) {
@@ -33,7 +33,7 @@ export async function updateProduct(req: Request, res: Response) {
     ...data,
     userId: req.user.id,
   });
-  res.send(updatedProduct);
+  res.status(201).send(updatedProduct);
 }
 
 export async function deleteProduct(req: Request, res: Response) {
@@ -47,7 +47,7 @@ export async function getProductList(req: Request, res: Response) {
   const result = await productsService.getProductList(params, {
     userId: req.user?.id,
   });
-  res.send(result);
+  res.status(200).send(result);
 }
 
 export async function createComment(req: Request, res: Response) {

@@ -12,6 +12,7 @@ import usersRouter from './routers/usersRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
 import http from 'http';
 import { setupWebSocket } from './lib/websocket';
+import notificationsRouter from './routers/notificationsRouter';
 
 const app = express();
 const server = http.createServer(app);
@@ -29,6 +30,7 @@ app.use('/comments', commentsRouter);
 app.use('/images', imagesRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/notifications', notificationsRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);

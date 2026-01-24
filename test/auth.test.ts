@@ -162,5 +162,7 @@ describe('회원가입 / 로그인 / 로그아웃 통합 테스트', () => {
       );
     });
   });
-  //   describe('토큰 재발행 : POST /refresh', () => {});
+
+  // 개별 심화
+  // describe('토큰 재발행 : POST /refresh', () => {});
 });

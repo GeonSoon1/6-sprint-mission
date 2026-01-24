@@ -107,4 +107,7 @@ describe('인증이 필요하지 않은 게시글 API 통합 테스트', () => {
       expect(response.body.message).toBe(`article with id ${article.id + 1} not found`);
     });
   });
+
+  // 개별 심화
+  // describe('인증이 필요하지 않는 게시글 & 댓글 조회 GET /articles/:id/comment', async () => {});
 });

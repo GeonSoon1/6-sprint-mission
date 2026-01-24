@@ -35,7 +35,7 @@ describe('인증이 필요하지 않은 상품 API 통합 테스트', () => {
       expect(response.body.totalCount).toBe(0);
     });
 
-    test('상품이 있고, 필터가 없는 경우 모든 정보 반환', async () => {
+    test('상품이 있고, query가 없는 경우 모든 데이터 반환', async () => {
       // 상품 등록 로직 실행
       await createProductsWithUsers(userSample, productSample);
 
@@ -65,35 +65,30 @@ describe('인증이 필요하지 않은 상품 API 통합 테스트', () => {
       expect(response.body.list[0].name).toBe('로봇');
     });
 
-    test('query : Keyword 테스트', async () => {
+    test('query : keyword 테스트', async () => {
       // 상품 등록 로직 실행
       await createProductsWithUsers(userSample, productSample);
 
-      const response = await request(app).get('/products').query({ keyword: '미니' });
-      expect(response.status).toBe(200);
-      expect(response.body.list.length).toBe(3);
+      // 키워드가 상품명에 있는 경우
+      const response1 = await request(app).get('/products').query({ keyword: '미니' });
+      expect(response1.status).toBe(200);
+      expect(response1.body.list.length).toBe(3);
+
+      // 키워드가 상품명에 없는 경우 -> 프론트에서 없는 화면 처리 필요 ㅎ
+      const response2 = await request(app).get('/products').query({ keyword: '메롱' });
+      expect(response2.status).toBe(200);
+      expect(response2.body.list.length).toBe(0);
     });
   });
 
   describe('인증 없이 상품 상세 조회 GET /products/:id', () => {
     test('인증 없이 상품 상세 조회', async () => {
       // 상품 등록 로직 실행
-      const user = await prismaClient.user.create({
-        data: {
-          email: 'test1@test.com',
-          nickname: 'tester1',
-          password: 'qwer1234',
-          image: 'test1.jpg',
-        },
-      });
+      const user = await prismaClient.user.create({ data: userSample[0] });
 
       const product = await prismaClient.product.create({
         data: {
-          name: '로봇',
-          description: '어린이용 변신 로봇',
-          price: 5000,
-          tags: ['어린이', '장난감'],
-          images: ['img1.jpg', 'img1.png'],
+          ...productSample[0],
           userId: user.id,
         },
       });
@@ -101,6 +96,20 @@ describe('인증이 필요하지 않은 상품 API 통합 테스트', () => {
       const response = await request(app).get(`/products/${product.id}`);
       expect(response.status).toBe(200);
       expect(response.body.name).toBe('로봇');
+    });
+
+    test('존재하지 않는 상품 상세 조회', async () => {
+      const user = await prismaClient.user.create({ data: userSample[0] });
+      const product = await prismaClient.product.create({
+        data: {
+          ...productSample[0],
+          userId: user.id,
+        },
+      });
+
+      const response = await request(app).get(`/products/${product.id + 1}`);
+      expect(response.status).toBe(404);
+      expect(response.body.message).toBe(`product with id ${product.id + 1} not found`);
     });
   });
 });

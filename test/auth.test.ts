@@ -5,7 +5,8 @@ import app from '@/app';
 describe('회원가입 / 로그인 / 로그아웃 통합 테스트', () => {
   console.log('auth run!!');
 
-  beforeEach(async () => {
+  // 전체 작업을 통틀어 1번만 실행되는 DB 리셋
+  beforeAll(async () => {
     // DB 데이터 삭제는 가장 관계 설정이 적은 단위부터 시행
     await prismaClient.notification.deleteMany();
     await prismaClient.like.deleteMany();
@@ -14,7 +15,10 @@ describe('회원가입 / 로그인 / 로그아웃 통합 테스트', () => {
 
     await prismaClient.article.deleteMany();
     await prismaClient.product.deleteMany();
+  });
 
+  // test마다 실행 될 DB 리셋 & 기본 셋팅
+  beforeEach(async () => {
     await prismaClient.user.deleteMany();
 
     // 로그인 테스트를 위하여 임의로 user data 1개 입력

@@ -228,3 +228,66 @@ export const productSample = [
     userId: 2,
   },
 ];
+
+export const articleSample = [
+  {
+    title: '게시판 이용 수칙 안내',
+    content: '욕설 및 비방은 금지됩니다. 쾌적한 커뮤니티를 만들어가요.',
+    image: 'rule.jpg',
+    userId: 1,
+  },
+  {
+    title: '오늘 점심 메뉴 추천받아요',
+    content: '회사 근처 맛집 추천 부탁드립니다. 한식 위주로요!',
+    image: null,
+    userId: 1,
+  },
+  {
+    title: '중고거래 꿀팁 공유합니다',
+    content: '직거래 시 확인해야 할 체크리스트 정리해봤어요.',
+    image: 'tip.png',
+    userId: 1,
+  },
+  {
+    title: '주말에 아이랑 갈만한 곳',
+    content: '날씨 좋은데 야외 활동 하기 좋은 곳 있을까요?',
+    image: 'park.jpg',
+    userId: 1,
+  },
+  {
+    title: '요즘 유행하는 장난감 뭔가요?',
+    content: '조카 선물 사주려고 하는데 추천 좀 해주세요.',
+    image: null,
+    userId: 1,
+  },
+  {
+    title: '판다마켓 이용 후기',
+    content: '원하던 물건 저렴하게 잘 구했습니다. 감사합니다.',
+    image: 'review.jpg',
+    userId: 2,
+  },
+  {
+    title: '육아 고민 상담소',
+    content: '아이가 밥을 잘 안 먹어서 걱정이에요. 노하우 있으신가요?',
+    image: null,
+    userId: 2,
+  },
+  {
+    title: '동네 친구 구해요',
+    content: '같이 산책하거나 커피 마실 친구 구합니다.',
+    image: 'coffee.jpg',
+    userId: 2,
+  },
+  {
+    title: '책 추천 해주세요',
+    content: '요즘 읽기 좋은 베스트셀러 추천 부탁드립니다.',
+    image: 'book.jpg',
+    userId: 2,
+  },
+  {
+    title: '가입 인사 드립니다',
+    content: '반갑습니다. 활동 열심히 하겠습니다!',
+    image: null,
+    userId: 2,
+  },
+];

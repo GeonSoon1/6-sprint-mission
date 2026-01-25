@@ -1,0 +1,81 @@
+@baseUrl = http://localhost:3000
+
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY5MjY2OTM5LCJleHAiOjE3NjkzMzg5Mzl9.AaAHQ6va4gJAbVFp0HMTe9uZTdnw3LGGIn-8-89LbrA
+
+@refreshToken = 
+
+###
+// 상품 등록 
+// POST http://localhost:3000/products
+POST {{baseUrl}}/products
+Content-Type: application/json
+Cookie: access-token={{accessToken}}
+
+{
+  "name": "축구공",
+  "description": "축구공",
+  "price": 17000,
+  "tags": ["SPORTS"]
+}
+
+###
+# // 상품 조회
+GET {{baseUrl}}/products/7
+Cookie: access-token={{accessToken}}
+
+
+
+### 상품 수정 
+# // PATCH http://localhost:3000/products/{productId}
+PATCH {{baseUrl}}/products/7
+Content-Type: application/json
+Cookie: access-token={{accessToken}}
+
+{
+  "description": "화장품",
+  "price" : 6600
+}
+
+### 상품 삭제 
+// DELETE http://localhost:3000/products/{productId}
+DELETE {{baseUrl}}/products/6
+Cookie: access-token={{accessToken}}
+
+
+### 상품 댓글 등록 
+POST {{baseUrl}}/products/7/comments
+Content-Type: application/json
+Cookie: access-token={{accessToken}}
+
+{
+  "content": "nike 옷이 정말 좋아보이는군요."
+}
+
+
+### 유저의 상품 조회 
+GET {{baseUrl}}/products/myProduct
+Cookie: access-token={{accessToken}}
+
+### 유저가 상품 좋아요
+POST {{baseUrl}}/products/1/like
+Cookie: access-token={{accessToken}}
+
+# ###
+# // 로그인 안 한 유저의 상품 조회 (검색, 페이지네이션) 좋아요는 못 봄
+# // GET http://localhost:3000/products?offset=0&limit=10&order=newest&keyword=nike
+# GET http://localhost:3000/products?offset=0&limit=10&order=newest
+
+
+
+# ###
+# // 로그인 한 유저가 상품에 '좋아요' 클릭
+# // POST http://localhost:3000/products/{productId}/like
+# POST http://localhost:3000/products/2/like
+# Cookie: access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTc2NDI4OTYxOSwiZXhwIjoxNzY0MzYxNjE5fQ.ZhvbfnuoCADq6F2rf_H8td0LB8gavIZMogoLQt_9Dc8;
+
+
+# ###
+# // 로그인 한 유저가 상품에 '좋아요 취소' 클릭
+# // DELETE http://localhost:3000/products/{productId}/like
+# DELETE http://localhost:3000/products/10/like
+# Cookie: access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTEsImlhdCI6MTc2NDI4OTYxOSwiZXhwIjoxNzY0MzYxNjE5fQ.ZhvbfnuoCADq6F2rf_H8td0LB8gavIZMogoLQt_9Dc8;

@@ -1,0 +1,30 @@
+@baseUrl = http://localhost:3000
+
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzcsImlhdCI6MTc2OTI1Mzc3NywiZXhwIjoxNzY5MzI1Nzc3fQ.M5yQDckyVxB21h3sU14Vcwl7vKwXJ1ho8Y6LI470zGg
+
+@refreshToken = 
+
+### 자신의 정보를 조회
+// 
+GET {{baseUrl}}/users/me
+Cookie: access-token={{accessToken}}
+
+
+### 유저 정보를 수정
+PATCH {{baseUrl}}/users/me
+Content-Type: application/json
+Cookie: access-token={{accessToken}}
+
+{
+  "nickname" : "김영희"
+}
+
+
+### 유저가 자신의 비밀번호를 변경
+PATCH {{baseUrl}}/users/me/password
+Content-Type: application/json
+Cookie: access-token={{accessToken}}
+
+{
+  "password" : "6666"
+}

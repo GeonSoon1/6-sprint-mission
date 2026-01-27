@@ -14,7 +14,7 @@ export async function getArticle(id: number) {
   return article;
 }
 
-export async function getArticleWithLkes(id: number, { userId }: { userId?: number } = {}) {
+export async function getArticleWithLikes(id: number, { userId }: { userId?: number } = {}) {
   const article = await prismaClient.article.findUnique({
     where: { id },
     include: {

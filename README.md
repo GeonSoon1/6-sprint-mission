@@ -9,9 +9,9 @@
 ### 1. 기본 요구사항
 
 - [x] Jest의 테스트 커버리지 도구를 사용하도록 설정
-- [ ] publicProduct.test.ts : 인증이 필요하지 않은 상품 API에 대한 통합 테스트
-- [ ] publicArticle.test.ts : 인증이 필요하지 않은 게시글 API에 대한 통합 테스트
-- [ ] auth.test.ts : 로그인, 회원가입 API에 대한 통합 테스트
+- [x] publicProduct.test.ts : 인증이 필요하지 않은 상품 API에 대한 통합 테스트
+- [x] publicArticle.test.ts : 인증이 필요하지 않은 게시글 API에 대한 통합 테스트
+- [x] auth.test.ts : 로그인, 회원가입 API에 대한 통합 테스트
 - [ ] authProduct.test.ts : 인증이 필요한 상품 API에 대한 통합 테스트
 - [ ] authArticle.test.ts : 인증이 필요한 게시글 API에 대한 통합 테스트
 

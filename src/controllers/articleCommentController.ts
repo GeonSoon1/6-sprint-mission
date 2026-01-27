@@ -10,7 +10,7 @@ export class ArticleCommentController {
     private readonly articleCommentService: ArticleCommentService,
   ) {}
 
-  public createComment = async (req: Request, res: Response) => {
+  createComment = async (req: Request, res: Response) => {
     const { articleId } = req.params;
     const authorId = req.user!.id;
     const { content } = req.body;
@@ -19,13 +19,13 @@ export class ArticleCommentController {
     res.status(201).json(newComment);
   };
 
-  public getCommentsByArticleId = async (req: Request, res: Response) => {
+  getCommentsByArticleId = async (req: Request, res: Response) => {
     const { articleId } = req.params;
     const content = await this.articleCommentService.getComments(articleId);
     res.status(200).json(content);
   };
 
-  public updateComment = async (req: Request, res: Response) => {
+  updateComment = async (req: Request, res: Response) => {
     const { commentId } = req.params;
     const authorId = req.user!.id;
     const { content } = req.body;
@@ -38,7 +38,7 @@ export class ArticleCommentController {
     res.status(200).json(updateComment);
   };
 
-  public deleteComment = async (req: Request, res: Response) => {
+  deleteComment = async (req: Request, res: Response) => {
     const { commentId } = req.params;
     const authorId = req.user!.id;
 

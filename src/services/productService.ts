@@ -1,4 +1,4 @@
-import { Prisma, User, Product } from '@prisma/client';
+import { Prisma, User, Product, NotificationType } from '@prisma/client';
 import { injectable, inject } from 'inversify';
 import { ProductRepository } from '@repositories';
 import type { CreateProductDTO } from '@dto';
@@ -82,22 +82,21 @@ export class ProductService {
     const product = await this.checkProductOwnership(productId, userId);
     const oldPrice = product.price;
     const newPrice = data.price;
-    const isPriceChanged = typeof newPrice === 'number' && oldPrice !== newPrice;
 
     const updatedProduct = await this.productRepository.updateProduct(productId, data);
+
+    const isPriceChanged = typeof newPrice === 'number' && oldPrice !== newPrice;
 
     // 정보 업데이트
     if (isPriceChanged) {
       const userIds = await this.productRepository.findFavoriteUserIds(productId);
-      const notifications = userIds.map((targetUserId) =>
-        this.notificationService.createNotification(targetUserId, {
-          title: '관심상품 가격변동',
-          content: `찜하신 '${product.name}' 상품가격이 ${oldPrice}원에서 ${newPrice}으로 변경되었습니다.`,
-          type: 'NOTICE',
-          link: `/product/${productId}`,
-        }),
-      );
-      await Promise.all(notifications);
+
+      await this.notificationService.createNotification(userIds, {
+        title: '관심상품 가격변동',
+        content: `찜하신 상품의 가격이 변경되었습니다.`,
+        type: NotificationType.NOTICE,
+        link: `/product/${productId}`,
+      });
     }
     return updatedProduct;
   }

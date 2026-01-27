@@ -18,7 +18,7 @@ export class NotificationController {
   createNotification = async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const data = req.body;
-    const newNotification = await this.notificationService.createNotification(userId, data);
+    const newNotification = await this.notificationService.createNotification([userId], data);
 
     res.status(201).json(newNotification);
   };

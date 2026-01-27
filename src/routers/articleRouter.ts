@@ -28,7 +28,6 @@ router
     asyncHandler(articleController.updateArticle), //게시글 수정
   )
   .get(
-    isLoggedIn,
     validator({ params: ArticleIdParamDTO }),
     asyncHandler(articleController.getArticleById), // 게시글 ID로 가져오기
   )

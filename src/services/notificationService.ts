@@ -12,28 +12,29 @@ export class NotificationService {
   ) {}
 
   // 알림생성
-  async createNotification(userId: User['id'], data: NotificationDTO) {
+  async createNotification(userIds: User['id'][], data: Omit<NotificationDTO, 'userId'>) {
     const { title, content, type, link } = data;
-    // DB 저장
-    const dataToNotification: Prisma.NotificationCreateInput = {
+    // createMany용 데이터 배열 생성(userId 직접 할당)
+    const dataList: Prisma.NotificationCreateManyInput[] = userIds.map((userId) => ({
       title,
       content,
       type,
       link,
-      user: { connect: { id: userId } },
-    };
-    const newNotification =
-      await this.notificationRepository.createNotification(dataToNotification);
+      userId,
+    }));
+
+    // DB 일괄 저장(createMany)
+    await this.notificationRepository.createNotifications(dataList);
 
     // 실시간 전송
     try {
       const io = getIO();
-      // 'notification'이라는 이벤트 이름으로 보냅니다. 클라이언트도 이걸 리스팅해야 함!
-      io.to(userId).emit('notification', newNotification);
+      userIds.forEach((userId) => {
+        io.to(userId).emit('notification', { message: '새로운 알림이 도착했습니다.' });
+      });
     } catch (error) {
-      console.error('Socket emission failed: ', error);
+      console.error('알림 메시지 전송 실패 : ', error);
     }
-    return newNotification;
   }
 
   // 내 알림 목록 조회

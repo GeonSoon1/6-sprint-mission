@@ -6,9 +6,10 @@ import { TYPES } from '@types';
 export class NotificationRepository {
   constructor(@inject(TYPES.PrismaClient) private prisma: PrismaClient) {}
   // 알림생성
-  async createNotification(data: Prisma.NotificationCreateInput) {
-    return this.prisma.notification.create({ data });
+  async createNotifications(dataList: Prisma.NotificationCreateManyInput[]) {
+    return this.prisma.notification.createMany({ data: dataList, skipDuplicates: true }); //중복 방지
   }
+
   // 알림 목록 조회
   async findNotification(options: Prisma.NotificationFindManyArgs) {
     return this.prisma.notification.findMany(options);

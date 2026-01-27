@@ -42,7 +42,7 @@ export class ProductRepository {
   }
 
   /**
-   * 상품을 좋아요(favorite)안 유저 ID 목록 조회
+   * 상품을 좋아요(favorite)한 유저 ID 목록 조회
    */
   async findFavoriteUserIds(productId: Product['id']) {
     const favorites = await this.prisma.favorite.findMany({

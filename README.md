@@ -78,7 +78,7 @@ Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통
 
 ## API Endpoints
 
-API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
+- API의 기본 경로: `/` (예시: `http://localhost:3000`)
 
 #### 👤 인증 (Auth) - `/auth`
 
@@ -200,7 +200,7 @@ API의 기본 경로는 `/` 입니다. (e.g., `http://localhost:3000`)
 **.env 파일 예시**
 
 ```
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema="
 PORT=3000
 JWT_SECRET_KEY=your_jwt_secret_key
 ```

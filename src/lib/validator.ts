@@ -1,12 +1,13 @@
 import {
   registerDecorator,
   ValidationOptions,
+  ValidatorConstraint,
   ValidatorConstraintInterface,
 } from 'class-validator';
 import { prisma } from '@lib'; // export된 prisma 인스턴스를 가져옵니다.
 
 // --- 이메일 중복 검사 ---
-({ async: true });
+@ValidatorConstraint({ async: true })
 export class IsEmailUniqueConstraint implements ValidatorConstraintInterface {
   async validate(email: string) {
     const user = await prisma.user.findUnique({ where: { email } });
@@ -31,7 +32,7 @@ export function IsEmailUnique(validationOptions?: ValidationOptions) {
 }
 
 // --- 닉네임 중복 검사 ---
-({ async: true });
+@ValidatorConstraint({ async: true })
 export class IsNicknameUniqueConstraint implements ValidatorConstraintInterface {
   async validate(nickname: string) {
     const user = await prisma.user.findUnique({ where: { nickname } });

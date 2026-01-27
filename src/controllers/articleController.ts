@@ -14,7 +14,7 @@ export class ArticleController {
   /**
    * 게시글 생성
    */
-  public createArticle = async (req: Request, res: Response) => {
+  createArticle = async (req: Request, res: Response) => {
     const articleData: CreateArticleDTO = req.body;
     const userId = req.user!.id;
 
@@ -25,7 +25,7 @@ export class ArticleController {
   /**
    * 게시글 목록
    */
-  public getArticles = async (req: Request, res: Response) => {
+  getArticles = async (req: Request, res: Response) => {
     const { skip, take } = (req as any).pagination;
     const articles = await this.articleService.findArticles({ skip, take });
     res.status(200).json(articles);
@@ -34,7 +34,7 @@ export class ArticleController {
   /**
    * 게시글 상세
    */
-  public getArticleById = async (req: Request, res: Response) => {
+  getArticleById = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const article = await this.articleService.findArticleById(id);
@@ -44,7 +44,7 @@ export class ArticleController {
   /**
    * 게시글 수정
    */
-  public updateArticle = async (req: Request, res: Response) => {
+  updateArticle = async (req: Request, res: Response) => {
     const { id } = req.params;
     const data = req.body;
     const userId = req.user!.id;
@@ -56,7 +56,7 @@ export class ArticleController {
   /**
    * 게시글 삭제
    */
-  public deleteArticle = async (req: Request, res: Response) => {
+  deleteArticle = async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user!.id;
 

@@ -74,9 +74,9 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
   });
 
   // describe('인증을 거친 후 게시글 목록 조회 GET /articles', () => {});
-  // describe('인증을 거친 후 게시글 상세 조회 GET /articles:id', () => {});
+  // describe('인증을 거친 후 게시글 상세 조회 GET /articles/:id', () => {});
 
-  describe('인증을 거친 후 게시글 수정 PATCH /articles:id', () => {
+  describe('인증을 거친 후 게시글 수정 PATCH /articles/:id', () => {
     test('게시글 수정 : title', async () => {
       const agent = request.agent(app);
       await agent.post('/auth/login').send({ email: 'test@test.com', password: 'qwer1234' });
@@ -169,7 +169,7 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
     });
   });
 
-  describe('인증을 거친 후 게시글 삭제 DELETE /articles', () => {
+  describe('인증을 거친 후 게시글 삭제 DELETE /articles/:id', () => {
     test('게시글 삭제', async () => {
       const agent = request.agent(app);
       await agent.post('/auth/login').send({ email: 'test@test.com', password: 'qwer1234' });

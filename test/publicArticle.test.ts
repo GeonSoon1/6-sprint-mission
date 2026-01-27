@@ -25,6 +25,9 @@ describe('인증이 필요하지 않은 게시글 API 통합 테스트', () => {
     await prismaClient.$disconnect();
   });
 
+  // ---------------------------------------------------------
+  // 1. GET - Detail
+  // ---------------------------------------------------------
   describe('인증 없이 게시글 리스트 조회 GET /articles', () => {
     test('게시글이 없는 경우 빈 배열 반환', async () => {
       const response = await request(app).get('/articles');
@@ -78,6 +81,9 @@ describe('인증이 필요하지 않은 게시글 API 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 2. GET - List
+  // ---------------------------------------------------------
   describe('인증 없이 게시글 상세 조회 GET /articles/:id', () => {
     test('인증 없이 게시글 상세 조회', async () => {
       const user = await prismaClient.user.create({ data: userSample[0] });

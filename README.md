@@ -12,12 +12,12 @@
 - [x] publicProduct.test.ts : 인증이 필요하지 않은 상품 API에 대한 통합 테스트
 - [x] publicArticle.test.ts : 인증이 필요하지 않은 게시글 API에 대한 통합 테스트
 - [x] auth.test.ts : 로그인, 회원가입 API에 대한 통합 테스트
-- [ ] authProduct.test.ts : 인증이 필요한 상품 API에 대한 통합 테스트
-- [ ] authArticle.test.ts : 인증이 필요한 게시글 API에 대한 통합 테스트
+- [x] authProduct.test.ts : 인증이 필요한 상품 API에 대한 통합 테스트
+- [x] authArticle.test.ts : 인증이 필요한 게시글 API에 대한 통합 테스트
 
 ### 2. 심화 요구사항
 
-- [ ] 상품 API의 비즈니스 로직에 대해 Mock, Spy를 활용해 유닛 테스트를 작성
+- [x] 상품 API의 비즈니스 로직에 대해 Mock, Spy를 활용해 유닛 테스트를 작성
 
 <br><br><br><br>
 

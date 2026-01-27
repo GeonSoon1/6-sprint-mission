@@ -46,6 +46,9 @@ describe('인증이 필요한 상품 API 통합 테스트', () => {
     await prismaClient.$disconnect();
   });
 
+  // ---------------------------------------------------------
+  // 1. CREATE
+  // ---------------------------------------------------------
   describe('인증을 거친 후 상품 생성 POST /products', () => {
     test('신규 상품 등록 : name, description, price, tags, images', async () => {
       const productResponse = await agent1.post('/products').send({
@@ -111,6 +114,9 @@ describe('인증이 필요한 상품 API 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 2. GET - List
+  // ---------------------------------------------------------
   describe('인증을 거친 후 상품 목록 조회 GET /products', () => {
     test('상품이 없는 경우, 빈 배열 반환', async () => {
       const getResponse = await agent1.get('/products');
@@ -131,6 +137,9 @@ describe('인증이 필요한 상품 API 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 2. GET - Detail
+  // ---------------------------------------------------------
   describe('인증을 거친 후 상품 상세 조회 GET /products/:id', () => {
     test('생성자와 관계 없이 상세 조회 가능', async () => {
       const product = await agent1.post('/products').send({
@@ -163,6 +172,9 @@ describe('인증이 필요한 상품 API 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 3. UPDATE
+  // ---------------------------------------------------------
   describe('인증을 거친 후 상품 수정 PATCH /products/:id', () => {
     test('상품 정보 수정 : name', async () => {
       const product = await agent1.post('/products').send({
@@ -266,7 +278,7 @@ describe('인증이 필요한 상품 API 통합 테스트', () => {
       expect(updateResponse.body.message).toBe(`product with id ${product.body.id + 1} not found`);
     });
 
-    test('상품 정보 수정 불가 : 현재 상품을 등록하지 않은 다른 사용자', async () => {
+    test('상품 정보 수정 불가 : 권한이 없는 사용자', async () => {
       const product = await agent1.post('/products').send({
         name: '로봇',
         description: '어린이용 변신 로봇',
@@ -284,6 +296,9 @@ describe('인증이 필요한 상품 API 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 4. DELETE
+  // ---------------------------------------------------------
   describe('인증을 거친 후 상품 삭제 DELETE /products/:id', () => {
     test('상품 삭제', async () => {
       const product = await agent1.post('/products').send({
@@ -314,7 +329,7 @@ describe('인증이 필요한 상품 API 통합 테스트', () => {
       expect(deleteResponse.body.message).toBe(`product with id ${product.body.id + 1} not found`);
     });
 
-    test('상품 삭제 불가 : 현재 상품을 등록하지 않은 다른 사용자 ', async () => {
+    test('상품 삭제 불가 : 권한이 없는 사용자 ', async () => {
       const product = await agent1.post('/products').send({
         name: '로봇',
         description: '어린이용 변신 로봇',

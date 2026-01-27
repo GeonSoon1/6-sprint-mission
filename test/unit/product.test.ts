@@ -54,7 +54,7 @@ describe('Product Service Unit Test', () => {
   });
 
   // ---------------------------------------------------------
-  // 2. GET (Detail)
+  // 2. GET - Detail
   // ---------------------------------------------------------
   describe('getProduct', () => {
     test('상품 세부 정보 조회', async () => {
@@ -72,7 +72,7 @@ describe('Product Service Unit Test', () => {
   });
 
   // ---------------------------------------------------------
-  // 3. GET (List)
+  // 2. GET - List
   // ---------------------------------------------------------
   describe('getProductList', () => {
     test('상품 리스트 조회 : query 적용', async () => {
@@ -90,7 +90,7 @@ describe('Product Service Unit Test', () => {
   });
 
   // ---------------------------------------------------------
-  // 4. UPDATE
+  // 3. UPDATE
   // ---------------------------------------------------------
   describe('updateProduct', () => {
     const existingProduct = {
@@ -156,7 +156,7 @@ describe('Product Service Unit Test', () => {
   });
 
   // ---------------------------------------------------------
-  // 5. DELETE
+  // 4. DELETE
   // ---------------------------------------------------------
   describe('deleteProduct', () => {
     test('상품 삭제', async () => {

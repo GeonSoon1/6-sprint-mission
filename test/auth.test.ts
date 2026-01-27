@@ -34,6 +34,9 @@ describe('회원가입 / 로그인 / 로그아웃 통합 테스트', () => {
     await prismaClient.$disconnect();
   });
 
+  // ---------------------------------------------------------
+  // 1. Create Register
+  // ---------------------------------------------------------
   describe('회원가입 : POST /auth/register', () => {
     test('회원가입 성공', async () => {
       const response = await request(app).post('/auth/register').send({
@@ -99,6 +102,9 @@ describe('회원가입 / 로그인 / 로그아웃 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 2. Login
+  // ---------------------------------------------------------
   describe('로그인 : POST /auth/login', () => {
     test('로그인 성공', async () => {
       const response = await request(app)
@@ -152,6 +158,9 @@ describe('회원가입 / 로그인 / 로그아웃 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 3. Logout
+  // ---------------------------------------------------------
   describe('로그아웃 : POST /logout', () => {
     test('로그아웃 성공', async () => {
       const response = await request(app).post('/auth/logout');

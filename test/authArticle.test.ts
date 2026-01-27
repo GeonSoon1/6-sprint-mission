@@ -46,6 +46,9 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
     await prismaClient.$disconnect();
   });
 
+  // ---------------------------------------------------------
+  // 1. CREATE
+  // ---------------------------------------------------------
   describe('인증을 거친 후 게시글 생성 POST /articles', () => {
     test('신규 게시글 작성 : title, content, image', async () => {
       const createResponse = await agent1.post('/articles').send({
@@ -91,6 +94,9 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 2. GET - List
+  // ---------------------------------------------------------
   describe('인증을 거친 후 게시글 목록 조회 GET /articles', () => {
     test('게시글이 없는 경우, 빈 배열 반환', async () => {
       const getResponse = await agent1.get('/articles');
@@ -113,6 +119,9 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
     // 상세 쿼리 테스트 생략..
   });
 
+  // ---------------------------------------------------------
+  // 2. GET - Detail
+  // ---------------------------------------------------------
   describe('인증을 거친 후 게시글 상세 조회 GET /articles/:id', () => {
     test('생성자와 관계 없이 상세 조회 가능', async () => {
       const article = await agent1
@@ -137,6 +146,9 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 3. UPDATE
+  // ---------------------------------------------------------
   describe('인증을 거친 후 게시글 수정 PATCH /articles/:id', () => {
     test('게시글 수정 : title', async () => {
       const article = await agent1
@@ -190,7 +202,7 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
       expect(updateResponse.body.message).toBe(`article with id ${article.body.id + 1} not found`);
     });
 
-    test('게시글 수정 불가 : 현재 글을 작성하지 않은 다른 사용자', async () => {
+    test('게시글 수정 불가 : 권한이 없는 사용자', async () => {
       const article = await agent1
         .post('/articles')
         .send({ title: '게시글', content: '내용', image: 'img.jpg' });
@@ -205,6 +217,9 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
     });
   });
 
+  // ---------------------------------------------------------
+  // 4. DELETE
+  // ---------------------------------------------------------
   describe('인증을 거친 후 게시글 삭제 DELETE /articles/:id', () => {
     test('게시글 삭제', async () => {
       const article = await agent1
@@ -227,7 +242,7 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
       expect(deleteResponse.body.message).toBe(`article with id ${article.body.id + 1} not found`);
     });
 
-    test('게시글 삭제 불가 : 현재 글을 작성하지 않은 다른 사용자', async () => {
+    test('게시글 삭제 불가 : 권한이 없는 사용자', async () => {
       const article = await agent1
         .post('/articles')
         .send({ title: '게시글', content: '내용', image: 'img.jpg' });

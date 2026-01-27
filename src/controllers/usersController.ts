@@ -1,72 +1,58 @@
-import { RequestHandler } from 'express';
-import { usersService } from '../services/usersService';
-import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../utils/constants';
-import { ErrorWithStatus } from '../utils/types';
-import { Prisma } from '@prisma/client';
+import { Request, Response } from 'express';
+import { create } from 'superstruct';
+import {
+  UpdateMeBodyStruct,
+  UpdatePasswordBodyStruct,
+  GetMyProductListParamsStruct,
+  GetMyFavoriteListParamsStruct,
+} from '../structs/usersStructs';
+import * as usersService from '../services/usersService';
+import * as authService from '../services/authService';
+import userResponseDTO from '../dto/userResponseDTO';
 
-export const getMyInfo: RequestHandler = async (req, res) => {
-  const userId = req.user!.id;
+export async function getMe(req: Request, res: Response) {
+  const user = await usersService.getUser(req.user.id);
+  res.send(userResponseDTO(user));
+}
 
-  const user = await usersService.getUserById(userId);
+export async function updateMe(req: Request, res: Response) {
+  const data = create(req.body, UpdateMeBodyStruct);
+  const updatedUser = await usersService.updateUser(req.user.id, data);
+  res.status(200).send(userResponseDTO(updatedUser));
+}
 
-  res.status(200).json(user);
-};
-export const updateMyInfo: RequestHandler = async (req, res) => {
-  const userId = req.user!.id;
-  const { nickname, image }: Prisma.UserUpdateInput = req.body;
+export async function updateMyPassword(req: Request, res: Response) {
+  const { password, newPassword } = create(req.body, UpdatePasswordBodyStruct);
+  await authService.updateMyPassword(req.user.id, password, newPassword);
+  res.status(200).send();
+}
 
-  if (!nickname && !image) {
-    const error: ErrorWithStatus = new Error('수정할 내용이 없습니다.');
-    error.status = 400;
-    throw error;
-  }
-
-  const updatedUser = await usersService.updateUser(userId, { nickname, image });
-
-  res.status(200).json({
-    message: '내 정보가 수정되었습니다.',
-    data: updatedUser,
+export async function getMyProductList(req: Request, res: Response) {
+  const { page, pageSize, orderBy, keyword } = create(req.query, GetMyProductListParamsStruct);
+  const { list, totalCount } = await usersService.getMyProductList(req.user.id, {
+    page,
+    pageSize,
+    orderBy,
+    keyword,
   });
-};
 
-export const updatePassword: RequestHandler = async (req, res) => {
-  const userId = req.user!.id;
-  const { currentPassword, newPassword } = req.body;
-
-  if (!currentPassword || !newPassword) {
-    const error: ErrorWithStatus = new Error('현재 비밀번호와 새 비밀번호를 모두 입력해주세요.');
-    error.status = 400;
-    throw error;
-  }
-
-  await usersService.changePassword(userId, currentPassword, newPassword);
-
-  res.clearCookie(ACCESS_TOKEN_COOKIE_NAME);
-  res.clearCookie(REFRESH_TOKEN_COOKIE_NAME);
-
-  res.status(200).json({
-    message: '비밀번호가 변경되었습니다. 다시 로그인해주세요.',
+  res.send({
+    list,
+    totalCount,
   });
-};
+}
 
-export const getMyProducts: RequestHandler = async (req, res) => {
-  const userId = req.user!.id;
-
-  const products = await usersService.getUserProducts(userId);
-
-  res.status(200).json({
-    message: '내가 등록한 상품 목록을 조회했습니다.',
-    data: products,
+export async function getMyFavoriteList(req: Request, res: Response) {
+  const { page, pageSize, orderBy, keyword } = create(req.query, GetMyFavoriteListParamsStruct);
+  const { list, totalCount } = await usersService.getMyFavoriteList(req.user.id, {
+    page,
+    pageSize,
+    orderBy,
+    keyword,
   });
-};
 
-export const getMyLikedProducts: RequestHandler = async (req, res) => {
-  const userId = req.user!.id;
-
-  const products = await usersService.getUserLikedProducts(userId);
-
-  res.status(200).json({
-    message: '좋아요한 상품 목록을 조회했습니다.',
-    data: products,
+  res.send({
+    list,
+    totalCount,
   });
-};
+}

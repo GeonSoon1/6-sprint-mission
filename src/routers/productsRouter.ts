@@ -1,27 +1,28 @@
 import express from 'express';
-import { validatePagination } from '../middlewares/paginationValidator';
+import { withAsync } from '../lib/withAsync';
 import {
   createProduct,
-  deleteProduct,
   getProduct,
-  getProducts,
-  patchProduct,
+  updateProduct,
+  deleteProduct,
+  getProductList,
+  createComment,
+  getCommentList,
+  createFavorite,
+  deleteFavorite,
 } from '../controllers/productsController';
-import * as likesController from '../controllers/likesController';
-import commentsRouter from './commentsRouter';
-import { authenticate } from '../middlewares/authenticate';
-import { validate } from '../middlewares/validate';
-import { CreateProductSchema, PatchProductSchema } from '../validations/productsSchema';
+import authenticate from '../middlewares/authenticate';
 
-const router = express.Router();
+const productsRouter = express.Router();
 
-router.post('/', authenticate, validate(CreateProductSchema, 'body'), createProduct);
-router.get('/', validatePagination, getProducts);
-router.post('/:productId/like', authenticate, likesController.changeProductLike);
-router.get('/:id', getProduct);
-router.patch('/:id', authenticate, validate(PatchProductSchema, 'body'), patchProduct);
-router.delete('/:id', authenticate, deleteProduct);
+productsRouter.post('/', authenticate(), withAsync(createProduct));
+productsRouter.get('/:id', authenticate({ optional: true }), withAsync(getProduct));
+productsRouter.patch('/:id', authenticate(), withAsync(updateProduct));
+productsRouter.delete('/:id', authenticate(), withAsync(deleteProduct));
+productsRouter.get('/', authenticate({ optional: true }), withAsync(getProductList));
+productsRouter.post('/:id/comments', authenticate(), withAsync(createComment));
+productsRouter.get('/:id/comments', withAsync(getCommentList));
+productsRouter.post('/:id/favorites', authenticate(), withAsync(createFavorite));
+productsRouter.delete('/:id/favorites', authenticate(), withAsync(deleteFavorite));
 
-router.use('/:productId/comments', commentsRouter);
-
-export default router;
+export default productsRouter;

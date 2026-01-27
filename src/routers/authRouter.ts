@@ -1,11 +1,12 @@
 import express from 'express';
-import * as authController from '../controllers/authController';
+import { register, login, logout, refreshToken } from '../controllers/authController';
+import { withAsync } from '../lib/withAsync';
 
-const router = express.Router();
+const authRouter = express.Router();
 
-router.post('/signup', authController.signUp);
-router.post('/login', authController.login);
-router.post('/refresh', authController.refresh);
-router.post('/logout', authController.logout);
+authRouter.post('/register', withAsync(register));
+authRouter.post('/login', withAsync(login));
+authRouter.post('/logout', withAsync(logout));
+authRouter.post('/refresh', withAsync(refreshToken));
 
-export default router;
+export default authRouter;

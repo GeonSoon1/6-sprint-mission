@@ -1,51 +1,37 @@
-import { prisma } from '../utils/prisma';
-import { Prisma } from '@prisma/client';
+import { User } from '@prisma/client';
+import { prismaClient } from '../lib/prismaClient';
 
-const findUserById = async (id: string, select?: Prisma.UserSelect) => {
-  return prisma.user.findUnique({
-    where: { id },
-    select,
+export async function createUser(data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) {
+  const createdUser = await prismaClient.user.create({
+    data,
   });
-};
+  return createdUser;
+}
 
-const findUserByIdOrThrow = async (id: string) => {
-  return prisma.user.findUniqueOrThrow({
+export async function getUser(id: number) {
+  const user = await prismaClient.user.findUnique({
     where: { id },
   });
-};
+  return user;
+}
 
-const updateUser = async (id: string, data: Prisma.UserUpdateInput, select?: Prisma.UserSelect) => {
-  return prisma.user.update({
+export async function getUserByEmail(email: string) {
+  const user = await prismaClient.user.findUnique({
+    where: { email },
+  });
+  return user;
+}
+
+export async function updateUser(id: number, data: Partial<User>) {
+  const updatedUser = await prismaClient.user.update({
     where: { id },
     data,
-    select,
   });
-};
+  return updatedUser;
+}
 
-const findProductsByUserId = async (userId: string, select: Prisma.ProductSelect) => {
-  return prisma.product.findMany({
-    where: { userId },
-    orderBy: { createdAt: 'desc' },
-    select,
+export async function deleteUser(id: number) {
+  await prismaClient.user.delete({
+    where: { id },
   });
-};
-
-const findLikedProductsByUserId = async (userId: string, select: Prisma.ProductSelect) => {
-  return prisma.product.findMany({
-    where: {
-      likes: {
-        some: { userId },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-    select,
-  });
-};
-
-export const usersRepository = {
-  findUserById,
-  findUserByIdOrThrow,
-  updateUser,
-  findProductsByUserId,
-  findLikedProductsByUserId,
-};
+}

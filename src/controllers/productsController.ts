@@ -1,104 +1,79 @@
-import { productsService } from '../services/productsService';
-import { RequestHandler } from 'express';
-import { ErrorWithStatus } from '../utils/types';
-import { Prisma } from '@prisma/client';
+import { Request, Response } from 'express';
+import { create } from 'superstruct';
+import { IdParamsStruct } from '../structs/commonStructs';
+import {
+  CreateProductBodyStruct,
+  GetProductListParamsStruct,
+  UpdateProductBodyStruct,
+} from '../structs/productsStruct';
+import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '../structs/commentsStruct';
+import * as productsService from '../services/productsService';
+import * as commentsService from '../services/commentsService';
+import * as favoritesService from '../services/favoritesService';
 
-export const createProduct: RequestHandler = async (req, res) => {
-  const productData: Prisma.ProductCreateInput = req.body;
-  const userId = req.user!.id;
-
-  const newProduct = await productsService.createProductInDb(productData, userId);
-
-  res.status(201).json({
-    message: '상품이 성공적으로 등록되었습니다.',
-    data: newProduct,
+export async function createProduct(req: Request, res: Response) {
+  const data = create(req.body, CreateProductBodyStruct);
+  const createdProduct = await productsService.createProduct({
+    ...data,
+    userId: req.user.id,
   });
-};
+  res.status(201).send(createdProduct);
+}
 
-export const getProducts: RequestHandler = async (req, res) => {
-  const { sort, search } = req.query;
-  const { offset = 0, limit } = req.paginationParams!;
-  const userId = req.user?.id;
+export async function getProduct(req: Request, res: Response) {
+  const { id } = create(req.params, IdParamsStruct);
+  const product = await productsService.getProduct(id);
+  res.send(product);
+}
 
-  const { products, totalProducts } = await productsService.findProducts(
-    {
-      sort: sort as string,
-      search: search as string,
-      offset,
-      limit,
-    },
-    userId,
-  );
-
-  if (search && totalProducts === 0) {
-    res.status(200).json({
-      message: `${search}와 일치하는 상품을 찾을 수 없습니다.`,
-      data: [],
-      pagination: {},
-    });
-    return;
-  }
-
-  const totalPages = Math.ceil(totalProducts / limit);
-  const currentPage = Math.floor(offset / limit) + 1;
-
-  res.status(200).json({
-    message: '상품 목록을 조회했습니다.',
-    data: products,
-    pagination: {
-      totalItems: totalProducts,
-      totalPages,
-      currentPage,
-      itemsPerPage: limit,
-    },
+export async function updateProduct(req: Request, res: Response) {
+  const { id } = create(req.params, IdParamsStruct);
+  const data = create(req.body, UpdateProductBodyStruct);
+  const updatedProduct = await productsService.updateProduct(id, {
+    ...data,
+    userId: req.user.id,
   });
-};
+  res.send(updatedProduct);
+}
 
-export const getProduct: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.user?.id;
-  const product = await productsService.findProductById(id, userId);
+export async function deleteProduct(req: Request, res: Response) {
+  const { id } = create(req.params, IdParamsStruct);
+  await productsService.deleteProduct(id, req.user.id);
+  res.status(204).send();
+}
 
-  res.status(200).send(product);
-};
-
-export const patchProduct: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.user!.id;
-
-  const { name, description, price, tags } = req.body;
-
-  const updateData: Prisma.ProductUpdateInput = {
-    name,
-    description,
-    price,
-    tags,
-  };
-
-  const hasUpdateValues = Object.values(updateData).some((value) => value !== undefined);
-
-  if (!hasUpdateValues) {
-    const err: ErrorWithStatus = new Error('수정할 내용이 비어 있습니다.');
-    err.status = 400;
-    throw err;
-  }
-
-  const product = await productsService.updateProductInDb(id, updateData, userId);
-
-  res.status(200).json({
-    message: '상품이 성공적으로 수정되었습니다.',
-    data: product,
+export async function getProductList(req: Request, res: Response) {
+  const params = create(req.query, GetProductListParamsStruct);
+  const result = await productsService.getProductList(params, {
+    userId: req.user?.id,
   });
-};
+  res.send(result);
+}
 
-export const deleteProduct: RequestHandler = async (req, res) => {
-  const { id } = req.params;
-  const userId = req.user!.id;
-
-  const deletedProduct = await productsService.deleteProductInDb(id, userId);
-
-  res.status(200).json({
-    message: '상품이 성공적으로 삭제되었습니다.',
-    data: deletedProduct,
+export async function createComment(req: Request, res: Response) {
+  const data = create(req.body, CreateCommentBodyStruct);
+  const createdComment = await commentsService.createComment({
+    ...data,
+    userId: req.user.id,
   });
-};
+  res.status(201).send(createdComment);
+}
+
+export async function getCommentList(req: Request, res: Response) {
+  const { id: productId } = create(req.params, IdParamsStruct);
+  const params = create(req.query, GetCommentListParamsStruct);
+  const result = await commentsService.getCommentListByProductId(productId, params);
+  res.send(result);
+}
+
+export async function createFavorite(req: Request, res: Response) {
+  const { id: productId } = create(req.params, IdParamsStruct);
+  await favoritesService.createFavorite(productId, req.user.id);
+  res.status(201).send();
+}
+
+export async function deleteFavorite(req: Request, res: Response) {
+  const { id: productId } = create(req.params, IdParamsStruct);
+  await favoritesService.deleteFavorite(productId, req.user.id);
+  res.status(204).send();
+}

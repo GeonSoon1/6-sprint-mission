@@ -1,135 +1,101 @@
-import { commentsRepository } from '../repositories/commentsRepository';
-import { Prisma } from '@prisma/client';
-import { ErrorWithStatus } from '../utils/types';
+import * as articlesRepository from '../repositories/articlesRepository';
+import * as commentsRepository from '../repositories/commentsRepository';
+import * as productsRepository from '../repositories/productsRepository';
+import { CursorPaginationParams, CursorPaginationResult } from '../types/pagination';
+import BadRequestError from '../lib/errors/BadRequestError';
+import ForbiddenError from '../lib/errors/ForbiddenError';
+import NotFoundError from '../lib/errors/NotFoundError';
+import Comment, { CreateCommentData } from '../types/Comment';
+import * as notificationService from './notificationService';
 
-interface FindCommentsArgs {
-  articleId?: string;
-  productId?: string;
-  limit: number;
-  cursor?: string;
+export async function createComment(data: CreateCommentData): Promise<Comment> {
+  if (!data.articleId && !data.productId) {
+    throw new BadRequestError('Either articleId or productId must be provided');
+  }
+
+  let receiverId: number | undefined;
+
+  if (data.articleId) {
+    const article = await articlesRepository.getArticle(data.articleId);
+    if (!article) throw new NotFoundError('article', data.articleId);
+    receiverId = article.userId;
+  }
+
+  if (data.productId) {
+    const product = await productsRepository.getProduct(data.productId);
+    if (!product) throw new NotFoundError('product', data.productId);
+    receiverId = product.userId;
+  }
+
+  const comment = await commentsRepository.createComment({
+    ...data,
+    articleId: data.articleId ?? null,
+    productId: data.productId ?? null,
+  });
+
+  if (receiverId && receiverId !== data.userId) {
+    notificationService
+      .notifyNewComment(receiverId, data.userId, data.content, data.articleId, data.productId)
+      .catch((err) => console.error('알림 발송 실패:', err));
+  }
+
+  return comment;
 }
 
-const createArticleComment = async (articleId: string, content: string, userId: string) => {
-  return commentsRepository.createComment(
-    {
-      content,
-      article: { connect: { id: articleId } },
-      user: { connect: { id: userId } },
-    },
-    {
-      id: true,
-      content: true,
-      createdAt: true,
-      articleId: true,
-      user: { select: { nickname: true } },
-    },
-  );
-};
+export async function getComment(id: number): Promise<Comment | null> {
+  const comment = await commentsRepository.getComment(id);
+  if (!comment) {
+    throw new NotFoundError('comment', id);
+  }
+  return comment;
+}
 
-const createProductComment = async (productId: string, content: string, userId: string) => {
-  return commentsRepository.createComment(
-    {
-      content,
-      product: { connect: { id: productId } },
-      user: { connect: { id: userId } },
-    },
-    {
-      id: true,
-      content: true,
-      createdAt: true,
-      productId: true,
-      user: { select: { nickname: true } },
-    },
-  );
-};
-
-const findCommentsByArticleId = async ({ articleId, limit, cursor }: FindCommentsArgs) => {
-  const findOptions: Prisma.CommentFindManyArgs = {
-    where: { articleId },
-    orderBy: { createdAt: 'desc' },
-    take: limit + 1,
-    select: {
-      id: true,
-      content: true,
-      createdAt: true,
-      user: { select: { nickname: true } },
-    },
-  };
-
-  if (cursor) {
-    findOptions.cursor = { id: cursor };
-    findOptions.skip = 1;
+export async function getCommentListByArticleId(
+  articleId: number,
+  params: CursorPaginationParams,
+): Promise<CursorPaginationResult<Comment>> {
+  const article = await articlesRepository.getArticle(articleId);
+  if (!article) {
+    throw new NotFoundError('article', articleId);
   }
 
-  const comments = await commentsRepository.findComments(findOptions);
+  return commentsRepository.getCommentList({ articleId }, params);
+}
 
-  let nextCursor: string | null = null;
-  if (comments.length > limit) {
-    nextCursor = comments[limit - 1].id;
-    comments.pop();
+export async function getCommentListByProductId(
+  productId: number,
+  params: CursorPaginationParams,
+): Promise<CursorPaginationResult<Comment>> {
+  const product = await productsRepository.getProduct(productId);
+  if (!product) {
+    throw new NotFoundError('product', productId);
   }
 
-  return { comments, nextCursor };
-};
+  return commentsRepository.getCommentList({ productId }, params);
+}
 
-const findCommentsByProductId = async ({ productId, limit, cursor }: FindCommentsArgs) => {
-  const findOptions: Prisma.CommentFindManyArgs = {
-    where: { productId },
-    orderBy: { createdAt: 'desc' },
-    take: limit + 1,
-    select: {
-      id: true,
-      content: true,
-      createdAt: true,
-      user: { select: { nickname: true } },
-    },
-  };
-
-  if (cursor) {
-    findOptions.cursor = { id: cursor };
-    findOptions.skip = 1;
+export async function updateComment(id: number, userId: number, content: string): Promise<Comment> {
+  const comment = await commentsRepository.getComment(id);
+  if (!comment) {
+    throw new NotFoundError('comment', id);
   }
-
-  const comments = await commentsRepository.findComments(findOptions);
-
-  let nextCursor: string | null = null;
-  if (comments.length > limit) {
-    nextCursor = comments[limit - 1].id;
-    comments.pop();
-  }
-
-  return { comments, nextCursor };
-};
-
-const updateCommentInDb = async (commentId: string, content: string, userId: string) => {
-  const comment = await commentsRepository.findCommentById(commentId, { userId: true });
 
   if (comment.userId !== userId) {
-    const error: ErrorWithStatus = new Error('수정 권한이 없습니다.');
-    error.status = 403;
-    throw error;
+    throw new ForbiddenError('Should be the owner of the comment');
   }
 
-  return commentsRepository.updateComment(commentId, content);
-};
+  return commentsRepository.updateComment(id, { content });
+}
 
-const deleteCommentInDb = async (commentId: string, userId: string) => {
-  const comment = await commentsRepository.findCommentById(commentId, { userId: true });
+export async function deleteComment(id: number, userId: number): Promise<void> {
+  const comment = await commentsRepository.getComment(id);
+  if (!comment) {
+    throw new NotFoundError('comment', id);
+  }
 
   if (comment.userId !== userId) {
-    const error: ErrorWithStatus = new Error('삭제 권한이 없습니다.');
-    error.status = 403;
-    throw error;
+    throw new ForbiddenError('Should be the owner of the comment');
   }
 
-  return commentsRepository.deleteComment(commentId);
-};
-
-export const commentsService = {
-  createArticleComment,
-  createProductComment,
-  findCommentsByArticleId,
-  findCommentsByProductId,
-  updateCommentInDb,
-  deleteCommentInDb,
-};
+  await commentsRepository.deleteComment(id);
+}

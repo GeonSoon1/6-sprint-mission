@@ -1,35 +1,23 @@
-import { prisma } from '../utils/prisma';
-import { verifyAccessToken } from '../utils/token';
-import { ACCESS_TOKEN_COOKIE_NAME } from '../utils/constants';
-import { RequestHandler } from 'express';
+import { Request, Response, NextFunction, RequestHandler } from 'express';
+import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants';
+import * as authService from '../services/authService';
 
-export const authenticate: RequestHandler = async (req, res, next) => {
-  try {
+function authenticate(options = { optional: false }): RequestHandler {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const accessToken = req.cookies[ACCESS_TOKEN_COOKIE_NAME];
-
-    if (!accessToken) {
-      res.status(401).json({ message: '로그인이 필요합니다. (토큰 없음)' });
+    try {
+      const user = await authService.authenticate(accessToken);
+      req.user = user;
+    } catch (error) {
+      if (options.optional) {
+        next();
+        return;
+      }
+      next(error);
       return;
     }
-
-    const payload = verifyAccessToken(accessToken);
-
-    if (typeof payload === 'string' || !payload.userId) {
-      throw new Error('토큰 페이로드가 유효하지 않습니다.');
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: payload.userId },
-    });
-
-    if (!user) {
-      res.status(401).json({ message: '토큰 사용자가 존재하지 않습니다.' });
-      return;
-    }
-
-    req.user = user;
     next();
-  } catch (error) {
-    res.status(401).json({ message: '인증에 실패했습니다.(유효하지 않은 토큰)' });
-  }
-};
+  };
+}
+
+export default authenticate;

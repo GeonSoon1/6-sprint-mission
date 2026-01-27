@@ -1,139 +1,69 @@
-import { productsRepository } from '../repositories/productsRepository';
-import { Prisma } from '@prisma/client';
-import { ErrorWithStatus } from '../utils/types';
+import ForbiddenError from '../lib/errors/ForbiddenError';
+import NotFoundError from '../lib/errors/NotFoundError';
+import * as productsRepository from '../repositories/productsRepository';
+import { PagePaginationParams, PagePaginationResult } from '../types/pagination';
+import Product from '../types/Product';
+import * as notificationService from './notificationService';
 
-interface FindProductsQuery {
-  search?: string;
-  limit?: number;
-  offset?: number;
-  sort?: string;
+type CreateProductData = Omit<
+  Product,
+  'id' | 'createdAt' | 'updatedAt' | 'favoriteCount' | 'isFavorited'
+>;
+type UpdateProductData = Partial<CreateProductData> & { userId: number };
+
+export async function createProduct(data: CreateProductData): Promise<Product> {
+  const createdProduct = await productsRepository.createProduct(data);
+  return {
+    ...createdProduct,
+    favoriteCount: 0,
+    isFavorited: false,
+  };
 }
 
-const createProductInDb = async (productData: Prisma.ProductCreateInput, userId: string) => {
-  return productsRepository.createProduct({
-    ...productData,
-    user: {
-      connect: { id: userId },
-    },
-  });
-};
+export async function getProduct(id: number): Promise<Product | null> {
+  const product = await productsRepository.getProductWithFavorites(id);
+  if (!product) {
+    throw new NotFoundError('product', id);
+  }
+  return product;
+}
 
-const findProducts = async (
-  { sort, search, offset, limit }: FindProductsQuery,
-  userId: string | undefined,
-) => {
-  const orderBy: Prisma.ProductOrderByWithRelationInput =
-    sort === 'recent' ? { createdAt: 'desc' } : { createdAt: 'asc' };
+export async function getProductList(
+  params: PagePaginationParams,
+  { userId }: { userId?: number } = {},
+): Promise<PagePaginationResult<Product>> {
+  const products = await productsRepository.getProductListWithFavorites(params, { userId });
+  return products;
+}
 
-  const where: Prisma.ProductWhereInput = {};
-  if (search) {
-    where.OR = [{ name: { contains: search } }, { description: { contains: search } }];
+export async function updateProduct(id: number, data: UpdateProductData): Promise<Product> {
+  const existingProduct = await productsRepository.getProduct(id);
+  if (!existingProduct) {
+    throw new NotFoundError('product', id);
   }
 
-  const selectOption: Prisma.ProductSelect = {
-    id: true,
-    name: true,
-    price: true,
-    createdAt: true,
-  };
-
-  if (userId) {
-    selectOption.likes = {
-      where: { userId },
-      select: { id: true },
-    };
+  if (existingProduct.userId !== data.userId) {
+    throw new ForbiddenError('Should be the owner of the product');
   }
 
-  const [products, totalProducts] = await Promise.all([
-    productsRepository.findProducts({
-      where,
-      orderBy,
-      skip: offset,
-      take: limit,
-      select: selectOption,
-    }),
-    productsRepository.countProducts(where),
-  ]);
+  const updatedProduct = await productsRepository.updateProductWithFavorites(id, data);
 
-  const productsLike = products.map((p) => {
-    const product = p as any;
-    const isLiked = product.likes ? product.likes.length > 0 : false;
-    const { likes, ...rest } = product;
-
-    return {
-      ...rest,
-      isLiked,
-    };
-  });
-
-  return { products: productsLike, totalProducts };
-};
-
-const findProductById = async (id: string, userId: string | undefined) => {
-  const selectOption: Prisma.ProductSelect = {
-    id: true,
-    name: true,
-    description: true,
-    price: true,
-    tags: true,
-    createdAt: true,
-    user: {
-      select: {
-        id: true,
-        nickname: true,
-        email: true,
-      },
-    },
-  };
-
-  if (userId) {
-    selectOption.likes = {
-      where: { userId },
-      select: { id: true },
-    };
+  if (existingProduct.price !== updatedProduct.price) {
+    notificationService
+      .notifyPriceChange(id, updatedProduct.name, updatedProduct.price)
+      .catch((err) => console.error('가격 변동 알림 발송 실패:', err));
   }
 
-  const product = await productsRepository.findProductById(id, selectOption);
+  return updatedProduct;
+}
 
-  const productData = product as any;
-  const isLiked = productData.likes ? productData.likes.length > 0 : false;
-  const { likes, ...rest } = productData;
-
-  return { ...rest, isLiked };
-};
-
-const updateProductInDb = async (
-  id: string,
-  updateData: Prisma.ProductUpdateInput,
-  userId: string,
-) => {
-  const product = await productsRepository.findProductById(id, { userId: true });
-
-  if (product.userId !== userId) {
-    const error: ErrorWithStatus = new Error('수정 권한이 없습니다.');
-    error.status = 403;
-    throw error;
+export async function deleteProduct(id: number, userId: number): Promise<void> {
+  const existingProduct = await productsRepository.getProduct(id);
+  if (!existingProduct) {
+    throw new NotFoundError('product', id);
   }
-
-  return productsRepository.updateProduct(id, updateData);
-};
-
-const deleteProductInDb = async (id: string, userId: string) => {
-  const product = await productsRepository.findProductById(id, { userId: true });
-
-  if (product.userId !== userId) {
-    const error: ErrorWithStatus = new Error('삭제 권한이 없습니다.');
-    error.status = 403;
-    throw error;
+  if (existingProduct.userId !== userId) {
+    throw new ForbiddenError('Should be the owner of the product');
   }
-
-  return productsRepository.deleteProduct(id);
-};
-
-export const productsService = {
-  createProductInDb,
-  findProducts,
-  findProductById,
-  updateProductInDb,
-  deleteProductInDb,
-};
+  await productsRepository.deleteProduct(id);
+}

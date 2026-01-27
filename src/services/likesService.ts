@@ -1,41 +1,32 @@
-import { likesRepository } from '../repositories/likesRepository';
-import { productsRepository } from '../repositories/productsRepository';
-import { articlesRepository } from '../repositories/articlesRepository';
+import * as likesRepository from '../repositories/likesRepository';
+import * as articlesRepository from '../repositories/articlesRepository';
+import NotFoundError from '../lib/errors/NotFoundError';
+import BadRequestError from '../lib/errors/BadRequestError';
 
-interface LikeResponse {
-  isLiked: boolean;
-  message: string;
+export async function createLike(articleId: number, userId: number) {
+  const existingArticle = await articlesRepository.getArticle(articleId);
+  if (!existingArticle) {
+    throw new NotFoundError('article', articleId);
+  }
+
+  const existingLike = await likesRepository.getLike(articleId, userId);
+  if (existingLike) {
+    throw new BadRequestError('Already liked');
+  }
+
+  await likesRepository.createLike({ articleId, userId });
 }
 
-const changeProductLike = async (productId: string, userId: string): Promise<LikeResponse> => {
-  await productsRepository.findProductById(productId);
-
-  const likeCheck = await likesRepository.findProductLike(userId, productId);
-
-  if (likeCheck) {
-    await likesRepository.deleteProductLike(likeCheck.id);
-    return { isLiked: false, message: '좋아요를 취소했습니다.' };
-  } else {
-    await likesRepository.createProductLike(userId, productId);
-    return { isLiked: true, message: '좋아요를 눌렀습니다.' };
+export async function deleteLike(articleId: number, userId: number) {
+  const existingArticle = await articlesRepository.getArticle(articleId);
+  if (!existingArticle) {
+    throw new NotFoundError('article', articleId);
   }
-};
 
-const changeArticleLike = async (articleId: string, userId: string): Promise<LikeResponse> => {
-  await articlesRepository.findArticleById(articleId);
-
-  const likeCheck = await likesRepository.findArticleLike(userId, articleId);
-
-  if (likeCheck) {
-    await likesRepository.deleteArticleLike(likeCheck.id);
-    return { isLiked: false, message: '좋아요를 취소했습니다.' };
-  } else {
-    await likesRepository.createArticleLike(userId, articleId);
-    return { isLiked: true, message: '좋아요를 눌렀습니다.' };
+  const existingLike = await likesRepository.getLike(articleId, userId);
+  if (!existingLike) {
+    throw new BadRequestError('Not liked');
   }
-};
 
-export const likesService = {
-  changeProductLike,
-  changeArticleLike,
-};
+  await likesRepository.deleteLike(existingLike.id);
+}

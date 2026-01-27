@@ -1,30 +1,28 @@
 import express from 'express';
-import { validatePagination } from '../middlewares/paginationValidator';
+import { withAsync } from '../lib/withAsync';
 import {
   createArticle,
-  getArticles,
+  getArticleList,
   getArticle,
-  patchArticle,
+  updateArticle,
   deleteArticle,
+  createComment,
+  getCommentList,
+  createLike,
+  deleteLike,
 } from '../controllers/articlesController';
-import * as likesController from '../controllers/likesController';
-import commentsRouter from './commentsRouter';
-import { authenticate } from '../middlewares/authenticate';
-import { validate } from '../middlewares/validate';
-import { CreateArticleSchema, PatchArticleSchema } from '../validations/articlesSchema';
-import { authMiddleware } from '../middlewares/authMiddleware';
+import authenticate from '../middlewares/authenticate';
 
-const router = express.Router();
+const articlesRouter = express.Router();
 
-router.post('/', authenticate, validate(CreateArticleSchema, 'body'), createArticle);
-router.get('/', validatePagination, authMiddleware, getArticles);
+articlesRouter.post('/', authenticate(), withAsync(createArticle));
+articlesRouter.get('/', authenticate({ optional: true }), withAsync(getArticleList));
+articlesRouter.get('/:id', authenticate({ optional: true }), withAsync(getArticle));
+articlesRouter.patch('/:id', authenticate(), withAsync(updateArticle));
+articlesRouter.delete('/:id', authenticate(), withAsync(deleteArticle));
+articlesRouter.post('/:id/comments', authenticate(), withAsync(createComment));
+articlesRouter.get('/:id/comments', withAsync(getCommentList));
+articlesRouter.post('/:id/likes', authenticate(), withAsync(createLike));
+articlesRouter.delete('/:id/likes', authenticate(), withAsync(deleteLike));
 
-router.get('/:id', authMiddleware, getArticle);
-router.patch('/:id', authenticate, validate(PatchArticleSchema, 'body'), patchArticle);
-router.delete('/:id', authenticate, deleteArticle);
-
-router.post('/:articleId/like', authenticate, likesController.changeArticleLike);
-
-router.use('/:articleId/comments', commentsRouter);
-
-export default router;
+export default articlesRouter;

@@ -1,56 +1,22 @@
-import { prisma } from '../utils/prisma';
+import { Like } from '@prisma/client';
+import { prismaClient } from '../lib/prismaClient';
 
-const findProductLike = async (userId: string, productId: string) => {
-  return prisma.productLike.findUnique({
-    where: {
-      userId_productId: {
-        userId,
-        productId,
-      },
-    },
+export async function createLike(data: Omit<Like, 'id' | 'createdAt' | 'updatedAt'>) {
+  const createdLike = await prismaClient.like.create({
+    data,
   });
-};
+  return createdLike;
+}
 
-const createProductLike = async (userId: string, productId: string) => {
-  return prisma.productLike.create({
-    data: { userId, productId },
+export async function getLike(articleId: number, userId: number) {
+  const like = await prismaClient.like.findFirst({
+    where: { articleId, userId },
   });
-};
+  return like;
+}
 
-const deleteProductLike = async (id: string) => {
-  return prisma.productLike.delete({
+export async function deleteLike(id: number) {
+  await prismaClient.like.delete({
     where: { id },
   });
-};
-
-const findArticleLike = async (userId: string, articleId: string) => {
-  return prisma.articleLike.findUnique({
-    where: {
-      userId_articleId: {
-        userId,
-        articleId,
-      },
-    },
-  });
-};
-
-const createArticleLike = async (userId: string, articleId: string) => {
-  return prisma.articleLike.create({
-    data: { userId, articleId },
-  });
-};
-
-const deleteArticleLike = async (id: string) => {
-  return prisma.articleLike.delete({
-    where: { id },
-  });
-};
-
-export const likesRepository = {
-  findProductLike,
-  createProductLike,
-  deleteProductLike,
-  findArticleLike,
-  createArticleLike,
-  deleteArticleLike,
-};
+}

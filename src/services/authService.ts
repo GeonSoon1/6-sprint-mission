@@ -1,83 +1,102 @@
-import { authRepository } from '../repositories/authRepository';
 import bcrypt from 'bcrypt';
-import { generateTokens, verifyRefreshToken } from '../utils/token';
-import { ErrorWithStatus } from '../utils/types';
+import * as usersRepository from '../repositories/usersRepository';
+import BadRequestError from '../lib/errors/BadRequestError';
+import NotFoundError from '../lib/errors/NotFoundError';
+import { generateTokens, verifyAccessToken, verifyRefreshToken } from '../lib/token';
+import UnauthorizedError from '../lib/errors/UnauthorizedError';
+import User from '../types/User';
 
-const signUp = async (email: string, nickname: string, password: string) => {
-  const existingUser = await authRepository.findUserByEmail(email);
+type RegisterData = Omit<User, 'id' | 'createdAt' | 'updatedAt'>;
+type LoginData = Pick<User, 'email' | 'password'>;
+
+async function verifyPassword(user: User, password: string) {
+  return await bcrypt.compare(password, user.password);
+}
+
+async function hashPassword(password: string) {
+  const salt = await bcrypt.genSalt(10);
+  return await bcrypt.hash(password, salt);
+}
+
+export async function register(data: RegisterData) {
+  const existingUser = await usersRepository.getUserByEmail(data.email);
   if (existingUser) {
-    const error: ErrorWithStatus = new Error('이미 존재하는 이메일입니다.');
-    error.status = 409;
-    throw error;
+    throw new BadRequestError('User already exists');
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(data.password);
 
-  const user = await authRepository.createUser({
-    email,
-    nickname,
+  const user = await usersRepository.createUser({
+    email: data.email,
+    nickname: data.nickname,
     password: hashedPassword,
+    image: data.image,
   });
 
-  const { password: _, ...userWithoutPassword } = user;
-  return userWithoutPassword;
-};
+  return user;
+}
 
-const login = async (email: string, password: string) => {
-  const user = await authRepository.findUserByEmail(email);
+export async function login(data: LoginData) {
+  const user = await usersRepository.getUserByEmail(data.email);
   if (!user) {
-    const error: ErrorWithStatus = new Error('존재하지 않는 이메일입니다.');
-    error.status = 401;
-    throw error;
+    throw new BadRequestError('Invalid credentials');
   }
 
-  const isPasswordValid = await bcrypt.compare(password, user.password);
+  const isPasswordValid = await verifyPassword(user, data.password);
   if (!isPasswordValid) {
-    const error: ErrorWithStatus = new Error('비밀번호가 일치하지 않습니다.');
-    error.status = 401;
-    throw error;
+    throw new BadRequestError('Invalid credentials');
   }
 
   const { accessToken, refreshToken } = generateTokens(user.id);
+  return {
+    accessToken,
+    refreshToken,
+  };
+}
 
-  await authRepository.updateUserToken(user.id, refreshToken);
-
-  return { user, accessToken, refreshToken };
-};
-
-const refreshTokens = async (refreshToken: string) => {
-  const payload = verifyRefreshToken(refreshToken);
-
-  if (typeof payload === 'string' || !payload.userId) {
-    const error: ErrorWithStatus = new Error('유효하지 않은 토큰입니다.');
-    error.status = 401;
-    throw error;
+export async function refreshToken(refreshToken?: string) {
+  if (!refreshToken) {
+    throw new BadRequestError('Invalid refresh token');
   }
 
-  const userId = payload.userId;
+  const { userId } = verifyRefreshToken(refreshToken);
 
-  const user = await authRepository.findUserById(userId);
+  const user = await usersRepository.getUser(userId);
   if (!user) {
-    const error: ErrorWithStatus = new Error('사용자를 찾을 수 없습니다.');
-    error.status = 404;
-    throw error;
+    throw new BadRequestError('Invalid refresh token');
   }
 
-  if (user.refreshToken !== refreshToken) {
-    const error: ErrorWithStatus = new Error('유효하지 않은 Refresh Token입니다.');
-    error.status = 401;
-    throw error;
+  const { accessToken, refreshToken: newRefreshToken } = generateTokens(userId);
+  return {
+    accessToken,
+    refreshToken: newRefreshToken,
+  };
+}
+
+export async function updateMyPassword(userId: User['id'], password: string, newPassword: string) {
+  const user = await usersRepository.getUser(userId);
+  if (!user) {
+    throw new NotFoundError('user', userId);
   }
 
-  const tokens = generateTokens(user.id);
+  const isPasswordValid = await verifyPassword(user, password);
+  if (!isPasswordValid) {
+    throw new BadRequestError('Invalid credentials');
+  }
 
-  await authRepository.updateUserToken(user.id, tokens.refreshToken);
+  const hashedPassword = await hashPassword(newPassword);
+  await usersRepository.updateUser(userId, { password: hashedPassword });
+}
 
-  return tokens;
-};
+export async function authenticate(accessToken?: string) {
+  if (!accessToken) {
+    throw new UnauthorizedError('Unauthorized');
+  }
 
-export const authService = {
-  signUp,
-  login,
-  refreshTokens,
-};
+  const { userId } = verifyAccessToken(accessToken);
+  const user = await usersRepository.getUser(userId);
+  if (!user) {
+    throw new UnauthorizedError('Unauthorized');
+  }
+  return user;
+}

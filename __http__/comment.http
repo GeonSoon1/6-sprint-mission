@@ -1,0 +1,43 @@
+
+@baseUrl = http://localhost:3000
+
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MzcsImlhdCI6MTc2OTI1Mzc3NywiZXhwIjoxNzY5MzI1Nzc3fQ.M5yQDckyVxB21h3sU14Vcwl7vKwXJ1ho8Y6LI470zGg
+
+@refreshToken = 
+
+### 특정 댓글 조회
+GET {{baseUrl}}/comments/15
+Cookie : access-token={{accessToken}}
+
+
+### 댓글 수정
+PATCH {{baseUrl}}/comments/15
+Content-Type: application/json
+Cookie: access-token={{accessToken}}
+
+{
+  "content": "addidas 최고"
+}
+
+
+### 댓글 삭제
+DELETE {{baseUrl}}/comments/10
+Cookie: access-token={{accessToken}}
+
+
+# ###
+# // 로그인 안 한 유저 상품에 대한 댓글 조회 가능(페이지네이션) 
+# // GET http://localhot:3000/products/{productId}/comments?offset=0&limit=10&order=newest
+# GET http://localhost:3000/products/4/comments?offset=0&limit=10&order=newest
+
+
+
+
+# ########## 기사(Article) #########
+
+
+# ###
+# // 로그인 안 한 유저 article 댓글 조회 
+# // GET http://localhot:3000/articles/{articleId}/comments?offset=0&limit=10&order=newest
+# GET http://localhost:3000/articles/2/comments?offset=0&limit=10&order=newest
+

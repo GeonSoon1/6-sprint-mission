@@ -1,0 +1,42 @@
+@baseUrl = http://localhost:3000
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY5MjY2OTM5LCJleHAiOjE3NjkzMzg5Mzl9.AaAHQ6va4gJAbVFp0HMTe9uZTdnw3LGGIn-8-89LbrA
+
+### 상품 좋아요
+POST {{baseUrl}}/products/2/like
+Cookie: access-token={{accessToken}}
+
+
+### 상품 좋아요 취소
+DELETE {{baseUrl}}/products/1/like
+Cookie: access-token={{accessToken}}
+
+
+### 상품 단건 조회 (isLiked 포함)
+GET {{baseUrl}}/products/2
+Cookie: access-token={{accessToken}}
+
+
+### 내가 좋아요한 상품 목록
+GET {{baseUrl}}/products/liked
+Cookie: access-token={{accessToken}}
+
+
+
+### 게시글 좋아요
+POST {{baseUrl}}/articles/1/like
+Cookie: access-token={{accessToken}}
+
+
+### 게시글 좋아요 취소
+DELETE {{baseUrl}}/articles/1/like
+Cookie: access-token={{accessToken}}
+
+
+### 게시글 단건 조회 (isLiked 포함)
+GET {{baseUrl}}/articles/1
+Cookie: access-token={{accessToken}}
+
+
+### 내가 좋아요한 게시글 목록
+GET {{baseUrl}}/articles/liked
+Cookie: access-token={{accessToken}}

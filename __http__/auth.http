@@ -1,0 +1,44 @@
+@baseUrl = http://localhost:3000
+
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzY5MjY2OTM5LCJleHAiOjE3NjkzMzg5Mzl9.AaAHQ6va4gJAbVFp0HMTe9uZTdnw3LGGIn-8-89LbrA
+
+@refreshToken =
+
+### 유저 등록
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email" : "sujin@gmail.com",
+  "nickname" : "수진",
+  "password": "1234"
+}
+
+### 유저 로그인
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email" : "sujin@gmail.com",
+  "password": "1234"
+}
+
+
+### 유저 로그아웃
+POST {{baseUrl}}/auth/logout
+
+
+
+# ### refresh 토큰으로 access_token, refresh_token 재발급 
+# //토큰이 무효화된게 아니고 쿠키가 무효화된거랑 다시 refresh 사용 가능
+# POST http://localhost:3000/auth/refresh
+# Content-Type: application/json
+# Cookie: refresh-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywiaWF0IjoxNzY1NzY2NzUzLCJleHAiOjE3NjU4NTMxNTN9.zqLPlHpQ4kDWbVzhf_xE6wUyCyNSOccWy_rwo_Dpl7w;
+
+
+# ###
+# // GET http://localhost:3000/auth/{userId}
+# GET http://localhost:3000/auth/{}
+# Cookie: access-token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiaWF0IjoxNzY0MTM1Nzk2LCJleHAiOjE3NjQyMDc3OTZ9.NFH58zbUCuDzcIBmCENLh46qHa2FMg42HRS8foAtXbI;
+
+

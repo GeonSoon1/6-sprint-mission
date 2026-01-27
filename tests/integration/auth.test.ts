@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app } from '../../src/app.js';
 import * as authService from '../../src/services/authService.js';
+import { ACCESS_TOKEN_COOKIE_NAME, REFRESH_TOKEN_COOKIE_NAME } from '../../src/lib/constants.js';
 
 describe('Auth API', () => {
   afterEach(() => {
@@ -46,5 +47,34 @@ describe('Auth API', () => {
       : [];
     expect(setCookie.join(';')).toContain('access-token=');
     expect(setCookie.join(';')).toContain('refresh-token=');
+  });
+
+  it('POST /auth/logout clears auth cookies', async () => {
+    const res = await request(app).post('/auth/logout');
+
+    expect(res.status).toBe(200);
+    const setCookie = Array.isArray(res.headers['set-cookie'])
+      ? res.headers['set-cookie']
+      : [];
+    expect(setCookie.join(';')).toContain(`${ACCESS_TOKEN_COOKIE_NAME}=`);
+    expect(setCookie.join(';')).toContain(`${REFRESH_TOKEN_COOKIE_NAME}=`);
+  });
+
+  it('POST /auth/refresh sets new auth cookies', async () => {
+    jest.spyOn(authService, 'refreshToken').mockResolvedValue({
+      accessToken: 'new-access',
+      refreshToken: 'new-refresh',
+    });
+
+    const res = await request(app)
+      .post('/auth/refresh')
+      .set('Cookie', [`${REFRESH_TOKEN_COOKIE_NAME}=old-refresh`]);
+
+    expect(res.status).toBe(200);
+    const setCookie = Array.isArray(res.headers['set-cookie'])
+      ? res.headers['set-cookie']
+      : [];
+    expect(setCookie.join(';')).toContain(`${ACCESS_TOKEN_COOKIE_NAME}=`);
+    expect(setCookie.join(';')).toContain(`${REFRESH_TOKEN_COOKIE_NAME}=`);
   });
 });

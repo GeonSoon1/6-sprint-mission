@@ -122,7 +122,7 @@ async function patch(productId: number, data: UpdateProductDto): Promise<Product
   return newProduct;
 }
 
-async function erase(productId: string): Promise<void> {
+async function erase(productId: number): Promise<void> {
   await productRepo.erase(Number(productId));
 }
 
@@ -160,7 +160,7 @@ async function getList(
 // 조회 필드: id, name, description, price, tags, createdAt
 async function get(
   userId: number | undefined,
-  productId: string
+  productId: number
 ): Promise<ProductToShow | Product> {
   const product = await productRepo.findById(Number(productId));
   const product2show = selectFields(product);
@@ -170,7 +170,7 @@ async function get(
 }
 
 // 좋아요와 좋아요취소 토글
-async function likeToggle(userId: number, productId: string): Promise<ProductToShow> {
+async function likeToggle(userId: number, productId: number): Promise<ProductToShow> {
   const product = await productRepo.findById(Number(productId));
 
   const isLiked = includedOk(product.likedUsers, 'id', userId);

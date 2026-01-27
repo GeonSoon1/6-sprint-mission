@@ -1,6 +1,8 @@
+import { Prisma } from '@prisma/client';
 import articleLikeRepository from '../repositories/articleLikeRepository';
 import articleRepository from '../repositories/articleRepository';
-import { ArticleFindOptions } from './../libs/interfaces';
+import { ArticleFindOptions, ArticlePublicData, UpdateArticleData } from './../libs/interfaces';
+import { CustomError } from '../libs/Handler/errorHandler';
 
 class ArticleService {
     async likeArticle(userId: number, articleId: number) {
@@ -27,6 +29,24 @@ class ArticleService {
             const { articleLikes, ...rest } = article;
             return { ...rest, isLiked: articleLikes.length > 0 };
         });
+    }
+    async postArticle(userFields: ArticlePublicData) {
+        return await articleRepository.create(userFields);
+    }
+    async patchArticleById(id: number, userFields: UpdateArticleData) {
+        const article = await articleRepository.findById(id);
+        if (article.userId !== userFields.userId) {
+            throw new CustomError(403, "권한이 없습니다.");
+        }
+        return await articleRepository.update(id, userFields);
+    }
+    async deleteArticleById(id: number, userId: number) {
+        const article = await articleRepository.findById(id);
+        if (article.userId !== userId) {
+            throw new CustomError(403, "권한이 없습니다.");
+        }
+
+        return await articleRepository.ondelete(id);
     }
 }
 

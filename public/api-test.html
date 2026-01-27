@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panda Market API Tester</title>
+    <style>
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+        max-width: 1400px;
+        margin: 0 auto;
+        background-color: #f9f9f9;
+      }
+      h1 {
+        color: #333;
+      }
+      .container {
+        display: flex;
+        gap: 20px;
+      }
+      .panel {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      }
+      .left-panel {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .right-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        height: 80vh;
+        position: sticky;
+        top: 20px;
+      }
+
+      .section {
+        border-bottom: 1px solid #eee;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+      }
+      .section:last-child {
+        border-bottom: none;
+      }
+      h3 {
+        margin-top: 0;
+        color: #555;
+        border-left: 4px solid #007bff;
+        padding-left: 10px;
+      }
+      h4 {
+        margin: 10px 0 5px;
+        font-size: 0.95em;
+        color: #666;
+      }
+
+      .input-group {
+        margin-bottom: 10px;
+        display: flex;
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+      input,
+      textarea,
+      select {
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        flex: 1;
+        min-width: 150px;
+      }
+      textarea {
+        width: 100%;
+        min-height: 60px;
+        resize: vertical;
+      }
+
+      button {
+        cursor: pointer;
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+        font-weight: bold;
+        transition: background 0.2s;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      button.secondary {
+        background: #6c757d;
+      }
+      button.secondary:hover {
+        background: #5a6268;
+      }
+      button.danger {
+        background: #dc3545;
+      }
+      button.danger:hover {
+        background: #c82333;
+      }
+
+      #response-area {
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 15px;
+        flex: 1;
+        overflow-y: auto;
+        font-family: monospace;
+        border-radius: 4px;
+        font-size: 13px;
+      }
+      .log-entry {
+        border-bottom: 1px solid #333;
+        padding: 8px 0;
+      }
+      .log-time {
+        color: #888;
+        font-size: 0.8em;
+        margin-bottom: 4px;
+      }
+      .log-method {
+        color: #569cd6;
+        font-weight: bold;
+      }
+      .log-url {
+        color: #ce9178;
+      }
+      .log-success {
+        color: #6a9955;
+      }
+      .log-error {
+        color: #f44747;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🐼 Panda Market API Tester</h1>
+
+    <div class="container">
+      <div class="left-panel">
+        <!-- Auth -->
+        <div class="panel">
+          <h3>🔐 Auth (인증)</h3>
+          <div class="input-group">
+            <input
+              type="email"
+              id="auth-email"
+              placeholder="Email"
+              value="test@example.com"
+            />
+            <input
+              type="password"
+              id="auth-password"
+              placeholder="Password"
+              value="password123"
+            />
+            <input
+              type="text"
+              id="auth-nickname"
+              placeholder="Nickname (for Signup)"
+            />
+            <button onclick="signup()">Sign Up</button>
+            <button onclick="login()">Log In</button>
+          </div>
+          <h4>Access Token</h4>
+          <div class="input-group">
+            <textarea
+              id="access-token"
+              rows="2"
+              readonly
+              placeholder="Token will appear here after login..."
+            ></textarea>
+          </div>
+          <button class="secondary" onclick="clearToken()">Clear Token</button>
+        </div>
+
+        <!-- User Profile -->
+        <div class="panel">
+          <h3>👤 User Profile (마이페이지)</h3>
+          <div class="input-group">
+            <button onclick="getMe()">Get My Profile</button>
+            <button onclick="getMyProducts()">Get My Products</button>
+          </div>
+          <h4>Update Profile</h4>
+          <div class="input-group">
+            <input type="text" id="me-nickname" placeholder="New Nickname" />
+            <button onclick="updateMe()">Update</button>
+          </div>
+          <h4>Change Password</h4>
+          <div class="input-group">
+            <input
+              type="password"
+              id="me-old-pw"
+              placeholder="Current Password"
+            />
+            <input type="password" id="me-new-pw" placeholder="New Password" />
+            <input
+              type="password"
+              id="me-confirm-pw"
+              placeholder="Confirm New"
+            />
+            <button onclick="updatePassword()">Change PW</button>
+          </div>
+        </div>
+
+        <!-- Articles -->
+        <div class="panel">
+          <h3>📝 Articles (자유게시판)</h3>
+          <div class="input-group">
+            <button onclick="getArticles()">Get List</button>
+          </div>
+          <h4>Create / Update</h4>
+          <div class="input-group">
+            <input type="text" id="art-title" placeholder="Title" />
+            <textarea id="art-content" placeholder="Content"></textarea>
+          </div>
+          <div class="input-group">
+            <button onclick="createArticle()">Create</button>
+          </div>
+          <h4>Actions by ID</h4>
+          <div class="input-group">
+            <input type="number" id="art-id" placeholder="Article ID" />
+            <button class="secondary" onclick="getArticleById()">
+              Get One
+            </button>
+            <button class="secondary" onclick="updateArticle()">Update</button>
+            <button class="danger" onclick="deleteArticle()">Delete</button>
+            <button onclick="likeArticle()">❤️ Like</button>
+          </div>
+        </div>
+
+        <!-- Products -->
+        <div class="panel">
+          <h3>🛍️ Products (중고마켓)</h3>
+          <div class="input-group">
+            <button onclick="getProducts()">Get List</button>
+          </div>
+          <h4>Create / Update</h4>
+          <div class="input-group">
+            <input type="text" id="prod-name" placeholder="Name" />
+            <input type="number" id="prod-price" placeholder="Price" />
+            <input
+              type="text"
+              id="prod-tags"
+              placeholder="Tags (comma separated)"
+            />
+          </div>
+          <div class="input-group">
+            <textarea id="prod-desc" placeholder="Description"></textarea>
+          </div>
+          <div class="input-group">
+            <button onclick="createProduct()">Create</button>
+          </div>
+          <h4>Actions by ID</h4>
+          <div class="input-group">
+            <input type="number" id="prod-id" placeholder="Product ID" />
+            <button class="secondary" onclick="getProductById()">
+              Get One
+            </button>
+            <button class="secondary" onclick="updateProduct()">Update</button>
+            <button class="danger" onclick="deleteProduct()">Delete</button>
+            <button onclick="likeProduct()">❤️ Like</button>
+          </div>
+        </div>
+
+        <!-- Comments -->
+        <div class="panel">
+          <h3>💬 Comments (댓글)</h3>
+          <div class="input-group">
+            <select id="cmt-target-type" style="flex: 0 0 120px">
+              <option value="article">Article ID</option>
+              <option value="product">Product ID</option>
+            </select>
+            <input type="number" id="cmt-target-id" placeholder="Target ID" />
+            <button onclick="getComments()">Get Comments</button>
+          </div>
+          <div class="input-group">
+            <textarea id="cmt-content" placeholder="Comment Content"></textarea>
+            <button onclick="submitComment()">Post Comment</button>
+          </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="panel">
+          <h3>🔔 Notifications (알림)</h3>
+          <div class="input-group">
+            <button onclick="getNotifications()">Get All</button>
+            <button onclick="getUnreadCount()">Get Unread Count</button>
+          </div>
+          <h4>Mark as Read</h4>
+          <div class="input-group">
+            <input type="number" id="noti-id" placeholder="Notification ID" />
+            <button onclick="readNotification()">Read</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <h3>📡 Logs & Response</h3>
+        <button
+          class="secondary"
+          onclick="document.getElementById('response-area').innerHTML = ''"
+          style="margin-bottom: 10px"
+        >
+          Clear Logs
+        </button>
+        <div id="response-area"></div>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const API_URL = "http://localhost:3000";
+      let socket;
+
+      function log(data, type = "info", title = "") {
+        const area = document.getElementById("response-area");
+        const entry = document.createElement("div");
+        entry.className = "log-entry";
+        const time = new Date().toLocaleTimeString();
+
+        let content =
+          typeof data === "object" ? JSON.stringify(data, null, 2) : data;
+        let colorClass =
+          type === "error"
+            ? "log-error"
+            : type === "success"
+              ? "log-success"
+              : "";
+
+        entry.innerHTML = `<div class="log-time">[${time}] ${title}</div><pre class="${colorClass}">${content}</pre>`;
+        area.prepend(entry);
+      }
+
+      async function req(endpoint, method = "GET", body = null) {
+        const token = document.getElementById("access-token").value;
+        const headers = { "Content-Type": "application/json" };
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        log(`${method} ${endpoint}`, "info", "Request");
+
+        try {
+          const res = await fetch(API_URL + endpoint, {
+            method,
+            headers,
+            body: body ? JSON.stringify(body) : null,
+          });
+          const data = await res.json();
+          log(data, res.ok ? "success" : "error", `Response (${res.status})`);
+          return data;
+        } catch (err) {
+          log(err.message, "error", "Network Error");
+        }
+      }
+
+      // Auth
+      async function signup() {
+        const email = document.getElementById("auth-email").value;
+        const password = document.getElementById("auth-password").value;
+        const nickname = document.getElementById("auth-nickname").value;
+        await req("/auth/signup", "POST", { email, password, nickname });
+      }
+      async function login() {
+        const email = document.getElementById("auth-email").value;
+        const password = document.getElementById("auth-password").value;
+        const data = await req("/auth/login", "POST", { email, password });
+        if (data.accessToken) {
+          document.getElementById("access-token").value = data.accessToken;
+          localStorage.setItem("accessToken", data.accessToken);
+          initSocket(data.user.id);
+        }
+      }
+      function clearToken() {
+        document.getElementById("access-token").value = "";
+        localStorage.removeItem("accessToken");
+        if (socket) socket.disconnect();
+      }
+
+      // User Profile
+      const getMe = () => req("/auth/me");
+      const getMyProducts = () => req("/auth/me/products");
+      const updateMe = () =>
+        req("/auth/me", "PATCH", {
+          nickname: document.getElementById("me-nickname").value,
+        });
+      const updatePassword = () =>
+        req("/auth/me/password", "PATCH", {
+          currentPassword: document.getElementById("me-old-pw").value,
+          newPassword: document.getElementById("me-new-pw").value,
+          confirmNewPassword: document.getElementById("me-confirm-pw").value,
+        });
+
+      // Socket
+      function initSocket(userId) {
+        const token = document.getElementById("access-token").value;
+        if (socket) socket.disconnect();
+        socket = io(API_URL, { auth: { accessToken: token } });
+        socket.on("connect", () => {
+          log("Connected: " + socket.id, "success", "Socket");
+        });
+        socket.on("notification", (data) =>
+          log(data, "success", "🔔 Notification"),
+        );
+        socket.on("receiveNotification", (data) =>
+          log(data, "success", "🔔 Comment Notification"),
+        );
+      }
+
+      // Articles
+      const getArticles = () => req("/articles?limit=10");
+      const createArticle = () =>
+        req("/articles", "POST", {
+          title: document.getElementById("art-title").value,
+          content: document.getElementById("art-content").value,
+        });
+      const getArticleById = () =>
+        req(`/articles/${document.getElementById("art-id").value}`);
+      const updateArticle = () =>
+        req(`/articles/${document.getElementById("art-id").value}`, "PATCH", {
+          title: document.getElementById("art-title").value,
+          content: document.getElementById("art-content").value,
+        });
+      const deleteArticle = () =>
+        req(`/articles/${document.getElementById("art-id").value}`, "DELETE");
+      const likeArticle = () =>
+        req(
+          `/articles/${document.getElementById("art-id").value}/like`,
+          "POST",
+        );
+
+      // Products
+      const getProducts = () => req("/products?limit=10");
+      const createProduct = () =>
+        req("/products", "POST", {
+          name: document.getElementById("prod-name").value,
+          description: document.getElementById("prod-desc").value,
+          price: Number(document.getElementById("prod-price").value),
+          tags: document.getElementById("prod-tags").value.split(","),
+        });
+      const getProductById = () =>
+        req(`/products/${document.getElementById("prod-id").value}`);
+      const updateProduct = () =>
+        req(`/products/${document.getElementById("prod-id").value}`, "PATCH", {
+          price: Number(document.getElementById("prod-price").value),
+          description: document.getElementById("prod-desc").value,
+        });
+      const deleteProduct = () =>
+        req(`/products/${document.getElementById("prod-id").value}`, "DELETE");
+      const likeProduct = () =>
+        req(
+          `/products/${document.getElementById("prod-id").value}/like`,
+          "POST",
+        );
+
+      // Comments
+      const getComments = () => {
+        const type = document.getElementById("cmt-target-type").value;
+        const id = document.getElementById("cmt-target-id").value;
+        let q = "?take=10";
+        if (type === "article") q += `&articleId=${id}`;
+        else if (type === "product") q += `&productId=${id}`;
+        req("/comments" + q);
+      };
+      const submitComment = () => {
+        const type = document.getElementById("cmt-target-type").value;
+        const id = document.getElementById("cmt-target-id").value;
+        const body = { content: document.getElementById("cmt-content").value };
+        if (type === "article") body.articleId = Number(id);
+        else if (type === "product") body.productId = Number(id);
+        req("/comments", "POST", body);
+      };
+
+      // Notifications
+      const getNotifications = () => req("/notifications");
+      const getUnreadCount = () => req("/notifications/count");
+      const readNotification = () =>
+        req(
+          `/notifications/${document.getElementById("noti-id").value}/read`,
+          "PATCH",
+        );
+
+      // Init
+      const savedToken = localStorage.getItem("accessToken");
+      if (savedToken) {
+        document.getElementById("access-token").value = savedToken;
+        log(
+          "Token loaded. Please login again to connect socket.",
+          "info",
+          "System",
+        );
+      }
+    </script>
+  </body>
+</html>

@@ -1,7 +1,6 @@
 import { productService } from '../services/productService';
 import { assert } from 'superstruct';
 import { CreateProduct, PatchProduct } from '../structs/structs';
-import productRepository from '../repositories/productRepository';
 import { ExpressHandler } from '../libs/constants';
 import { CustomError } from '../libs/Handler/errorHandler';
 import { removeUndefined } from './../libs/removeTool';
@@ -42,17 +41,17 @@ export default class ProductController {
         }
 
         const userId = req.user ? req.user.userId : null;
-        if (!userId) return new CustomError(404, "UserId Not Found");
+        if (!userId) throw new CustomError(404, "UserId Not Found");
         const products = await productService.getProducts(findOptions, userId);
         res.send(products);
     };
 
     GetProductById: ExpressHandler = async (req, res) => {
         const id = req.params.id;
-        if (!id) return new CustomError(404, "id Not Found");
+        if (!id) throw new CustomError(404, "id Not Found");
         const _id = parseInt(id);
         const userId = req.user ? req.user.userId : null;
-        if (!userId) return new CustomError(404, "userId Not Found");
+        if (!userId) throw new CustomError(404, "userId Not Found");
         const product = await productService.getProductById(_id, userId);
         res.send(product);
     };
@@ -60,33 +59,50 @@ export default class ProductController {
     PostProduct: ExpressHandler = async (req, res) => {
         assert(req.body, CreateProduct);
         const { ...userFields } = req.body;
-        const product = await productRepository.create(userFields);
+        const userId = req.user ? req.user.userId : null;
+        if (!userId) throw new CustomError(404, "userId Not Found");
+        const product = await productService.createProducts({ ...userFields, userId });
         res.status(201).send(product);
     };
 
     PatchProductById: ExpressHandler = async (req, res) => {
         const id = req.params.id;
-        if (!id) return new CustomError(404, "id Not Found");
+        if (!id) throw new CustomError(404, "id Not Found");
         const _id = parseInt(id);
+
+        const userId = req.user ? req.user.userId : null;
+        if (!userId) throw new CustomError(404, "userId Not Found");
+
         assert(req.body, PatchProduct);
         const userFields = removeUndefined(req.body);
-        const Product = await productRepository.update(_id, userFields);
-        res.send(Product);
+        const { product, notifications } = await productService.updateProduct(_id, userFields);
+        if (notifications && notifications.length > 0) {
+            const io = req.app.get('io');
+            if (io) {
+                notifications.forEach((noti) => {
+                    io.to(noti.userId).emit('notification', noti);
+                });
+            }
+        }
+
+        res.send(product);
     };
 
     DeleteProductById: ExpressHandler = async (req, res) => {
         const id = req.params.id;
-        if (!id) return new CustomError(404, "id Not Found");
+        if (!id) throw new CustomError(404, "id Not Found");
         const _id = parseInt(id);
-        const Product = await productRepository.ondelete(_id);
+        const userId = req.user ? req.user.userId : null;
+        if (!userId) throw new CustomError(404, "userId Not Found");
+        const Product = await productService.deleteProduct(_id);
         res.send(Product);
     };
 
     likeProduct: ExpressHandler = async (req, res) => {
-        if (!req.user) return new CustomError(404, "user Not Found");
+        if (!req.user) throw new CustomError(404, "user Not Found");
         const userId = req.user.userId;
         const productId = req.params.id;
-        if (!productId) return new CustomError(404, "productId Not Found");
+        if (!productId) throw new CustomError(404, "productId Not Found");
         const _productId = parseInt(productId);
         const result = await productService.likeProduct(userId, _productId);
         return res.status(200).json(result);

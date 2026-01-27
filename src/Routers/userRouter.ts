@@ -7,7 +7,7 @@ const userRouter = EXPRESS.Router();
 const userController = new UserServiceController();
 
 
-userRouter.post('/', catchAsync(userController.register));
+userRouter.post('/signup', catchAsync(userController.register));
 userRouter.post('/login', catchAsync(userController.login));
 userRouter.post('/token/refresh',
     auth.verifyRefreshToken, catchAsync(userController.refresh));

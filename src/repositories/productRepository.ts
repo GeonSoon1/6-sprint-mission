@@ -2,8 +2,26 @@ import { prismaClient } from '../libs/constants';
 import { ProductPublicData, ProductFindOptions, UpdateProductData } from './../libs/interfaces';
 
 
-
-
+async function findByIdSimple(id: number) {
+    return prismaClient.product.findUnique({
+        where: { id },
+    });
+}
+async function findLikers(productId: number) {
+    return prismaClient.productLike.findMany({
+        where: { productId },
+        select: { userId: true } // 유저 ID만 쏙 뽑아옵니다.
+    });
+}
+async function createNotification(userId: number, content: string) {
+    return prismaClient.notification.create({
+        data: {
+            userId,
+            content,
+            isRead: false, // 안 읽음 상태로 생성
+        }
+    });
+}
 async function findByUserId(userId: number) {
     return prismaClient.product.findMany({
         where: {
@@ -67,5 +85,8 @@ export default {
     update,
     create,
     ondelete,
-    findByUserId
+    findByUserId,
+    findByIdSimple,
+    findLikers,
+    createNotification
 };

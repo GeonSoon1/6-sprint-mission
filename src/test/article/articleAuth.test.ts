@@ -6,6 +6,9 @@ import bcrypt from 'bcrypt';
 describe('게시글 API 인증 필요', () => {
   const agent = request.agent(app); // 상태 유지를 위한 agent 사용
   beforeAll(async () => {
+    await prisma.productLike.deleteMany();
+    await prisma.product.deleteMany();
+    await prisma.notification.deleteMany();
     await prisma.user.deleteMany();
     // 테스트용 유저 생성
     const hashedPassword = await bcrypt.hash('password123', 10);
@@ -43,7 +46,7 @@ describe('게시글 API 인증 필요', () => {
     expect(response.body).toHaveProperty('content', 'This is a new article.');
   });
   // 인증된 상태에서 게시글 수정 테스트
-  test('PUT /articles/:id - 인증된 상태에서 게시글 수정', async () => {
+  test('PATCH /articles/:id - 인증된 상태에서 게시글 수정', async () => {
     // 먼저 게시글 생성
     const article = await agent.post('/articles').send({
       title: 'Article',
@@ -171,5 +174,21 @@ describe('게시글 API 인증 필요', () => {
     const response = await agent.delete('/articles/9999');
     expect(response.status).toBe(404);
     expect(response.body.message).toBe('게시글이 존재하지 않습니다.');
+  });
+  // 필드 일부분만 수정 테스트
+  test('PATCH /articles/:id - 필드 일부분만 수정', async () => {
+    // 먼저 게시글 생성
+    const article = await agent.post('/articles').send({
+      title: 'Partial Update Article',
+      content: 'This article will be partially updated.',
+    });
+
+    const response = await agent.patch(`/articles/${article.body.id}`).send({
+      content: 'Content has been updated.',
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveProperty('title', 'Partial Update Article');
+    expect(response.body).toHaveProperty('content', 'Content has been updated.');
   });
 });

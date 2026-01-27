@@ -31,7 +31,7 @@ export class ArticleCommentService {
 
     // 알림 발송
     if (article.authorId !== authorId) {
-      await this.notificationService.createNotification(article.authorId, {
+      await this.notificationService.createNotification([article.authorId], {
         title: '새 댓글 알림',
         content: `회원님의 게시글 '${article.title}'에 새 댓글이 달렸습니다.`,
         type: 'NOTICE',

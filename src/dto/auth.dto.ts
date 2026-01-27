@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { User } from '@prisma/client';
-import { IsEmailUnique, IsNicknameUnique } from '@lib';
+import { IsEmailUnique, IsNicknameUnique } from '@middlewares';
 
 export class SignUpDTO {
   @IsNotEmpty({ message: '이메일 주소를 입력해주세요.' })

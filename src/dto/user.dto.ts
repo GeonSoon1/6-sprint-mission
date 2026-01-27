@@ -1,6 +1,6 @@
 import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
 import { User } from '@prisma/client';
-import { IsEmailUnique, IsNicknameUnique } from '@lib';
+import { IsEmailUnique, IsNicknameUnique } from '@middlewares';
 
 export class ChangePasswordDTO {
   @IsString()

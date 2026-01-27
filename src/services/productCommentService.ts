@@ -1,8 +1,8 @@
-import { ProductCommentRepository } from '../repositories';
 import { Prisma, Product, User, ProductComment } from '@prisma/client';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '@types';
 import { NotFoundError, UnauthorizedError } from '@lib';
+import { ProductCommentRepository } from '@repositories';
 
 @injectable()
 export class ProductCommentService {

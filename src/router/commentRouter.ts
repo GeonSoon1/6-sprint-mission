@@ -1,7 +1,7 @@
 import express from 'express';
-import { asyncHandler } from '../handler/handlerFn';
+import { asyncHandler } from '../middleware/handlerFn';
 import commentController from '../controller/commentController';
-import { authenticate } from '../handler/authenticate';
+import { authenticate } from '../middleware/authenticate';
 
 const commentRouter = express.Router();
 

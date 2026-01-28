@@ -30,33 +30,13 @@ class ProductRepository {
     return prisma.product.delete({ where: { id } });
   }
 
-  createComment(productId: number, content: string) {
-    return prisma.comment.create({
-      data: {
-        content,
-        product: { connect: { id: productId } },
-      },
-      include: { product: true },
-    });
-  }
-
-  getComments(productId: number, cursor: number | undefined, limit: number) {
-    return prisma.comment.findMany({
+  async findWatchers(productId: number): Promise<number[]> {
+    // 상품을 구독하거나 관심 등록한 유저들의 ID를 조회하는 로직
+    const watchers = await prisma.productLike.findMany({
       where: { productId },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
-      },
-      take: limit,
-      ...(cursor
-        ? {
-            skip: 1,
-            cursor: { id: cursor },
-          }
-        : {}),
-      orderBy: { createdAt: 'desc' },
+      select: { userId: true },
     });
+    return watchers.map((w) => w.userId);
   }
 }
 

@@ -55,28 +55,6 @@ class ProductController {
     await productService.deleteProduct(id, req.user.id);
     res.sendStatus(204);
   }
-
-  async createComment(req: Request, res: Response) {
-    assert(req.body, CreateComment);
-
-    const productId = Number(req.params.id);
-    const { content } = req.body;
-
-    const comment = await productService.createComment(productId, content);
-    res.status(201).send(comment);
-  }
-
-  async getComment(
-    req: Request<{ id: string }, any, any, { cursor?: number; limit?: string }>,
-    res: Response,
-  ) {
-    const productId = Number(req.params.id);
-    const cursor = req.query.cursor;
-    const limit = parseInt(req.query.limit || '10');
-
-    const result = await productService.getComments(productId, cursor, limit);
-    res.send(result);
-  }
 }
 
 export default new ProductController();

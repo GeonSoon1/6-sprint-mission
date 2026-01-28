@@ -1,16 +1,25 @@
 import express from 'express';
+import cors from 'cors';
+import http from 'http';
+import { initializeSocketServer } from './socket/socketServer';
 import cookieParser from 'cookie-parser';
 import { PORT } from './lib/constants';
 import productRouter from './router/productRouter';
 import articleRouter from './router/articleRouter';
-import { defaultNotFoundHandler, errorHandler } from './handler/errorHandler';
+import { defaultNotFoundHandler, errorHandler } from './middleware/errorHandler';
 import commentRouter from './router/commentRouter';
 import uploadRouter from './router/uploadRouter';
 import userRouter from './router/userRouter';
 import authRouter from './router/authRouter';
+import notificationRouter from './router/notificationRouter';
 
 const app = express();
-// app.use(cors());
+
+const server = http.createServer(app);
+initializeSocketServer(server);
+app.use(express.static('public'));
+
+app.use(cors());
 app.use(cookieParser());
 app.use(express.json());
 
@@ -37,7 +46,13 @@ app.use('/auth', authRouter);
 //user
 app.use('/user', userRouter);
 
+//notification
+app.use('/notifications', notificationRouter);
+
 app.use(defaultNotFoundHandler);
 app.use(errorHandler);
 
-app.listen(PORT || 3000, () => console.log('Server started'));
+//app.listen(PORT || 3000, () => console.log('Server started'));
+server.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});

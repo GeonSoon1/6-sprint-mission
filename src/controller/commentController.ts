@@ -5,6 +5,7 @@ import { PatchComment } from '../structs/commentStructs';
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import { AuthenticatedRequest } from '../types/auth';
 import commentService from '../service/commentService';
+import { CreateComment } from '../structs/commentStructs';
 
 class CommentController {
   async updateComment(
@@ -30,6 +31,52 @@ class CommentController {
 
     await commentService.deleteComment(id, loginUser.id);
     res.status(204).send();
+  }
+
+  async createArticleComment(req: Request, res: Response) {
+    assert(req.body, CreateComment);
+
+    const userId = req.user?.id;
+    if (!userId) {
+      throw new ForbiddenError('로그인이 필요합니다.');
+    }
+    const articleId = Number(req.params.id);
+    const content = req.body.content;
+
+    const comment = await commentService.createArticleComment(articleId, content, userId);
+    res.status(201).send(comment);
+  }
+
+  async getArticleComment(req: Request, res: Response) {
+    const articleId = Number(req.params.id);
+    const cursor = req.query.cursor ? Number(req.query.cursor) : undefined;
+    const limit = String(req.query.limit ?? '10');
+
+    const result = await commentService.getArticleComments(articleId, cursor, limit);
+
+    res.send(result);
+  }
+
+  async createProductComment(req: Request, res: Response) {
+    assert(req.body, CreateComment);
+
+    const productId = Number(req.params.id);
+    const { content } = req.body;
+
+    const comment = await commentService.createProductComment(productId, content);
+    res.status(201).send(comment);
+  }
+
+  async getProductComments(
+    req: Request<{ id: string }, any, any, { cursor?: number; limit?: string }>,
+    res: Response,
+  ) {
+    const productId = Number(req.params.id);
+    const cursor = req.query.cursor;
+    const limit = parseInt(req.query.limit || '10');
+
+    const result = await commentService.getProductComments(productId, cursor, limit);
+    res.send(result);
   }
 }
 

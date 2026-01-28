@@ -22,11 +22,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  productlikes ProductLike[]
-  articlelikes ArticleLike[]
-  products     Product[]
-  articles     Article[]
-  comments     Comment[]
+  productlikes  ProductLike[]
+  articlelikes  ArticleLike[]
+  products      Product[]
+  articles      Article[]
+  comments      Comment[]
+  notifications Notification[]
 }
 
 model Product {
@@ -97,6 +98,24 @@ model Comment {
 
   userId Int?
   user   User? @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        Int              @id @default(autoincrement())
+  userId    Int
+  user      User             @relation(fields: [userId], references: [id])
+  type      NotificationType
+  targetId  Int
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  readAt    DateTime?
+
+  @@index([userId, isRead, createdAt])
+}
+
+enum NotificationType {
+  COMMENT_CREATED //targetId: Comment.id
+  PRICE_CHANGED //targetId: Product.id
 }
 
 // model CommentToProduct {

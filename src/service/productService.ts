@@ -2,6 +2,8 @@ import { Category } from '@prisma/client';
 import productRepository from '../repository/productRepository';
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import NotFoundError from '../lib/errors/NotFoundError';
+import notificationService from './notificationService';
+import { notifyUser } from '../socket/socketServer';
 
 class ProductService {
   getProducts(offset: number, limit: number, order: string, search: string) {
@@ -46,12 +48,21 @@ class ProductService {
       throw new ForbiddenError('본인만 접근할 수 있습니다.');
     }
 
+    const oldPrice = existing.price;
+    const newPrice = data.price;
     const { category, ...rest } = data;
 
-    return productRepository.update(id, {
+    const updatedProduct = await productRepository.update(id, {
       ...rest,
       category: category as Category,
     });
+
+    // 가격이 실제로 바뀐 경우만 알림
+    if (typeof newPrice === 'number' && newPrice !== oldPrice) {
+      await this.notifyPriceChanged(updatedProduct);
+    }
+
+    return updatedProduct;
   }
 
   async deleteProduct(id: number, userId: number) {
@@ -64,22 +75,27 @@ class ProductService {
     await productRepository.delete(id);
   }
 
-  createComment(productId: number, content: string) {
-    return productRepository.createComment(productId, content);
-  }
-
-  async getComments(productId: number, cursor: number | undefined, limit: number) {
-    const comments = await productRepository.getComments(productId, cursor, limit);
-
-    return {
-      data: comments,
-      nextCursor: comments.length > 0 ? comments[comments.length - 1].id : null,
-    };
-  }
-
   private validateCategory(category: unknown) {
+    if (category === undefined) return;
     if (!Object.values(Category).includes(category as Category)) {
       throw new ForbiddenError('유효하지 않은 카테고리입니다.');
+    }
+  }
+  private async notifyPriceChanged(product: any) {
+    // 이 상품을 구독 / 관심 등록한 유저들 조회
+    const targetUserIds = await productRepository.findWatchers(product.id);
+
+    for (const userId of targetUserIds) {
+      // DB 알림 생성
+      const notification = await notificationService.notifyPriceChanged(product.id, userId);
+
+      // 실시간 소켓 알림
+      notifyUser(userId, 'notification', {
+        id: notification.id,
+        type: notification.type,
+        productId: product.id,
+        price: product.price,
+      });
     }
   }
 }

@@ -40,7 +40,7 @@ function getList() {
             const users = yield user_repo_1.default.getList();
             if (!users)
                 throw new Error('NOT_FOUND');
-            return users;
+            return filterPassword(users);
         }
         else {
             return { message: '개발자 옵션 입니다' };
@@ -104,7 +104,7 @@ function getInfo(userId) {
 function patchInfo(userId, userData) {
     return __awaiter(this, void 0, void 0, function* () {
         (0, superstruct_1.assert)(userData, structs_1.PatchUser);
-        const user = (yield user_repo_1.default.patch(userId, userData));
+        const user = yield user_repo_1.default.patch(userId, userData);
         return (0, selectFields_1.selectUserFields)(user, 'core');
     });
 }

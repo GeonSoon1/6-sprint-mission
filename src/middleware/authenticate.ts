@@ -1,10 +1,10 @@
 import { verifyAccessToken } from '../lib/token';
 import { ACCESS_TOKEN_COOKIE_NAME } from '../lib/constants';
-import userService from '../service/user.service';
+import authService from '../service/auth.service';
 import BadRequestError from './errors/BadRequestError';
 import { Request, Response, NextFunction } from 'express';
 
-async function authenticateUser(req: Request, res: Response, next: NextFunction) {
+async function authenticate(req: Request, res: Response, next: NextFunction) {
   try {
     const accessToken = check_accessTokenExist(req.cookies);
     if (!accessToken) {
@@ -21,7 +21,7 @@ async function authenticateUser(req: Request, res: Response, next: NextFunction)
       throw new BadRequestError('NO_USER_FOUND');
     }
 
-    const user = await userService.verifyUserExist(userId);
+    const user = await authService.verifyUserExist(userId);
     if (!user) {
       console.log('No user foundwith the given ID by accessToken');
       throw new BadRequestError('NO_USER_FOUND');
@@ -43,4 +43,4 @@ function check_accessTokenExist(cookieData: Record<string, string | undefined>) 
   return accessToken;
 }
 
-export default authenticateUser;
+export default authenticate;

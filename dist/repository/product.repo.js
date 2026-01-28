@@ -27,9 +27,27 @@ function patch(id, productData) {
         });
     });
 }
+function like(productId, userId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield prismaClient_1.default.product.update({
+            where: { id: productId },
+            data: { likedUsers: { connect: { id: userId } } },
+            include: { likedUsers: true }
+        });
+    });
+}
+function cancelLike(productId, userId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield prismaClient_1.default.product.update({
+            where: { id: productId },
+            data: { likedUsers: { disconnect: { id: userId } } },
+            include: { likedUsers: true }
+        });
+    });
+}
 function erase(id) {
     return __awaiter(this, void 0, void 0, function* () {
-        return yield prismaClient_1.default.product.delete({ where: { id } });
+        yield prismaClient_1.default.product.delete({ where: { id } });
     });
 }
 function countById(id) {
@@ -58,6 +76,8 @@ function findById(id) {
 exports.default = {
     post,
     patch,
+    like,
+    cancelLike,
     erase,
     findById,
     countById,

@@ -1,26 +1,22 @@
 import { assert } from 'superstruct';
-import { CreateArticle, PatchArticle } from '../struct/structs';
+import { CreateArticle, PatchArticle } from '../struct/article.struct';
 import NotFoundError from '../middleware/errors/NotFoundError';
 import articleRepo from '../repository/article.repo';
-import { isEmpty } from '../lib/myFuns';
-import { selectArticleFields } from '../lib/selectFields';
-import { createArticleDTO, updateArticleDTO } from '../dto/dto';
-import { Prisma } from '@prisma/client';
+import { isEmpty, includedOk } from '../lib/myFuns';
+import { selectFields } from '../lib/selectFields';
+import { CreateArticleDto, UpdateArticleDto } from '../types/dto';
+import { Article2show, ArticleList2show, LikedArticle2show } from '../types/interfaceType';
+import { Article, Prisma } from '@prisma/client';
 
 // 게시물 생성, 수정, 삭제: 토큰 인증된 유저만 가능
-async function post(userId: number, data: createArticleDTO) {
+async function post(userId: number, data: CreateArticleDto): Promise<Article> {
   const articleData = { ...data, userId };
   assert(articleData, CreateArticle);
-  const prismaData: Prisma.ArticleCreateInput = {
-    ...data, // title, content, imageUrls 등
-    user: { connect: { id: userId } } // userId → user 연결
-  };
-  const article = await articleRepo.post(prismaData);
-  //if (isEmpty(article)) throw new NotFoundError(article, article.id);
+  const article = await articleRepo.post(articleData);
   return article;
 }
 
-async function patch(articleId: string, articleData: updateArticleDTO) {
+async function patch(articleId: string, articleData: UpdateArticleDto) {
   assert(articleData, PatchArticle);
   const article = await articleRepo.patch(
     Number(articleId),
@@ -44,7 +40,7 @@ async function getList(
   orderStr: string,
   titleStr: string | undefined,
   contentStr: string | undefined
-) {
+): Promise<ArticleList2show[]> {
   const orderBy = { createdAt: 'desc' };
   if (orderStr === 'oldest') {
     orderBy.createdAt = 'asc';
@@ -60,49 +56,35 @@ async function getList(
     const { id, title, content, createdAt, ...rest } = a;
     return { id, title, content, createdAt };
   });
-
   return articlesToShow;
 }
 
 // 게시물 상세 조회
 // 조회 필드 요구: id, title, content, createdAt
 // 조회 필드 추가: comments, likedUsers
-async function get(userId: number | undefined, articleId: string) {
+async function get(
+  userId: number | undefined,
+  articleId: string
+): Promise<Article2show | LikedArticle2show> {
   let article = await articleRepo.findById(Number(articleId));
-  const article2show = selectArticleFields(article);
+  const article2show = selectFields(article);
   if (!userId) return article2show;
   const isLiked = article.likedUsers.some((a) => a.id === userId);
   return { isLiked, ...article2show };
 }
 
-async function like(userId: number, articleId: string) {
+// 좋아요와 좋아요취소 토글
+async function likeToggle(userId: number, articleId: string): Promise<LikedArticle2show> {
   const article = await articleRepo.findById(Number(articleId));
-  let updatedArticle;
-  if (article.likedUsers.some((n) => n.id === userId)) {
-    console.log('Already your favorite article');
-  } else {
-    console.log('Now, one of your favorite articles');
-    updatedArticle = await articleRepo.patch(Number(articleId), {
-      likedUsers: { connect: { id: userId } }
-    });
-  }
-  const article2show = selectArticleFields(updatedArticle ?? article);
-  return { isLiked: true, ...article2show };
-}
+  const isLiked = includedOk(article.likedUsers, 'id', userId);
 
-async function cancelLike(userId: number, articleId: string) {
-  let article = await articleRepo.findById(Number(articleId));
-  let updateArticle;
-  if (!article.likedUsers.some((n) => n.id === userId)) {
-    console.log('Already not your favorite article');
-  } else {
-    console.log('Now, not one of your favorite articles');
-    updateArticle = await articleRepo.patch(Number(articleId), {
-      likedUsers: { disconnect: { id: userId } }
-    });
-  }
-  const article2show = selectArticleFields(updateArticle ?? article);
-  return { isLiked: false, ...article2show };
+  const updated = isLiked
+    ? await articleRepo.cancelLike(Number(articleId), userId)
+    : await articleRepo.like(Number(articleId), userId);
+
+  console.log(isLiked ? 'Now, not your favorite article' : 'Now, your favorite article');
+  const article2show = selectFields(updated);
+  return { isLiked: !isLiked, ...article2show };
 }
 
 export default {
@@ -111,6 +93,5 @@ export default {
   erase,
   getList,
   get,
-  like,
-  cancelLike
+  likeToggle
 };

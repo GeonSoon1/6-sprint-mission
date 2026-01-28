@@ -1,35 +1,128 @@
 import { assert } from 'superstruct';
-import { isEmpty } from '../lib/myFuns';
+import { includedOk } from '../lib/myFuns';
 import productRepo from '../repository/product.repo';
-import { CreateProduct, PatchProduct } from '../struct/structs';
-import { selectProductFields } from '../lib/selectFields';
-import { createProductDTO, updateProductDTO, updateUserDTO } from '../dto/dto';
-import { Prisma } from '@prisma/client';
+import { selectFields } from '../lib/selectFields';
+import { ProductListToShow, ProductToShow } from '../types/interfaceType';
+import {
+  CreateProductDto,
+  UpdateProductDto,
+  CreateNotificationDto,
+  CreateProductPriceHistoryDto
+} from '../types/dto';
+import { Prisma, Product, ProductPriceHistory, NotificationType } from '@prisma/client';
 import NotFoundError from '../middleware/errors/NotFoundError';
+import prisma from '../lib/prismaClient';
+import {
+  CreateProduct,
+  PatchProduct,
+  CreateProductPriceHistory,
+  CreateNotification
+} from '../struct/product.struct';
+import { getIO } from '../websocket/socketIO';
 
-async function post(userId: number, data: createProductDTO) {
-  const productData = { ...data, userId };
-  assert(productData, CreateProduct);
-  const prismaData: Prisma.ProductCreateInput = {
-    ...data, // name, description, price, tags, imageUrls 등
-    user: { connect: { id: userId } } // userId → user 연결
-  };
-  const product = await productRepo.post(prismaData);
-  //if (isEmpty(product)) throw new Error('NOT_FOUND');
-  return product;
-}
+async function post(data: CreateProductDto): Promise<[Product, ProductPriceHistory]> {
+  assert(data, CreateProduct);
+  const { userId, ...rest } = data;
+  const productData = { ...rest, user: { connect: { id: userId } } } as Prisma.ProductCreateInput;
 
-async function patch(productId: string, productData: updateProductDTO) {
-  assert(productData, PatchProduct);
-  const product = await productRepo.patch(
-    Number(productId),
-    productData as Prisma.ProductUpdateInput
+  const { product, newPriceRecord } = await prisma.$transaction(
+    async (tx: Prisma.TransactionClient) => {
+      const product = await tx.product.create({ data: productData });
+
+      const priceData = {
+        price: data.price,
+        product: { connect: { id: product.id } }
+      } as Prisma.ProductPriceHistoryCreateInput;
+
+      assert({ productId: product.id, price: data.price }, CreateProductPriceHistory);
+      const newPriceRecord = await tx.productPriceHistory.create({ data: priceData });
+      return { product, newPriceRecord };
+    }
   );
-  if (isEmpty(product)) throw new NotFoundError('product', Number(productId));
-  return product;
+  return [product, newPriceRecord];
 }
 
-async function erase(productId: string) {
+async function patch(productId: number, data: UpdateProductDto): Promise<Product> {
+  assert(data, PatchProduct);
+  const prevPrice = await priceToBeChanged(productId, data);
+  let newProduct;
+
+  // 상품 가격 변동이 있는 경우, 가격 변동 기록 생성
+  if (Number(prevPrice)) {
+    const priceData = {
+      prevPrice,
+      price: data.price,
+      productId
+    } as CreateProductPriceHistoryDto;
+    assert(priceData, CreateProductPriceHistory);
+
+    const priceDataToRepo = {
+      prevPrice,
+      price: data.price,
+      product: { connect: { id: productId } }
+    } as Prisma.ProductPriceHistoryCreateInput;
+
+    const product = await productRepo.findById(productId);
+    if (!product) throw new NotFoundError('product', productId);
+
+    let priceRecord;
+    let notifications = [];
+
+    // 그 상품에 좋아요를 누른 사람이 있는 경우 알림 생성
+    if (product.likedUsers.length !== 0) {
+      const message = `상품${productId} 가격 변동 알림: (${prevPrice} --> ${data.price})`;
+
+      for (let likedUser of product.likedUsers) {
+        let notificationData = {
+          userId: likedUser.id,
+          type: NotificationType.PRODUCT,
+          message,
+          productId
+        } as CreateNotificationDto;
+        assert(notificationData, CreateNotification);
+      }
+
+      const notificationQueries = product.likedUsers.map((likedUser) =>
+        prisma.notification.create({
+          data: {
+            user: { connect: { id: likedUser.id } },
+            type: NotificationType.PRODUCT,
+            message: message,
+            product: { connect: { id: productId } }
+          } as Prisma.NotificationCreateInput
+        })
+      );
+
+      [priceRecord, newProduct, ...notifications] = await prisma.$transaction([
+        prisma.productPriceHistory.create({ data: priceDataToRepo }),
+        prisma.product.update({ data, where: { id: productId } }),
+        ...notificationQueries
+      ]);
+
+      const io = getIO();
+      for (const likeUser of product.likedUsers) {
+        io.to(`user:${likeUser.id}`).emit('notification', { message });
+      }
+      console.log('');
+      console.log('Price changed');
+      console.log('ProductPriceHistory updated');
+      console.log('Notification sent & stored');
+    } else {
+      // 좋아요를 누른 유저가 없는 상품인 경우 알림 없음
+      [priceRecord, newProduct] = await prisma.$transaction([
+        prisma.productPriceHistory.create({ data: priceDataToRepo }),
+        prisma.product.update({ data, where: { id: productId } })
+      ]);
+    }
+  } else {
+    newProduct = await productRepo.patch(productId, data);
+  }
+
+  if (!newProduct) throw new NotFoundError('product', productId);
+  return newProduct;
+}
+
+async function erase(productId: string): Promise<void> {
   await productRepo.erase(Number(productId));
 }
 
@@ -44,7 +137,7 @@ async function getList(
   orderStr: string,
   nameStr: string | undefined,
   descriptionStr: string | undefined
-) {
+): Promise<ProductListToShow[]> {
   const orderBy = { createdAt: 'desc' };
   if (orderStr === 'oldest') {
     orderBy.createdAt = 'asc';
@@ -65,40 +158,54 @@ async function getList(
 
 // 상품 상세 조회
 // 조회 필드: id, name, description, price, tags, createdAt
-async function get(userId: number | undefined, productId: string) {
-  let product = await productRepo.findById(Number(productId));
-  const product2show = selectProductFields(product);
+async function get(
+  userId: number | undefined,
+  productId: string
+): Promise<ProductToShow | Product> {
+  const product = await productRepo.findById(Number(productId));
+  const product2show = selectFields(product);
   if (!userId) return product2show;
-  const isLiked = product.likedUsers.some((u) => u.id === userId);
+  const isLiked = includedOk(product.likedUsers, 'id', userId);
   return { isLiked, ...product2show };
 }
 
-async function like(userId: number, productId: string) {
-  let product = await productRepo.findById(Number(productId));
-  if (product.likedUsers.some((n) => n.id === userId)) {
-    console.log('Already your favorite product');
-  } else {
-    console.log('Now, one of your favorite products');
-    product = await productRepo.patch(Number(productId), {
-      likedUsers: { connect: { id: userId } }
-    });
-  }
-  const product2show = selectProductFields(product);
-  return { isLiked: true, ...product2show };
+// 좋아요와 좋아요취소 토글
+async function likeToggle(userId: number, productId: string): Promise<ProductToShow> {
+  const product = await productRepo.findById(Number(productId));
+
+  const isLiked = includedOk(product.likedUsers, 'id', userId);
+
+  const updated = isLiked
+    ? await productRepo.cancelLike(Number(productId), userId)
+    : await productRepo.like(Number(productId), userId);
+
+  console.log(isLiked ? 'Now, not your favorite product' : 'Now, your favorite product');
+
+  const product2show = selectFields(updated);
+
+  return {
+    isLiked: !isLiked,
+    ...product2show
+  };
 }
 
-async function cancelLike(userId: number, productId: string) {
-  let product = await productRepo.findById(Number(productId));
-  if (!product.likedUsers.some((n) => n.id === userId)) {
-    console.log('Already not one of your liked products');
-  } else {
-    console.log('Now, not one of your liked products');
-    product = await productRepo.patch(Number(productId), {
-      likedUsers: { disconnect: { id: userId } }
-    });
-  }
-  const product2show = selectProductFields(product);
-  return { isLiked: false, ...product2show };
+async function getPriceRecord(id: number): Promise<ProductPriceHistory | null> {
+  return await productRepo.getPriceRecord(id);
+}
+
+async function getPriceRecords(productId: number): Promise<ProductPriceHistory[]> {
+  return await productRepo.getPriceRecords(productId);
+}
+
+//-----------------------------------
+
+async function priceToBeChanged(productId: number, productData: UpdateProductDto): Promise<Number> {
+  if (productData.price === undefined) return 0;
+
+  const currentProduct = await productRepo.findById(productId);
+  if (!currentProduct) throw new NotFoundError('product', productId);
+  if (productData.price === currentProduct.price) return 0;
+  return currentProduct.price;
 }
 
 export default {
@@ -107,6 +214,7 @@ export default {
   erase,
   getList,
   get,
-  like,
-  cancelLike
+  likeToggle,
+  getPriceRecord,
+  getPriceRecords
 };

@@ -22,6 +22,5 @@
     /* Completeness */
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*", "src-done"],
-  "exclude": ["./src-done/*"]
+  "include": ["src/**/*", "src/mock.ts", "src/seed.ts", "src/websocket/websocket.ts", "src/main.ts"]
 }

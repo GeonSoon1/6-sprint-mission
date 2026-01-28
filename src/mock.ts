@@ -1396,3 +1396,565 @@ export const COMMENTS = [
     updatedAt: '2025-11-07T11:00:00Z'
   }
 ];
+
+//----------------------------------------
+// Product-Price-Histories: 27개
+//----------------------------------------
+export const PRODUCTPRICEHISTORIES = [
+  {
+    id: 1,
+    productId: 1,
+    price: 159000,
+    createdAt: '2023-05-22T09:30:00Z'
+  },
+  {
+    id: 2,
+    productId: 2,
+    price: 149000,
+    createdAt: '2023-05-22T09:30:00Z'
+  },
+  {
+    id: 3,
+    productId: 3,
+    price: 459000,
+    createdAt: '2023-05-22T09:30:00Z'
+  },
+  {
+    id: 4,
+    productId: 4,
+    price: 759000,
+    createdAt: '2023-05-23T09:31:00Z'
+  },
+  {
+    id: 5,
+    productId: 5,
+    price: 149000,
+    createdAt: '2023-05-24T09:31:00Z'
+  },
+  {
+    id: 6,
+    productId: 6,
+    price: 1690000,
+    createdAt: '2023-06-04T10:00:00Z'
+  },
+  {
+    id: 7,
+    productId: 7,
+    price: 59000,
+    createdAt: '2023-06-06T09:30:00Z'
+  },
+  {
+    id: 8,
+    productId: 8,
+    price: 149000,
+    createdAt: '2023-06-13T08:00:00Z'
+  },
+  {
+    id: 9,
+    productId: 9,
+    price: 1190000,
+    createdAt: '2023-06-13T10:00:00Z'
+  },
+  {
+    id: 10,
+    productId: 10,
+    price: 2890000,
+    createdAt: '2023-06-13T14:22:00Z'
+  },
+  {
+    id: 11,
+    productId: 11,
+    price: 320000,
+    createdAt: '2023-06-17T11:00:00Z'
+  },
+  {
+    id: 12,
+    productId: 12,
+    price: 189000,
+    createdAt: '2023-07-15T10:00:00Z'
+  },
+  {
+    id: 13,
+    productId: 13,
+    price: 139000,
+    createdAt: '2023-07-20T08:00:00Z'
+  },
+  {
+    id: 14,
+    productId: 14,
+    price: 2290000,
+    createdAt: '2023-07-21T11:20:00Z'
+  },
+  {
+    id: 15,
+    productId: 15,
+    price: 129000,
+    createdAt: '2023-07-21T14:00:00Z'
+  },
+  {
+    id: 16,
+    productId: 16,
+    price: 1890000,
+    createdAt: '2023-07-21T23:26:00Z'
+  },
+  {
+    id: 17,
+    productId: 17,
+    price: 1450000,
+    createdAt: '2023-07-22T10:32:00Z'
+  },
+  {
+    id: 18,
+    productId: 18,
+    price: 1890000,
+    createdAt: '2023-08-03T09:00:00Z'
+  },
+  {
+    id: 19,
+    productId: 19,
+    price: 389000,
+    createdAt: '2023-08-09T10:15:00Z'
+  },
+  {
+    id: 20,
+    productId: 20,
+    price: 420000,
+    createdAt: '2023-08-15T09:30:00Z'
+  },
+  {
+    id: 21,
+    productId: 21,
+    price: 599000,
+    createdAt: '2023-08-16T14:15:00Z'
+  },
+  {
+    id: 22,
+    productId: 22,
+    price: 479000,
+    createdAt: '2023-09-09T09:30:00Z'
+  },
+  {
+    id: 23,
+    productId: 23,
+    price: 699000,
+    createdAt: '2023-09-11T09:15:00Z'
+  },
+  {
+    id: 24,
+    productId: 24,
+    price: 249000,
+    createdAt: '2023-09-15T14:00:00Z'
+  },
+  {
+    id: 25,
+    productId: 25,
+    price: 69000,
+    createdAt: '2023-09-19T09:15:00Z'
+  },
+  {
+    id: 26,
+    productId: 26,
+    price: 1590000,
+    createdAt: '2023-10-01T08:00:00Z'
+  },
+  {
+    id: 27,
+    productId: 27,
+    price: 1340000,
+    createdAt: '2023-10-03T08:00:00Z'
+  }
+];
+
+//----------------------------------------
+// Notificatioins: 43개 (article comments 수)
+//----------------------------------------
+import { NotificationType } from '@prisma/client';
+export const NOTIFICATIONS = [
+  {
+    message: '댓글 알림: 색감이 예술이에요. (1 by user5)',
+    id: 1,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 1,
+    createdAt: '2025-10-26T15:00:00Z'
+  },
+  {
+    message: '댓글 알림: 디테일이 환상적이에요. (2 by user3)',
+    id: 2,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 2,
+    createdAt: '2025-10-26T15:10:00Z'
+  },
+  {
+    message: '댓글 알림: 스파이더맨의 새로운 해석이 좋았어요! (3 by user5)',
+    id: 3,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 3,
+    createdAt: '2025-10-27T10:00:00Z'
+  },
+  {
+    message: '댓글 알림: 쿠키영상까지 완벽했습니다. (4 by user1)',
+    id: 4,
+    userId: 1,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 4,
+    createdAt: '2025-10-27T10:22:00Z'
+  },
+  {
+    message: '댓글 알림: 하울의 성 디자인이 너무 예뻐요. (6 by user4)',
+    id: 5,
+    userId: 4,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 6,
+    createdAt: '2025-10-29T09:15:00Z'
+  },
+  {
+    message: '댓글 알림: OST 들을 때마다 눈물이 납니다. (8 by user5)',
+    id: 6,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 8,
+    createdAt: '2025-10-29T09:18:00Z'
+  },
+  {
+    message: '댓글 알림: 인생 영화입니다. (8 by user3)',
+    id: 7,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 8,
+    createdAt: '2025-10-30T10:20:00Z'
+  },
+  {
+    message: '댓글 알림: 포레스트 검프의 순수함이 감동적이에요. (8 by user1)',
+    id: 8,
+    userId: 1,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 8,
+    createdAt: '2025-10-30T10:30:00Z'
+  },
+  {
+    message: '댓글 알림: 인간미를 찾을 수 없는 각박한 이야기네요. (9 by user2)',
+    id: 9,
+    userId: 2,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 9,
+    createdAt: '2025-10-31T12:00:00Z'
+  },
+  {
+    message: '댓글 알림: 두 주인공의 케미가 끔직하게 좋아요. (10 by user5)',
+    id: 10,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 10,
+    createdAt: '2025-10-31T12:20:00Z'
+  },
+  {
+    message: '댓글 알림: 실화라 더 충격적이었어요. (11 by user3)',
+    id: 11,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 11,
+    createdAt: '2025-11-01T08:00:00Z'
+  },
+  {
+    message: '댓글 알림: 배우 연기력이 모두 대단했습니다. (9 by user1)',
+    id: 12,
+    userId: 1,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 9,
+    createdAt: '2025-11-01T08:17:00Z'
+  },
+  {
+    message: '댓글 알림: 엔드게임은 진정한 대서사시! (1 by user5)',
+    id: 13,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 1,
+    createdAt: '2025-11-01T13:00:00Z'
+  },
+  {
+    message: '댓글 알림: 사회경제적 지위, 인종 따위를 넘어서는 인간미의 승리 (13 by user5)',
+    id: 14,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 13,
+    createdAt: '2025-11-01T13:10:00Z'
+  },
+  {
+    message: '댓글 알림: 민주화를 꿈꾸는 시민군의 열망이 느껴져요 (14 by user3)',
+    id: 15,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 14,
+    createdAt: '2025-11-02T08:00:00Z'
+  },
+  {
+    message: '댓글 알림: 진짜 판타지의 정석 (4 by user3)',
+    id: 16,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 4,
+    createdAt: '2025-11-02T08:54:00Z'
+  },
+  {
+    message: '댓글 알림: 조커 연기가 미쳤어요. (17 by user3)',
+    id: 17,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 17,
+    createdAt: '2025-11-02T10:00:00Z'
+  },
+  {
+    message: '댓글 알림: 엔딩에서 소름 돋았습니다. (17 by user1)',
+    id: 18,
+    userId: 1,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 17,
+    createdAt: '2025-11-02T10:35:00Z'
+  },
+  {
+    message: '댓글 알림: 눈물이 멈추지 않았어요 (18 by user4)',
+    id: 19,
+    userId: 4,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 18,
+    createdAt: '2025-11-02T21:10:00Z'
+  },
+  {
+    message: '댓글 알림: 레오나르도 연기가 압권입니다 (11 by user1)',
+    id: 20,
+    userId: 1,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 11,
+    createdAt: '2025-11-02T21:40:00Z'
+  },
+  {
+    message: '댓글 알림: 시간의 개념을 이렇게 표현하다니 대단해요 (5 by user5)',
+    id: 21,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 5,
+    createdAt: '2025-11-02T22:20:00Z'
+  },
+  {
+    message: '댓글 알림: OST도 정말 좋았어요 (16 by user3)',
+    id: 22,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 16,
+    createdAt: '2025-11-02T22:45:00Z'
+  },
+  {
+    message: '댓글 알림: 호랑이랑의 관계가 인상 깊었어요. (19 by user1)',
+    id: 23,
+    userId: 1,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 19,
+    createdAt: '2025-11-03T09:28:00Z'
+  },
+  {
+    message: '댓글 알림: 생명에 대한 메시지가 강렬했어요. (19 by user5)',
+    id: 24,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 19,
+    createdAt: '2025-11-03T09:31:00Z'
+  },
+  {
+    message: '댓글 알림: 환상적인 세계관! (19 by user5)',
+    id: 25,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 19,
+    createdAt: '2025-11-03T10:21:00Z'
+  },
+  {
+    message: '댓글 알림: 치히로의 성장 서사가 인상적이에요 (15 by user3)',
+    id: 26,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 15,
+    createdAt: '2025-11-03T10:40:00Z'
+  },
+  {
+    message: '댓글 알림: 결말의 반전이 충격적이었어요 (10 by user5)',
+    id: 27,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 10,
+    createdAt: '2025-11-03T12:08:00Z'
+  },
+  {
+    message: '댓글 알림: 박찬욱 감독다운 긴장감 (18 by user2)',
+    id: 28,
+    userId: 2,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 18,
+    createdAt: '2025-11-03T12:29:00Z'
+  },
+  {
+    message: '댓글 알림: 음악과 색감이 너무 아름다워요 (16 by user5)',
+    id: 29,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 16,
+    createdAt: '2025-11-03T12:30:00Z'
+  },
+  {
+    message: '댓글 알림: 엔딩이 마음 아파요 (18 by user2)',
+    id: 30,
+    userId: 2,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 18,
+    createdAt: '2025-11-03T13:34:00Z'
+  },
+  {
+    message: '댓글 알림: 꿈과 현실의 경계가 흥미로워요 (7 by user4)',
+    id: 31,
+    userId: 4,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 7,
+    createdAt: '2025-11-03T14:30:00Z'
+  },
+  {
+    message: '댓글 알림: 음악도 완벽했어요 (16 by user4)',
+    id: 32,
+    userId: 4,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 16,
+    createdAt: '2025-11-03T14:45:00Z'
+  },
+  {
+    message: '댓글 알림: 사랑과 기억에 대한 철학적인 영화예요 (20 by user5)',
+    id: 33,
+    userId: 5,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 20,
+    createdAt: '2025-11-04T07:45:00Z'
+  },
+  {
+    message: '댓글 알림: 희망을 잃지 않는 주인공의 모습이 감동적이에요 (12 by user4)',
+    id: 34,
+    userId: 4,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 12,
+    createdAt: '2025-11-04T08:00:00Z'
+  },
+  {
+    message: '댓글 알림: 서스펜스가 대단해요 (10 by user2)',
+    id: 35,
+    userId: 2,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 10,
+    createdAt: '2025-11-04T21:00:00Z'
+  },
+  {
+    message: '댓글 알림: 음악이 분위기를 살려줘요 (4 by user3)',
+    id: 36,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 4,
+    createdAt: '2025-11-04T21:15:00Z'
+  },
+  {
+    message: '댓글 알림: 봉준호 감독의 연출력 최고 (9 by user4)',
+    id: 37,
+    userId: 4,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 9,
+    createdAt: '2025-11-05T18:15:00Z'
+  },
+  {
+    message: '댓글 알림: 마지막 장면이 소름 돋았어요 (17 by user3)',
+    id: 38,
+    userId: 3,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 17,
+    createdAt: '2025-11-05T19:15:00Z'
+  },
+  {
+    message: '댓글 알림: 영국식 감성이 너무 좋아요 (21 by user4)',
+    id: 39,
+    userId: 4,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 21,
+    createdAt: '2025-11-06T09:52:00Z'
+  },
+  {
+    message: '댓글 알림: 잔잔하지만 감정이 깊어요 (21 by user4)',
+    id: 40,
+    userId: 4,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 21,
+    createdAt: '2025-11-06T10:11:00Z'
+  },
+  {
+    message: '댓글 알림: 조 페시의 연기 정말 웃겼어요! (22 by user2)',
+    id: 41,
+    userId: 2,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 22,
+    createdAt: '2025-11-07T10:00:00Z'
+  },
+  {
+    message: '댓글 알림: 대사 하나하나에 박장대소. 특히 초반의 감옥씬 (22 by user1)',
+    id: 42,
+    userId: 1,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 22,
+    createdAt: '2025-11-07T10:30:00Z'
+  },
+  {
+    message: '댓글 알림: 조 페시와 마리사 토메이, 환상의 연기 궁합 (22 by user1)',
+    id: 43,
+    userId: 1,
+    type: NotificationType.ARTICLE,
+    isRead: false,
+    articleId: 22,
+    createdAt: '2025-11-07T11:00:00Z'
+  }
+];

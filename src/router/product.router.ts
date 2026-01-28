@@ -1,17 +1,23 @@
 import express from 'express';
-import authenticateUser from '../middleware/authenticate.user';
-import authorizeUser from '../middleware/authorize.user';
+import authenticate from '../middleware/authenticate';
+import authorize from '../middleware/authorize';
 import productControl from '../controller/product.control';
 import withTryCatch from '../lib/withTryCatch';
 
 const productRouter = express.Router();
 
 productRouter.get('/', withTryCatch(productControl.getList));
-productRouter.get('/:id', authenticateUser, withTryCatch(productControl.get));
-productRouter.post('/:id/like', authenticateUser, withTryCatch(productControl.like));
-productRouter.post('/:id/like/cancel', authenticateUser, withTryCatch(productControl.cancelLike));
-productRouter.post('/', authenticateUser, withTryCatch(productControl.post));
-productRouter.patch('/:id', authenticateUser, authorizeUser, withTryCatch(productControl.patch));
-productRouter.delete('/:id', authenticateUser, authorizeUser, withTryCatch(productControl.erase));
+productRouter.get('/:id', authenticate, withTryCatch(productControl.get));
+productRouter.post('/:id/like/toggle', authenticate, withTryCatch(productControl.likeToggle));
+productRouter.post('/', authenticate, withTryCatch(productControl.post));
+productRouter.patch('/:id', authenticate, authorize, withTryCatch(productControl.patch));
+productRouter.delete('/:id', authenticate, authorize, withTryCatch(productControl.erase));
+
+productRouter.get(
+  '/:productId/price-records/',
+  authenticate,
+  withTryCatch(productControl.getPriceRecords)
+);
+productRouter.get('/price-records/:id', authenticate, withTryCatch(productControl.getPriceRecord));
 
 export default productRouter;

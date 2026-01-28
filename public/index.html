@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Socket.IO Notification Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      input {
+        width: 400px;
+        padding: 8px;
+      }
+      button {
+        padding: 8px 12px;
+        margin-left: 8px;
+        cursor: pointer;
+      }
+      .status {
+        margin-top: 10px;
+        font-weight: bold;
+      }
+      ul {
+        margin-top: 20px;
+        padding: 0;
+        list-style: none;
+      }
+      li {
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        background: #f5f5f5;
+        border-left: 5px solid #999;
+      }
+      .comment {
+        border-color: #4caf50;
+      }
+      .priceChange {
+        border-color: #ff9800;
+      }
+      .time {
+        font-size: 12px;
+        color: #666;
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔔 Socket.IO 알림 테스트</h1>
+
+    <form id="form">
+      <input type="text" id="token" placeholder="JWT Access Token 입력" />
+      <button>Connect</button>
+    </form>
+
+    <div class="status" id="status">⛔ 연결 안 됨</div>
+
+    <h2>받은 알림</h2>
+    <ul id="notifications"></ul>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+      const form = document.getElementById('form');
+      const tokenInput = document.getElementById('token');
+      const statusEl = document.getElementById('status');
+      const listEl = document.getElementById('notifications');
+
+      let socket;
+
+      function addNotification(type, message, extra = {}) {
+        const li = document.createElement('li');
+        li.className = type;
+
+        li.innerHTML = `
+          <strong>[${type}]</strong> ${message}
+          <div class="time">${new Date().toLocaleTimeString()}</div>
+        `;
+
+        listEl.prepend(li);
+      }
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        if (socket) {
+          socket.disconnect();
+        }
+
+        socket = io('http://localhost:3000', {
+          path: '/chat',
+          auth: {
+            accessToken: tokenInput.value,
+          },
+        });
+
+        socket.on('connect', () => {
+          statusEl.textContent = '✅ 서버 연결 완료';
+          statusEl.style.color = 'green';
+        });
+
+        socket.on('connect_error', (err) => {
+          statusEl.textContent = `❌ 연결 실패: ${err.message}`;
+          statusEl.style.color = 'red';
+        });
+
+        // 게시글 / 상품 댓글 알림
+        socket.on('comment', (data) => {
+          addNotification('comment', data.message, data);
+        });
+
+        // 상품 가격 변동 알림
+        socket.on('priceChange', (data) => {
+          addNotification('priceChange', data.message, data);
+        });
+      });
+    </script>
+  </body>
+</html>

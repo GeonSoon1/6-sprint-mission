@@ -7,6 +7,20 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "typeRoots": ["./src/types", "./node_modules/@types"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@dto/*": ["src/dto/*"],
+      "@lib/*": ["src/lib/*"],
+      "@middleware/*": ["src/middleware/*"],
+      "@repository/*": ["src/repository/*"],
+      "@routers/*": ["src/routers/*"],
+      "@service/*": ["src/service/*"],
+      "@structs/*": ["src/structs/*"],
+      "@app-types/*": ["src/types/*"] // 기존 @types 와 겹쳐서 이름 별도 지정
+      // 사용 예시) import asyncHandler from '@libs/asyncHandler';
+    },
 
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,

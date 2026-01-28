@@ -1,36 +1,39 @@
 import express from 'express';
-import cookieParser from 'cookie-parser';
-
 import cors from 'cors';
-import errorHandler from './middleware/errorhandler';
-import { PORT } from './lib/constants';
-
-import imgRouter from './routers/imgRoute';
-import authRoute from './routers/authRoute';
-import productRoute from './routers/productRoute';
-import articleRoute from './routers/articleRoute';
-import userRoute from './routers/userRoute';
+import path from 'path';
+import cookieParser from 'cookie-parser';
+import http from 'http';
+import { PORT, PUBLIC_PATH, STATIC_PATH } from '@lib/constants';
+import { setupWebSocket } from '@lib/websocket';
+import articlesRouter from '@/routers/article.router';
+import productsRouter from '@/routers/product.router';
+import commentsRouter from '@/routers/comment.router';
+import imagesRouter from '@/routers/image.router';
+import authRouter from '@/routers/auth.router';
+import usersRouter from '@/routers/user.router';
+import notificationRouter from '@/routers/notification.router';
+import { defaultNotFoundHandler, globalErrorHandler } from '@/controllers/error.controller';
 
 const app = express();
+const server = http.createServer(app);
+setupWebSocket(server); // 웹소켓 연결
 
 app.use(cors());
 app.use(express.json());
-
-// 쿠키 작업
 app.use(cookieParser());
+app.use(STATIC_PATH, express.static(path.resolve(process.cwd(), PUBLIC_PATH)));
 
-// 이미지 Multer 먼저 실행
-app.use('/files', imgRouter);
-app.use('/files', express.static('files'));
+app.use('/articles', articlesRouter);
+app.use('/products', productsRouter);
+app.use('/comments', commentsRouter);
+app.use('/images', imagesRouter);
+app.use('/auth', authRouter);
+app.use('/users', usersRouter);
+app.use('/notifications', notificationRouter);
 
-// 각각 route 작업
-app.use('/auth', authRoute);
-app.use('/articles', articleRoute);
-app.use('/products', productRoute);
-app.use('/mypage', userRoute);
+app.use(defaultNotFoundHandler);
+app.use(globalErrorHandler);
 
-app.use(errorHandler);
-
-app.listen(PORT, () => {
-  console.log('localhost 3000🚀');
+server.listen(PORT, () => {
+  console.log(`🚀 Server started on port ${PORT} 🚀`);
 });

@@ -1,109 +1,59 @@
-import { ArticleCustom } from '../types/express/body.types';
-import { Request, Response } from 'express';
-import prisma from '../lib/prismaclient';
-import {
-  CreateArticleRequestDto,
-  CreateArticleCommandDto,
-  GetArticlesRequestDto,
-  GetArticlesFinalRequestDto,
-  UpdateArticleDto,
-} from '../dto/article.dto';
-import { articleRepository } from '../repository/article.repository';
-import { OrderType, OrderByMap } from '../types/express/common.types';
+import * as articlesRepository from '@/repository/article.repo';
+import { PagePaginationParams, PagePaginationResult } from '@app-types/pagination';
+import ForbiddenError from '@lib/errors/ForbiddenError';
+import NotFoundError from '@lib/errors/NotFoundError';
+import Article from '@app-types/Article';
 
-export const articleService = {
-  async createArticle(data: CreateArticleRequestDto, userId: number) {
-    // 비즈니스 검증
-    if (!data.title || !data.content) {
-      throw new Error('게시글 제목 또는 내용이 없습니다');
-    }
+type CreateArticleData = Omit<Article, 'id' | 'createdAt' | 'updatedAt' | 'likeCount' | 'isLiked'>;
+type UpdateArticleData = Partial<CreateArticleData> & { userId: number };
 
-    if (!userId) {
-      throw new Error('유효한 사용자가 아닙니다');
-    }
+export async function createArticle(data: CreateArticleData): Promise<Article> {
+  const createdArticle = await articlesRepository.createArticle(data);
+  return {
+    ...createdArticle,
+    likeCount: 0,
+    isLiked: false,
+  };
+}
 
-    const createData: CreateArticleCommandDto = {
-      userId,
-      title: data.title,
-      content: data.content,
-    };
+export async function getArticle(id: number): Promise<Article | null> {
+  const article = await articlesRepository.getArticleWithLkes(id);
+  if (!article) {
+    throw new NotFoundError('article', id);
+  }
+  return article;
+}
 
-    return articleRepository.create(createData);
-  },
+export async function getArticleList(
+  params: PagePaginationParams
+): Promise<PagePaginationResult<Article>> {
+  const articles = await articlesRepository.getArticleListWithLikes(params);
+  return articles;
+}
 
-  async readArticles(query: GetArticlesRequestDto) {
-    // 비지니스 처리 & 검증
-    // offset & limit : 숫자 변환 + 검증
-    const offset = Number(query.offset ?? 0);
-    const limit = Number(query.limit ?? 10);
+export async function updateArticle(id: number, data: UpdateArticleData): Promise<Article> {
+  const existingArticle = await articlesRepository.getArticle(id);
+  if (!existingArticle) {
+    throw new NotFoundError('article', id);
+  }
 
-    // orderBy : 출력 순서 검증
-    const order = String(query.order ?? OrderType.NEWEST);
-    const orderTypeChange = order as OrderType;
+  if (existingArticle.userId !== data.userId) {
+    throw new ForbiddenError('Should be the owner of the article');
+  }
 
-    const orderBy = OrderByMap[orderTypeChange];
+  const updatedArticle = await articlesRepository.updateArticleWithLikes(id, data);
+  return updatedArticle;
+}
 
-    // article - title & content : 문자 검증
-    const title = String(query.title ?? '');
-    const content = String(query.content ?? '');
+export async function deleteArticle(id: number, userId: number): Promise<void> {
+  const existingArticle = await articlesRepository.getArticle(id);
+  if (!existingArticle) {
+    throw new NotFoundError('article', id);
+  }
 
-    const querySet: GetArticlesFinalRequestDto = {
-      offset,
-      limit,
-      orderBy,
-      title,
-      content,
-    };
+  if (existingArticle.userId !== userId) {
+    throw new ForbiddenError('Should be the owner of the article');
+  }
 
-    return articleRepository.readList(querySet);
-  },
-
-  async readArticle(paramId: string) {
-    const articleId = Number(paramId);
-    if (!articleId || Number.isNaN(articleId))
-      throw new Error('유효한 게시글 ID가 아닙니다');
-
-    return articleRepository.readInfo(articleId);
-  },
-
-  async readArticleLike(paramId: string, userId: number) {
-    const articleId = Number(paramId);
-    if (!articleId || Number.isNaN(articleId))
-      throw new Error('유효한 게시글 ID가 아닙니다');
-
-    if (!userId) throw new Error('유효한 사용자가 아닙니다');
-
-    const checkLiked = await articleRepository.readLike(articleId, userId);
-
-    return Boolean(checkLiked);
-  },
-
-  async updateArticle(
-    body: UpdateArticleDto,
-    articleId: string,
-    userId: number
-  ) {
-    const id = Number(articleId);
-    if (!id || Number.isNaN(id)) throw new Error('유효한 게시글 ID가 아닙니다');
-
-    const article = await articleRepository.readInfo(id);
-
-    if (article.userId !== userId) {
-      throw new Error('수정 권한이 없습니다');
-    }
-
-    return articleRepository.update(body, id);
-  },
-
-  async deleteArticle(articleId: string, userId: number) {
-    const id = Number(articleId);
-    if (!id || Number.isNaN(id)) throw new Error('유효한 게시글 ID가 아닙니다');
-    const article = await articleRepository.readInfo(id);
-
-    if (article.userId !== userId) {
-      throw new Error('삭제 권한이 없습니다');
-    }
-
-    return articleRepository.delete(id);
-  },
-};
+  await articlesRepository.deleteArticle(id);
+}

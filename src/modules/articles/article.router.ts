@@ -3,15 +3,15 @@ import {
   validateCreateArticle,
   validateGetListArticle,
   validateUpdateArticle,
-} from '../middlewares/validates/validateArticle';
-import { asyncHandler } from '../libs/asyncHandler';
-import { validateIdParam } from '../middlewares/validates/validateId';
-import { articleController } from '../controllers/articleController';
+} from '../../middlewares/validates/validateArticle';
+import { asyncHandler } from '../../libs/asyncHandler';
+import { validateIdParam } from '../../middlewares/validates/validateId';
+import { articleController } from './article.controller';
 import {
   authorizeArticle,
   authorizeUser,
   verifyAccessToken,
-} from '../middlewares/auth';
+} from '../../middlewares/auth';
 
 const articleRouter = express.Router();
 

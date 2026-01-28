@@ -3,9 +3,9 @@ import {
   ArticleCreateDto,
   ArticleQueryDto,
   ArticleUpdateDto,
-} from '../dto/articleDto';
-import { ArticleRepogitory } from '../repogitories/articleRepogitory';
-import { NotFoundError } from '../libs/error';
+} from '../articles/article.dto';
+import { ArticleRepogitory } from '../articles/article.repository';
+import { NotFoundError } from '../../libs/error';
 
 type GetArticleData = Omit<
   Article,

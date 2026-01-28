@@ -1,13 +1,15 @@
-import { UserCreateDto } from '../dto/userDto';
-import { BadRequestError } from '../libs/error';
-import { ArticleRepogitory } from '../repogitories/articleRepogitory';
-import { LikeRepository } from '../repogitories/likeRepogitory';
-import { ProductRepository } from '../repogitories/productRepogitory';
-import { UserRepository } from '../repogitories/userRepogitory';
-import { ArticleService } from '../services/articleService';
-import { LikeService } from '../services/likeService';
-import { ProductService } from '../services/productService';
-import { UserService } from '../services/userService';
+import { UserCreateDto } from '../users/user.dto';
+import { BadRequestError } from '../../libs/error';
+import { ArticleRepogitory } from '../articles/article.repository';
+import { LikeRepository } from '../likes/like.repository';
+import { ProductRepository } from '../products/product.repository';
+import { UserRepository } from '../users/user.repository';
+import { ArticleService } from '../articles/article.service';
+import { LikeService } from '../likes/like.service';
+import { ProductService } from '../products/product.service';
+import { UserService } from '../users/user.service';
+import { NotificationRepository } from '../notifications/notification.repository';
+import { NotificationService } from '../notifications/notification.service';
 import { Request, Response, NextFunction } from 'express';
 
 export class UserController {
@@ -181,8 +183,10 @@ const productRepository = new ProductRepository();
 const articleRepository = new ArticleRepogitory();
 const likeRepository = new LikeRepository();
 
+const notificationRepo = new NotificationRepository();
+const notificationService = new NotificationService(notificationRepo);
 const userService = new UserService(userRepository);
-const productService = new ProductService(productRepository);
+const productService = new ProductService(productRepository, notificationService);
 const articleService = new ArticleService(articleRepository);
 const likeService = new LikeService(likeRepository);
 

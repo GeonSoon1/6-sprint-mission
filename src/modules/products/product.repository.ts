@@ -1,6 +1,6 @@
 import { Prisma, Product } from '@prisma/client';
-import { ProductCreateDto, ProductQueryDto } from '../dto/productDto';
-import prisma from '../libs/prismaClient';
+import { ProductCreateDto, ProductQueryDto } from '../products/product.dto';
+import prisma from '../../libs/prismaClient';
 
 export class ProductRepository {
   async create(data: ProductCreateDto) {
@@ -78,5 +78,13 @@ export class ProductRepository {
 
   async findByUserId(userId: string): Promise<Product[]> {
     return prisma.product.findMany({ where: { userId } });
+  }
+
+  async findLikers(productId: string) {
+    const likes = await prisma.likedProduct.findMany({
+      where: { productId },
+      select: { userId: true },
+    });
+    return likes.map((like) => like.userId);
   }
 }

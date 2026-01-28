@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
-import { ArticleCreateDto } from '../dto/articleDto';
-import prisma from '../libs/prismaClient';
+import { ArticleCreateDto } from '../articles/article.dto';
+import prisma from '../../libs/prismaClient';
 
 export class ArticleRepogitory {
   // 게시글 생성
@@ -72,5 +72,14 @@ export class ArticleRepogitory {
   // 유저가 생성한 게시글 목록 조회
   async findByUserId(userId: string) {
     return prisma.article.findMany({ where: { userId } });
+  }
+
+  // 게시글 작성자 ID 조회
+  async findUserId(id: string) {
+    const article = await prisma.article.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+    return article?.userId;
   }
 }

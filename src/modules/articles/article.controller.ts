@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { ArticleService } from '../services/articleService';
-import { ArticleCreateDto, ArticleQueryDto } from '../dto/articleDto';
-import { ArticleRepogitory } from '../repogitories/articleRepogitory';
+import { ArticleService } from '../articles/article.service';
+import { ArticleCreateDto, ArticleQueryDto } from '../articles/article.dto';
+import { ArticleRepogitory } from '../articles/article.repository';
 
 export class ArticleController {
   constructor(private service: ArticleService) {}

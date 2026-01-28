@@ -4,11 +4,11 @@ GET http://localhost:4000/products?page=&sort=&search=
 
 // 상품 생성
 ###
-POST http://localhost:4000/products
+POST http://localhost:3001/products
 Content-Type: application/json
 
 {
-    "name": "a의 상품",
+    "name": "d의 상품",
     "description": "사람 입니다.",
     "price": 500,
     "tags": ["인간"]
@@ -20,13 +20,13 @@ GET http://localhost:4000/products/4aedc5e3-ac16-4e2a-8803-65e72d81b74e
 
 // 상품 수정
 ###
-PATCH http://localhost:4000/products/4aedc5e3-ac16-4e2a-8803-65e72d81b74e
+PATCH http://localhost:3001/products/2cbf05fc-b908-46bc-baed-8887a6d18c18
 Content-Type: application/json
 
 {
-    "name": "삼성 수퍼 울트라 갤럭시 S23",
+    "name": "b의 삼성 수퍼 울트라 갤럭시 S23",
     "description": "새것 같은 중고다 이말이야",
-    "price": 500000,
+    "price": 5000000,
     "tags": ["전자기기","폰","중고"]
 }
 

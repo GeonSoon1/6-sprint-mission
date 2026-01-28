@@ -5,10 +5,10 @@ import {
   ForbiddenError,
   IsSamePasswordError,
   NotFoundError,
-} from '../libs/error';
+} from '../../libs/error';
 import { User } from '@prisma/client';
-import { UserRepository } from '../repogitories/userRepogitory';
-import { UserCreateDto } from '../dto/userDto';
+import { UserRepository } from '../users/user.repository';
+import { UserCreateDto } from '../users/user.dto';
 
 type CreateUserData = Omit<User, 'password' | 'refreshToken'>;
 type PublicUser = Omit<User, 'password' | 'refreshToken'>;

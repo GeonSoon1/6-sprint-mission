@@ -1,4 +1,4 @@
-import prisma from '../libs/prismaClient';
+import prisma from '../../libs/prismaClient';
 
 export class LikeRepository {
   // Product Like

@@ -4,7 +4,7 @@ GET http://localhost:4000/comments/product/94dba363-a076-4a9e-9fe0-dfb35ee12e91
 
 // 상품 댓글 생성
 ###
-POST http://localhost:4000/comments/product/94dba363-a076-4a9e-9fe0-dfb35ee12e91
+POST http://localhost:3001/comments/product/285302b5-b72c-4f04-9364-253816ce9152
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ GET http://localhost:4000/comments/article/9ecc1270-3cc5-4e39-8f1a-53494475ceac
 
 // 게시글 댓글 생성
 ###
-POST http://localhost:4000/comments/article/9ecc1270-3cc5-4e39-8f1a-53494475ceac
+POST http://localhost:3001/comments/article/285302b5-b72c-4f04-9364-253816ce9152
 Content-Type: application/json
 
 {

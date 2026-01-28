@@ -24,6 +24,13 @@ export const validateArticleId = s.object({
   }),
 });
 
+export const validateNotificationId = s.object({
+  notificationId: s.define('UUID', (value: unknown) => {
+    if (typeof value !== 'string') return false;
+    return isUuid.v4(value);
+  }),
+});
+
 export const validateIdParam = (
   req: Request,
   res: Response,
@@ -59,6 +66,20 @@ export const validateArticleIdParam = (
 ) => {
   try {
     req.validatedArticleId = s.create(req.params, validateArticleId);
+    next();
+  } catch (e: unknown) {
+    if (e instanceof s.StructError) return next(e);
+    next(e);
+  }
+};
+
+export const validateNotificationIdParam = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    req.validatedNotificationId = s.create(req.params, validateNotificationId);
     next();
   } catch (e: unknown) {
     if (e instanceof s.StructError) return next(e);

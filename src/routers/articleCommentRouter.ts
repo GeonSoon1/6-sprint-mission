@@ -1,28 +1,27 @@
 import { Router } from 'express';
-import { prisma } from '../lib/constants';
-import { ArticleCommentRepository } from '../repositories/articleCommentRepository';
-import { ArticleCommentService } from '../services/articleCommentService';
-import { ArticleCommentController } from '../controllers/articleCommentController';
-import { asyncHandler } from '../middlewares/asyncHandler';
-import { isLoggedIn } from '../middlewares/isLoggedIn';
-import { ArticleValidators, validate } from '../middlewares/validator';
+import { asyncHandler, isLoggedIn, validator } from '@middlewares';
+import {
+  CreateArticleCommentDTO,
+  UpdateArticleCommentDTO,
+  ArticleIdParamDTO,
+  ArticleCommentParamDTO,
+} from '@dto';
+import { ArticleCommentController } from '@controllers';
+
+import { container } from '@lib';
+import { TYPES } from '@types';
+
+const articleCommentController = container.get<ArticleCommentController>(
+  TYPES.ArticleCommentController,
+);
 
 const router = Router();
-const articleCommentRepository = new ArticleCommentRepository(prisma);
-const articleCommentService = new ArticleCommentService(
-  articleCommentRepository,
-);
-const articleCommentController = new ArticleCommentController(
-  articleCommentService,
-);
-const articleValidator = ArticleValidators();
 
 router
-  .route('/articles/:id/comments')
+  .route('/articles/:articleId/comments')
   .post(
     isLoggedIn,
-    articleValidator.createCommentValidator,
-    validate,
+    validator({ params: ArticleCommentParamDTO, body: CreateArticleCommentDTO }),
     asyncHandler(articleCommentController.createComment),
   )
   .get(asyncHandler(articleCommentController.getCommentsByArticleId));
@@ -31,8 +30,7 @@ router
   .route('/comments/:id')
   .patch(
     isLoggedIn,
-    articleValidator.updateCommentValidator,
-    validate,
+    validator({ params: ArticleIdParamDTO, body: UpdateArticleCommentDTO }),
     asyncHandler(articleCommentController.updateComment),
   )
   .delete(isLoggedIn, asyncHandler(articleCommentController.deleteComment));

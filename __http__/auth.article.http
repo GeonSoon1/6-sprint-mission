@@ -1,0 +1,65 @@
+@host=http://localhost:3000
+@accessToken={{login.response.body.accessToken}}
+
+### 로그인
+# @name login
+POST {{host}}/auth/login
+Content-Type: application/json
+
+# {
+#   "email": "sadqueen300@naver.com",
+#   "password": "password1234"
+# }
+
+{
+  "email": "sadqueen400@naver.com",
+  "password": "password1234"
+}
+
+
+
+### 로그아웃
+POST {{host}}/auth/logout
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+
+### 아티클 생성
+POST {{host}}/articles
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "아티클 제목 테스트",
+  "content": "test contents1"
+}
+
+### 아티클 보기
+GET {{host}}/articles/9c993ae1-df74-43a0-9809-9102b6317c7e
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+### 아티클 수정
+PATCH {{host}}/articles/9c993ae1-df74-43a0-9809-9102b6317c7e
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "title": "아티클 제목 테스트 수정",
+  "content": "test contents1"
+}
+
+### 아티클 좋아요
+POST {{host}}/articles/9c993ae1-df74-43a0-9809-9102b6317c7e/like
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+###
+POST {{host}}/articles/9c993ae1-df74-43a0-9809-9102b6317c7e/comments
+Authorization: Bearer {{accessToken}}
+Content-Type: application/json
+
+{
+  "content": "댓글의 댓글"
+}
+

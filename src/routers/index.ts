@@ -1,10 +1,11 @@
 import { Router } from 'express';
-import authRouter from './authRouter';
 import userRouter from './userRouter';
+import authRouter from './authRouter';
 import productRouter from './productRouter';
-import productCommentRouter from './productCommentRouter';
 import articleRouter from './articleRouter';
+import productCommentRouter from './productCommentRouter';
 import articleCommentRouter from './articleCommentRouter';
+import notificationRouter from './notificationRouter';
 
 const router = Router();
 
@@ -16,6 +17,7 @@ router.use('/user', userRouter);
 router.use('/auth', authRouter);
 router.use('/products', productRouter);
 router.use('/articles', articleRouter);
+router.use('/notifications', notificationRouter);
 
 router.use(productCommentRouter);
 router.use(articleCommentRouter);

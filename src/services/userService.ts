@@ -1,10 +1,14 @@
 import bcrypt from 'bcrypt';
+import { injectable, inject } from 'inversify';
 import type { Prisma, User } from '@prisma/client';
-import { UserRepository } from '../repositories/userRepository';
+import { UserRepository } from '@repositories';
+import { TYPES } from '@types';
+import { NotFoundError, ForbiddenError } from '@lib';
 
+@injectable()
 export class UserService {
   // constructor(생성자)를 통해 UserRepository 인스턴스 주입받음
-  constructor(private userRepository: UserRepository) {}
+  constructor(@inject(TYPES.UserRepository) private userRepository: UserRepository) {}
 
   /**
    * 회원정보수정
@@ -27,20 +31,13 @@ export class UserService {
     // 사용자 찾기
     const user = await this.userRepository.findUserById(id);
     if (!user) {
-      const error = new Error('사용자를 찾을 수 없습니다.');
-      (error as any).status = 404; // 404 Not Found
-      throw error;
+      throw new NotFoundError('사용자를 찾을 수 없습니다.');
     }
 
     // password 확인
-    const isPasswordCorrect = await bcrypt.compare(
-      passwordToCheck,
-      user.password,
-    );
+    const isPasswordCorrect = await bcrypt.compare(passwordToCheck, user.password);
     if (!isPasswordCorrect) {
-      const error = new Error('비밀번호가 일치하지 않습니다.');
-      (error as any).status = 403; // 403 Forbidden(권한없음)
-      throw error;
+      throw new ForbiddenError('비밀번호가 일치하지 않습니다.');
     }
 
     // 확인 완료 후 userRepository에 삭제요청 전달

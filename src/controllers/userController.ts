@@ -1,18 +1,22 @@
 import { Request, Response } from 'express';
-import { UserService } from '../services/userService';
+import { injectable, inject } from 'inversify';
+import { UserService } from '@services';
+import { TYPES } from '@types';
+import { NotFoundError } from '@lib';
 
+@injectable()
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(@inject(TYPES.UserService) private readonly userService: UserService) {}
 
   /**
    * 회원 ID로 회원 찾기
    */
-  public getUserById = async (req: Request, res: Response) => {
+  getUserById = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const user = await this.userService.findUserById(id);
     if (!user) {
-      return res.status(404).json({ message: '사용자를 찾을 수 없습니다.' });
+      throw new NotFoundError('사용자를 찾을 수 없습니다.');
     }
 
     const { password, ...restUser } = user;
@@ -22,7 +26,7 @@ export class UserController {
   /**
    * 회원정보 수정
    */
-  public updateUser = async (req: Request, res: Response) => {
+  updateUser = async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const updatedUser = await this.userService.updateUser(userId, req.body);
 
@@ -36,7 +40,7 @@ export class UserController {
   /**
    * 회원 탈퇴(삭제)
    */
-  public deleteUser = async (req: Request, res: Response) => {
+  deleteUser = async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const { password } = req.body;
 
@@ -47,7 +51,7 @@ export class UserController {
   /**
    * 회원검색
    */
-  public getSearchUsers = async (req: Request, res: Response) => {
+  getSearchUsers = async (req: Request, res: Response) => {
     const { nickname } = req.query;
 
     const findOptions: any = {};

@@ -1,10 +1,10 @@
 import type { Prisma, PrismaClient, User } from '@prisma/client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '@types';
 
+@injectable()
 export class AuthRepository {
-  /**
-   * 생성자(constructor)에서 PrismaClient를 주입받음
-   */
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(TYPES.PrismaClient) private prisma: PrismaClient) {}
 
   /**
    * 회원가입

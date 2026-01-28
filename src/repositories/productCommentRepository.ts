@@ -1,13 +1,10 @@
-import type {
-  Prisma,
-  PrismaClient,
-  User,
-  Product,
-  ProductComment,
-} from '@prisma/client';
+import type { Prisma, PrismaClient, User, Product, ProductComment } from '@prisma/client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '@types';
 
+@injectable()
 export class ProductCommentRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(TYPES.PrismaClient) private prisma: PrismaClient) {}
 
   /**
    * 댓글 작성
@@ -40,10 +37,7 @@ export class ProductCommentRepository {
   /**
    * 댓글 수정
    */
-  async update(
-    id: ProductComment['id'],
-    data: Prisma.ProductCommentUpdateInput,
-  ) {
+  async update(id: ProductComment['id'], data: Prisma.ProductCommentUpdateInput) {
     return this.prisma.productComment.update({ where: { id }, data });
   }
 

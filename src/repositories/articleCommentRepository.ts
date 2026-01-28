@@ -1,7 +1,10 @@
 import { Prisma, PrismaClient, Article, ArticleComment } from '@prisma/client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '@types';
 
+@injectable()
 export class ArticleCommentRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(TYPES.PrismaClient) private prisma: PrismaClient) {}
 
   /**
    * 댓글 작성

@@ -1,11 +1,14 @@
 import type { Request, Response } from 'express';
-import { LikeService } from '../services/likeService';
+import { injectable, inject } from 'inversify';
+import { LikeService } from '@services';
+import { TYPES } from '@types';
 
+@injectable()
 export class LikeController {
-  constructor(private likeService: LikeService) {}
+  constructor(@inject(TYPES.LikeService) private readonly likeService: LikeService) {}
 
   // 상품 좋아요 토글
-  public toggleProductLike = async (req: Request, res: Response) => {
+  toggleProductLike = async (req: Request, res: Response) => {
     const { id: productId } = req.params;
     const userId = req.user!.id;
 
@@ -13,7 +16,7 @@ export class LikeController {
     res.status(200).json(result);
   };
 
-  public toggleArticleLike = async (req: Request, res: Response) => {
+  toggleArticleLike = async (req: Request, res: Response) => {
     const { id: articleId } = req.params;
     const userId = req.user!.id;
 

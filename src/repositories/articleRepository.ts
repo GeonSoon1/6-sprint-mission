@@ -1,7 +1,10 @@
-import { Prisma, PrismaClient, User } from '@prisma/client';
+import { Prisma, PrismaClient, Article } from '@prisma/client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '@types';
 
+@injectable()
 export class ArticleRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(TYPES.PrismaClient) private prisma: PrismaClient) {}
 
   /**
    * 게시물 생성
@@ -20,21 +23,21 @@ export class ArticleRepository {
   /**
    * 게시물 상세 조회
    */
-  async findArticleById(id: User['id']) {
+  async findArticleById(id: Article['id']) {
     return this.prisma.article.findUnique({ where: { id } });
   }
 
   /**
    * 게시물 수정
    */
-  async updateArticle(id: User['id'], data: Prisma.ArticleUpdateInput) {
+  async updateArticle(id: Article['id'], data: Prisma.ArticleUpdateInput) {
     return this.prisma.article.update({ where: { id }, data });
   }
 
   /**
    * 게시물 삭제
    */
-  async deleteArticle(id: User['id']) {
+  async deleteArticle(id: Article['id']) {
     return this.prisma.article.delete({ where: { id } });
   }
 }

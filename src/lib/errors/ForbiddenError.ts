@@ -1,4 +1,4 @@
-import { BaseError } from './BaseError';
+import { BaseError } from '@lib';
 
 export class ForbiddenError extends BaseError {
   constructor(message = '접근권한이 없습니다.') {

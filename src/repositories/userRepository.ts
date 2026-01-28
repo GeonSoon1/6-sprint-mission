@@ -1,9 +1,10 @@
 import type { Prisma, PrismaClient, User } from '@prisma/client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '@types';
 
+@injectable()
 export class UserRepository {
-  constructor(private prisma: PrismaClient) {
-    this.prisma = prisma;
-  }
+  constructor(@inject(TYPES.PrismaClient) private prisma: PrismaClient) {}
 
   /**
    * 회원정보수정

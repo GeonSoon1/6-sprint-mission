@@ -1,7 +1,10 @@
 import { PrismaClient, Product, Article, User } from '@prisma/client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '@types';
 
+@injectable()
 export class LikeRepository {
-  constructor(private prisma: PrismaClient) {}
+  constructor(@inject(TYPES.PrismaClient) private prisma: PrismaClient) {}
 
   /**
    * 상품 좋아요 찾기

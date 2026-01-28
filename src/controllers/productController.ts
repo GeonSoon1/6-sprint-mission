@@ -1,12 +1,18 @@
 import type { Request, Response } from 'express';
-import { CreateProductDTO } from '../lib/dto';
-import { ProductService } from '../services/productService';
+import { injectable, inject } from 'inversify';
+import { CreateProductDTO } from '@dto';
+import { ProductService } from '@services';
+import { TYPES } from '@types';
 
+@injectable()
 export class ProductController {
-  constructor(private productService: ProductService) {}
+  constructor(
+    @inject(TYPES.ProductService)
+    private readonly productService: ProductService,
+  ) {}
 
   // 상품 생성 콘트롤러
-  public createProduct = async (req: Request, res: Response) => {
+  createProduct = async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const product: CreateProductDTO = req.body;
 
@@ -15,14 +21,14 @@ export class ProductController {
   };
 
   // 상품목록조회
-  public getProducts = async (req: Request, res: Response) => {
+  getProducts = async (req: Request, res: Response) => {
     const { skip, take } = (req as any).pagination;
     const products = await this.productService.findProducts({ skip, take });
     res.status(200).json({ products });
   };
 
   // 상품상세 조회
-  public getProductById = async (req: Request, res: Response) => {
+  getProductById = async (req: Request, res: Response) => {
     const { id } = req.params;
 
     const product = await this.productService.findProductById(id);
@@ -30,21 +36,17 @@ export class ProductController {
   };
 
   // 상품 수정
-  public updateProduct = async (req: Request, res: Response) => {
+  updateProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user!.id;
     const product = req.body;
 
-    const updatedProduct = await this.productService.updateProduct(
-      id,
-      userId,
-      product,
-    );
+    const updatedProduct = await this.productService.updateProduct(id, userId, product);
     res.status(200).json(updatedProduct);
   };
 
   // 상품 삭제
-  public deleteProduct = async (req: Request, res: Response) => {
+  deleteProduct = async (req: Request, res: Response) => {
     const { id } = req.params;
     const userId = req.user!.id;
 

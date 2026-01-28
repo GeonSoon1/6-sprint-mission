@@ -1,10 +1,20 @@
-import { ProductRepository } from '../repositories/productRepository';
-import { Prisma, Category, ProductStatus, User, Product } from '@prisma/client';
-import type { CreateProductDTO } from '../lib/dto';
+import { Prisma, User, Product, NotificationType } from '@prisma/client';
+import { injectable, inject } from 'inversify';
+import { ProductRepository } from '@repositories';
+import type { CreateProductDTO } from '@dto';
+import { TYPES } from '@types';
+import { NotFoundError, ForbiddenError } from '@lib';
+import { NotificationService } from '@services';
 
+@injectable()
 export class ProductService {
   // 생성자(constructor)에서 ProductRepository의 인스턴스 주입 받음
-  constructor(private productRepository: ProductRepository) {}
+  constructor(
+    @inject(TYPES.ProductRepository)
+    private productRepository: ProductRepository,
+    @inject(TYPES.NotificationService)
+    private notificationService: NotificationService,
+  ) {}
 
   /**
    * 상품 등록
@@ -12,8 +22,7 @@ export class ProductService {
    * @param productData 등록할 상품의 데이터
    */
   async createProduct(id: User['id'], productData: CreateProductDTO) {
-    const { name, description, category, price, stock, status, tags, images } =
-      productData;
+    const { name, description, category, price, stock, status, tags, images } = productData;
 
     const dataToCreate: Prisma.ProductCreateInput = {
       name,
@@ -53,9 +62,7 @@ export class ProductService {
   async findProductById(id: Product['id']) {
     const product = await this.productRepository.findProductById(id);
     if (!product) {
-      const error = new Error('상품을 찾을 수 없습니다.');
-      (error as any).status = 404;
-      throw error;
+      throw new NotFoundError('상품을 찾을 수 없습니다.');
     }
     return product;
   }
@@ -71,8 +78,27 @@ export class ProductService {
     userId: User['id'],
     data: Prisma.ProductUpdateInput,
   ) {
-    await this.checkProductOwnership(productId, userId);
-    return this.productRepository.updateProduct(productId, data);
+    // 권한 확인
+    const product = await this.checkProductOwnership(productId, userId);
+    const oldPrice = product.price;
+    const newPrice = data.price;
+
+    const updatedProduct = await this.productRepository.updateProduct(productId, data);
+
+    const isPriceChanged = typeof newPrice === 'number' && oldPrice !== newPrice;
+
+    // 정보 업데이트
+    if (isPriceChanged) {
+      const userIds = await this.productRepository.findFavoriteUserIds(productId);
+
+      await this.notificationService.createNotification(userIds, {
+        title: '관심상품 가격변동',
+        content: `찜하신 상품의 가격이 변경되었습니다.`,
+        type: NotificationType.NOTICE,
+        link: `/product/${productId}`,
+      });
+    }
+    return updatedProduct;
   }
 
   /**
@@ -88,22 +114,17 @@ export class ProductService {
   /**
    * 헬퍼 메소드(private)
    */
-  private async checkProductOwnership(
-    productId: Product['id'],
-    userId: User['id'],
-  ) {
+  private async checkProductOwnership(productId: Product['id'], userId: User['id']) {
     const product = await this.productRepository.findProductById(productId);
 
     if (!product) {
-      const error = new Error('상품을 찾을 수 없습니다.');
-      (error as any).status = 404;
-      throw error;
+      throw new NotFoundError('상품을 찾을 수 없습니다.');
     }
 
     if (product.authorId !== userId) {
-      const error = new Error('삭제 권한이 없습니다.');
-      (error as any).status = 403;
-      throw error;
+      throw new ForbiddenError('삭제 권한이 없습니다.');
     }
+
+    return product;
   }
 }

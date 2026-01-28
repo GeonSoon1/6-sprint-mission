@@ -1,28 +1,29 @@
 import type { Request, Response } from 'express';
-import { AuthService } from '../services/authService';
+import { injectable, inject } from 'inversify';
+import { AuthService } from '@services';
+import { TYPES } from '@types';
+import { UnauthorizedError } from '@lib';
 
+@injectable()
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(@inject(TYPES.AuthService) private readonly authService: AuthService) {}
 
   /**
    * 회원가입(signUp)
    */
-  public signUp = async (req: Request, res: Response) => {
-    const newUser = await this.authService.singUp(req.body);
+  signUp = async (req: Request, res: Response) => {
+    const newUser = await this.authService.signUp(req.body);
+    const { password, ...newUserData } = newUser;
     res.status(201).json({
       message: '회원가입이 완료되었습니다.',
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        nickname: newUser.nickname,
-      },
+      user: newUserData,
     });
   };
 
   /**
    * 로그인(login)
    */
-  public login = async (req: Request, res: Response) => {
+  login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const { accessToken, refreshToken } = await this.authService.login({
       email,
@@ -35,7 +36,7 @@ export class AuthController {
   /**
    * 로그아웃(logout)
    */
-  public logout = async (req: Request, res: Response) => {
+  logout = async (req: Request, res: Response) => {
     const userId = (req as any).user.id;
     await this.authService.logout(userId);
     res.clearCookie('refreshToken');
@@ -45,16 +46,12 @@ export class AuthController {
   /**
    * 토큰 재발급(refresh)
    */
-  public refresh = async (req: Request, res: Response) => {
+  refresh = async (req: Request, res: Response) => {
     const { refreshToken } = req.cookies;
     if (!refreshToken) {
-      const error = new Error('Refresh Token이 존재하지 않습니다.');
-      (error as any).status = 401;
-      throw error;
+      throw new UnauthorizedError('Refresh Token이 존재하지 않습니다.');
     }
-    const { accessToken } = await this.authService.refreshAccessToken(
-      refreshToken,
-    );
+    const { accessToken } = await this.authService.refreshAccessToken(refreshToken);
 
     res.status(200).json({
       message: 'Access Token이 재발급되었습니다.',

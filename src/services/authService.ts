@@ -1,20 +1,23 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import type { User } from '@prisma/client';
-import { UserRepository } from '../repositories/userRepository';
-import { AuthRepository } from '../repositories/authRepository';
-import { LoginDTO, SignUpDTO } from '../lib/dto';
+import { injectable, inject } from 'inversify';
+import { UserRepository, AuthRepository } from '@repositories';
+import { SignUpDTO, AuthDTO } from '@dto';
+import { TYPES } from '@types';
+import { UnauthorizedError } from '@lib';
 
+@injectable()
 export class AuthService {
   constructor(
-    private authRepository: AuthRepository,
-    private userRepository: UserRepository,
+    @inject(TYPES.AuthRepository) private authRepository: AuthRepository,
+    @inject(TYPES.UserRepository) private userRepository: UserRepository,
   ) {}
 
   /**
    * 회원가입(signUp)
    */
-  async singUp(userData: SignUpDTO) {
+  async signUp(userData: SignUpDTO) {
     const hashedPassword = await bcrypt.hash(userData.password, 10);
     const signupData = { ...userData, password: hashedPassword };
     return this.authRepository.signUp(signupData);
@@ -23,17 +26,17 @@ export class AuthService {
   /**
    * 로그인(login)
    */
-  async login({ email, password }: LoginDTO) {
+  async login({ email, password }: AuthDTO) {
     // 사용자 확인
     const user = await this.authRepository.findUserByEmail(email);
     if (!user) {
-      throw new Error('이메일 주소가 일치하지 않습니다.');
+      throw new UnauthorizedError('이메일 또는 비밀번호가 일치하지 않습니다.');
     }
 
     // 비밀번호 확인
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-      throw new Error('비밀번호가 일치하지 않습니다.');
+      throw new UnauthorizedError('이메일 또는 비밀번호가 일치하지 않습니다.');
     }
 
     // 토큰 발급
@@ -54,26 +57,22 @@ export class AuthService {
   // 리프레시 토큰
   async refreshAccessToken(token: string) {
     try {
-      const payload = jwt.verify(token, process.env.JWT_SECRET!) as {
+      const payload = jwt.verify(token, process.env.JWT_SECRET_KEY!) as {
         userId: string;
       };
 
       const user = await this.userRepository.findUserById(payload.userId);
 
       if (!user || user.refreshToken !== token) {
-        throw new Error('유효하지 않은 토큰입니다.');
+        throw new UnauthorizedError('유효하지 않은 토큰입니다.');
       }
 
-      const newAccessToken = jwt.sign(
-        { userId: user.id },
-        process.env.JWT_SECRET!,
-        {
-          expiresIn: '1h',
-        },
-      );
+      const newAccessToken = jwt.sign({ userId: user.id }, process.env.JWT_SECRET_KEY!, {
+        expiresIn: '1h',
+      });
       return { accessToken: newAccessToken };
     } catch (error) {
-      throw new Error('유효하지 않은 토큰입니다.');
+      throw new UnauthorizedError('유효하지 않은 토큰입니다.');
     }
   }
 
@@ -82,10 +81,10 @@ export class AuthService {
    */
   private _issueTokens(user: User) {
     const payload = { userId: user.id };
-    const accessToken = jwt.sign(payload, process.env.JWT_SECRET!, {
+    const accessToken = jwt.sign(payload, process.env.JWT_SECRET_KEY!, {
       expiresIn: '1h', //유효기간 1시간
     });
-    const refreshToken = jwt.sign(payload, process.env.JWT_SECRET!, {
+    const refreshToken = jwt.sign(payload, process.env.JWT_SECRET_KEY!, {
       expiresIn: '7d', // 유효기간 7일
     });
     return { accessToken, refreshToken };

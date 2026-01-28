@@ -33,6 +33,7 @@ model User {
   articleComments ArticleComment[]
   favorites       Favorite[]
   likes           Like[]
+  notifications   Notification[]
 }
 
 model UserPreference {
@@ -166,4 +167,23 @@ model Like {
   createdAt DateTime @default(now())
 
   @@id([userId, articleId])
+}
+
+model Notification {
+  id        String           @id @default(uuid()) //id
+  title     String
+  content   String
+  createdAt DateTime         @default(now())
+  readAt    DateTime?
+  type      NotificationType @default(SYSTEM)
+  link      String? // 클릭시 이동할 경로(ex. '/orders/123')
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum NotificationType {
+  SYSTEM
+  PAYMENT
+  CHAT
+  NOTICE
 }

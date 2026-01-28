@@ -1,30 +1,32 @@
 import { Request, Response } from 'express';
-import { ProductCommentService } from '../services/productCommentService';
+import { injectable, inject } from 'inversify';
+import { ProductCommentService } from '@services';
+import { TYPES } from '@types';
 
+@injectable()
 export class ProductCommentController {
-  constructor(private readonly productCommentService: ProductCommentService) {}
+  constructor(
+    @inject(TYPES.ProductCommentService)
+    private readonly productCommentService: ProductCommentService,
+  ) {}
 
-  public createComment = async (req: Request, res: Response) => {
+  createComment = async (req: Request, res: Response) => {
     const { productId } = req.params;
     const authorId = req.user!.id;
     const content = req.body;
 
-    const newProduct = await this.productCommentService.createComment(
-      productId,
-      authorId,
-      content,
-    );
+    const newProduct = await this.productCommentService.createComment(productId, authorId, content);
 
     res.status(201).json(newProduct);
   };
 
-  public getCommentsByProductId = async (req: Request, res: Response) => {
+  getCommentsByProductId = async (req: Request, res: Response) => {
     const { productId } = req.params;
     const content = await this.productCommentService.getComments(productId);
     res.status(200).json(content);
   };
 
-  public updateComment = async (req: Request, res: Response) => {
+  updateComment = async (req: Request, res: Response) => {
     const { commentId } = req.params;
     const authorId = req.user!.id;
     const content = req.body;
@@ -38,7 +40,7 @@ export class ProductCommentController {
     res.status(200).json(updateComment);
   };
 
-  public deleteComment = async (req: Request, res: Response) => {
+  deleteComment = async (req: Request, res: Response) => {
     const { commentId } = req.params;
     const authorId = req.user!.id;
 

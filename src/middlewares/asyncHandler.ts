@@ -3,11 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 /**
  * 비동기 요청 핸들러의 타입 정의
  */
-type AsyncRequestHandler = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => Promise<any>;
+type AsyncRequestHandler = (req: Request, res: Response, next: NextFunction) => Promise<any>;
 
 /**
  * 비동기 콘트롤 함수를 위한 래퍼 함수.

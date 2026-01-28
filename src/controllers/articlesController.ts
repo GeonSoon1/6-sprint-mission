@@ -1,92 +1,79 @@
 import { Request, Response } from 'express';
 import { create } from 'superstruct';
-import { articleService } from '../services/articleService.js';
-import { IdParamsStruct } from '../structs/commonStructs.js';
+import { IdParamsStruct } from '../structs/commonStructs';
 import {
   CreateArticleBodyStruct,
   UpdateArticleBodyStruct,
   GetArticleListParamsStruct,
-} from '../structs/articlesStructs.js';
-import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '../structs/commentsStruct.js';
-import UnauthorizedError from '../lib/errors/UnauthorizedError.js';
+} from '../structs/articlesStructs';
+import { CreateCommentBodyStruct, GetCommentListParamsStruct } from '../structs/commentsStruct';
+import * as articlesService from '../services/articlesService';
+import * as commentsService from '../services/commentsService';
+import * as likesService from '../services/likesService';
 
-export async function createArticle(req: Request, res: Response): Promise<void> {
-  if (!req.user) {
-    throw new UnauthorizedError('Unauthorized');
-  }
-
+export async function createArticle(req: Request, res: Response) {
   const data = create(req.body, CreateArticleBodyStruct);
-  const article = await articleService.createArticle(req.user.id, data);
+  const article = await articlesService.createArticle({
+    ...data,
+    userId: req.user.id,
+  });
   res.status(201).send(article);
 }
 
-export async function getArticle(req: Request, res: Response): Promise<void> {
+export async function getArticle(req: Request, res: Response) {
   const { id } = create(req.params, IdParamsStruct);
-  const article = await articleService.getArticle(id, req.user?.id);
+  const article = await articlesService.getArticle(id);
   res.send(article);
 }
 
-export async function updateArticle(req: Request, res: Response): Promise<void> {
-  if (!req.user) {
-    throw new UnauthorizedError('Unauthorized');
-  }
-
+export async function updateArticle(req: Request, res: Response) {
   const { id } = create(req.params, IdParamsStruct);
   const data = create(req.body, UpdateArticleBodyStruct);
-  const updatedArticle = await articleService.updateArticle(id, req.user.id, data);
+  const updatedArticle = await articlesService.updateArticle(id, {
+    ...data,
+    userId: req.user.id,
+  });
   res.send(updatedArticle);
 }
 
-export async function deleteArticle(req: Request, res: Response): Promise<void> {
-  if (!req.user) {
-    throw new UnauthorizedError('Unauthorized');
-  }
-
+export async function deleteArticle(req: Request, res: Response) {
   const { id } = create(req.params, IdParamsStruct);
-  await articleService.deleteArticle(id, req.user.id);
+  await articlesService.deleteArticle(id, req.user.id);
   res.status(204).send();
 }
 
-export async function getArticleList(req: Request, res: Response): Promise<void> {
-  const query = create(req.query, GetArticleListParamsStruct);
-  const result = await articleService.getArticleList(query, req.user?.id);
+export async function getArticleList(req: Request, res: Response) {
+  const params = create(req.query, GetArticleListParamsStruct);
+  const result = await articlesService.getArticleList(params);
   res.send(result);
 }
 
-export async function createComment(req: Request, res: Response): Promise<void> {
-  if (!req.user) {
-    throw new UnauthorizedError('Unauthorized');
-  }
-
+export async function createComment(req: Request, res: Response) {
   const { id: articleId } = create(req.params, IdParamsStruct);
-  const data = create(req.body, CreateCommentBodyStruct);
-  const createdComment = await articleService.createComment(articleId, req.user.id, data);
+  const { content } = create(req.body, CreateCommentBodyStruct);
+  const createdComment = await commentsService.createComment({
+    articleId,
+    content,
+    userId: req.user.id,
+  });
   res.status(201).send(createdComment);
 }
 
-export async function getCommentList(req: Request, res: Response): Promise<void> {
+export async function getCommentList(req: Request, res: Response) {
   const { id: articleId } = create(req.params, IdParamsStruct);
-  const query = create(req.query, GetCommentListParamsStruct);
-  const result = await articleService.getCommentList(articleId, query);
+  const { cursor, limit } = create(req.query, GetCommentListParamsStruct);
+  const result = await commentsService.getCommentListByArticleId(articleId, { cursor, limit });
   res.send(result);
 }
 
-export async function createLike(req: Request, res: Response): Promise<void> {
-  if (!req.user) {
-    throw new UnauthorizedError('Unauthorized');
-  }
-
+export async function createLike(req: Request, res: Response) {
   const { id: articleId } = create(req.params, IdParamsStruct);
-  await articleService.createLike(articleId, req.user.id);
+  await likesService.createLike(articleId, req.user.id);
   res.status(201).send();
 }
 
-export async function deleteLike(req: Request, res: Response): Promise<void> {
-  if (!req.user) {
-    throw new UnauthorizedError('Unauthorized');
-  }
-
+export async function deleteLike(req: Request, res: Response) {
   const { id: articleId } = create(req.params, IdParamsStruct);
-  await articleService.deleteLike(articleId, req.user.id);
+  await likesService.deleteLike(articleId, req.user.id);
   res.status(204).send();
 }

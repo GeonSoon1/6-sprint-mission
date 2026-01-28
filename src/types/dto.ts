@@ -90,6 +90,14 @@ export interface CommentResponseDTO extends Comment {
   nextCursor?: number | null;
 }
 
+// Notification DTOs
+export interface NotificationListQueryDTO {
+  page: number;
+  pageSize: number;
+  orderBy?: 'recent';
+  keyword?: string;
+}
+
 // Favorite DTOs
 export interface CreateFavoriteDTO {
   productId: number;

@@ -79,5 +79,5 @@ export interface ErrorResponse {
 }
 
 // Re-export DTOs
-export * from './dto.js';
+export * from './dto';
 

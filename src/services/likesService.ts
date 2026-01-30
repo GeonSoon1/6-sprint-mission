@@ -1,9 +1,15 @@
 import * as likesRepository from '../repositories/likesRepository';
 import * as articlesRepository from '../repositories/articlesRepository';
+import * as usersRepository from '../repositories/usersRepository';
 import NotFoundError from '../lib/errors/NotFoundError';
 import BadRequestError from '../lib/errors/BadRequestError';
 
 export async function createLike(articleId: number, userId: number) {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const existingArticle = await articlesRepository.getArticle(articleId);
   if (!existingArticle) {
     throw new NotFoundError('article', articleId);
@@ -18,6 +24,11 @@ export async function createLike(articleId: number, userId: number) {
 }
 
 export async function deleteLike(articleId: number, userId: number) {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const existingArticle = await articlesRepository.getArticle(articleId);
   if (!existingArticle) {
     throw new NotFoundError('article', articleId);

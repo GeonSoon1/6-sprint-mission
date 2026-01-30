@@ -74,6 +74,11 @@ export async function refreshToken(refreshToken?: string) {
 }
 
 export async function updateMyPassword(userId: User['id'], password: string, newPassword: string) {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const user = await usersRepository.getUser(userId);
   if (!user) {
     throw new NotFoundError('user', userId);

@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">31.25% </span>
+                <span class="strong">68.75% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>5/16</span>
+                <span class='fraction'>11/16</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">25% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>1/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">66.66% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/3</span>
+                <span class='fraction'>2/3</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">31.25% </span>
+                <span class="strong">68.75% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>5/16</span>
+                <span class='fraction'>11/16</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -94,31 +94,31 @@
 <a name='L29'></a><a href='#L29'>29</a>
 <a name='L30'></a><a href='#L30'>30</a>
 <a name='L31'></a><a href='#L31'>31</a>
-<a name='L32'></a><a href='#L32'>32</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L32'></a><a href='#L32'>32</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">71x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">71x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">71x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">57x</span>
+<span class="cline-any cline-yes">57x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">57x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -131,22 +131,22 @@ import {
   JWT_REFRESH_TOKEN_SECRET,
 } from '@lib/constants';
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >generateTokens(</span>userId: number) {
-  const accessToken = <span class="cstat-no" title="statement not covered" >jwt.sign({ id: userId }, JWT_ACCESS_TOKEN_SECRET, {</span>
+export function generateTokens(userId: number) {
+  const accessToken = jwt.sign({ id: userId }, JWT_ACCESS_TOKEN_SECRET, {
     expiresIn: '1h',
   });
-  const refreshToken = <span class="cstat-no" title="statement not covered" >jwt.sign({ id: userId }, JWT_REFRESH_TOKEN_SECRET, {</span>
+  const refreshToken = jwt.sign({ id: userId }, JWT_REFRESH_TOKEN_SECRET, {
     expiresIn: '7d',
   });
-<span class="cstat-no" title="statement not covered" >  return { accessToken, refreshToken };</span>
+  return { accessToken, refreshToken };
 }
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >verifyAccessToken(</span>token: string) {
-  const decoded = <span class="cstat-no" title="statement not covered" >jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);</span>
-<span class="cstat-no" title="statement not covered" >  if (typeof decoded === 'string') {</span>
+export function verifyAccessToken(token: string) {
+  const decoded = jwt.verify(token, JWT_ACCESS_TOKEN_SECRET);
+  <span class="missing-if-branch" title="if path not taken" >I</span>if (typeof decoded === 'string') {
 <span class="cstat-no" title="statement not covered" >    throw new Error('Invalid token');</span>
   }
-<span class="cstat-no" title="statement not covered" >  return { userId: decoded.id };</span>
+  return { userId: decoded.id };
 }
 &nbsp;
 export function <span class="fstat-no" title="function not covered" >verifyRefreshToken(</span>token: string) {
@@ -163,7 +163,7 @@ export function <span class="fstat-no" title="function not covered" >verifyRefre
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T01:38:03.490Z
+                at 2026-01-30T08:36:36.759Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

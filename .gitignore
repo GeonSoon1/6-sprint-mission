@@ -1,5 +1,7 @@
 .DS_Store
 node_modules/
+__http__
+__test__
 dist/
 .vscode
 .env
@@ -8,4 +10,5 @@ GEMINI.md
 README_backup.md
 Sprint_Mission_8.md
 Sprint_Mission_9.md
+Sprint_Mission_10.md
 antigravity.md

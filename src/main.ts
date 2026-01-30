@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import { createServer } from 'http';
 import cookieParser from 'cookie-parser';
 import { PORT, PUBLIC_PATH, STATIC_PATH } from './lib/constants';
 import articlesRouter from './routers/articlesRouter';
@@ -10,14 +11,9 @@ import imagesRouter from './routers/imagesRouter';
 import authRouter from './routers/authRouter';
 import usersRouter from './routers/usersRouter';
 import { defaultNotFoundHandler, globalErrorHandler } from './controllers/errorController';
-import http from 'http';
-import { setupWebSocket } from './lib/websocket';
+import socketService from './services/socketService';
 import notificationsRouter from './routers/notificationsRouter';
-
 const app = express();
-const server = http.createServer(app);
-
-setupWebSocket(server);
 
 app.use(cors());
 app.use(express.json());
@@ -34,6 +30,9 @@ app.use('/notifications', notificationsRouter);
 
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
+
+const server = createServer(app);
+socketService.initialize(server);
 
 server.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);

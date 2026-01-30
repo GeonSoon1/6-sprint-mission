@@ -54,8 +54,10 @@ export async function updateProduct(id: number, data: UpdateProductData): Promis
   const originName = existingProduct.name;
   const cutName = originName.substring(0, 10);
 
-  if (data.price && data.price !== existingProduct.price) {
-    const priceUpdate = data.price > existingProduct.price ? '상승하였습니다' : '하락하였습니다';
+  const isPriceChanged = data.price && data.price !== existingProduct.price;
+
+  if (isPriceChanged) {
+    const priceUpdate = data.price! > existingProduct.price ? '상승하였습니다' : '하락하였습니다';
 
     await Promise.all(
       likeProductMember.map((user) =>

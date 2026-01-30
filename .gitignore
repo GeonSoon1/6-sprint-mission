@@ -5,6 +5,7 @@ __test__
 dist/
 .vscode
 .env
+panda_market.pem
 
 GEMINI.md
 README_backup.md

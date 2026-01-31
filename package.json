@@ -20,7 +20,8 @@
     "dev": "nodemon --watch src --exec ts-node src/main.ts",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
-    "prisma:seed": "node prisma/seed.js"
+    "prisma:seed": "node prisma/seed.js",
+    "test:coverage": "dotenv -e .env.test -- jest --coverage"
   },
   "dependencies": {
     "@prisma/client": "^5.4.2",

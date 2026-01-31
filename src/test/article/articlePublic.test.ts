@@ -3,6 +3,10 @@ import app from '../../app';
 import prisma from '../../lib/prisma';
 
 describe('게시글 API 인증 불필요', () => {
+  beforeAll(async () => {
+    await prisma.article.deleteMany();
+    await prisma.user.deleteMany();
+  });
   beforeEach(async () => {
     await prisma.article.deleteMany();
     await prisma.user.deleteMany();

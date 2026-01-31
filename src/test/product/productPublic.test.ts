@@ -3,6 +3,10 @@ import app from '../../app';
 import prisma from '../../lib/prisma';
 
 describe('상품 API 인증 불필요', () => {
+  beforeAll(async () => {
+    await prisma.product.deleteMany();
+    await prisma.user.deleteMany();
+  });
   beforeEach(async () => {
     await prisma.product.deleteMany();
     await prisma.user.deleteMany();

@@ -17,7 +17,7 @@
     "dev": "nodemon --watch src --exec ts-node ./src/server.ts",
     "start": "node ./dist/server.js",
     "build": "tsc",
-    "test": "dotenv -e .env.test -- jest --runInBand --coverage"
+    "test": "DOTENV_CONFIG_QUIET=true dotenv -e .env.test -- jest --runInBand --coverage"
   },
   "dependencies": {
     "@prisma/client": "^5.10.0",

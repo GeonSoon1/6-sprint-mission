@@ -1,5 +1,4 @@
 import { RegisterBodyStruct, LoginBodyStruct } from '../structs/auth.struct.js'
-import { Request, Response } from "express";
 import {create} from 'superstruct'
 import * as authServices from '../services/auth.service.js'
 import { clearTokenCookies, setTokenCookies } from '../lib/cookies.js'

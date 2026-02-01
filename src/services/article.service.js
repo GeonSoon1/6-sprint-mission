@@ -1,7 +1,7 @@
-import * as ArticleRepo from "../repositories/article.repo";
-import NotFoundError from "../errors/NotFoundError";
-import UnauthorizedError from "../errors/UnauthorizedError";
-import * as userRepo from '../repositories/user.repo'
+import * as ArticleRepo from "../repositories/article.repo.js";
+import NotFoundError from "../errors/NotFoundError.js";
+import * as userRepo from '../repositories/user.repo.js'
+import ForbiddenError from "../errors/ForbiddenError.js";
 
 export async function createArticle(data, user) {
   const article = await ArticleRepo.createArticle(data, user);
@@ -22,7 +22,7 @@ export async function updateArticle(id, data, user) {
     throw new NotFoundError("기사를 찾을 수 없습니다.");
   }
   if (existingArticle.userId !== user.id) {
-    throw new UnauthorizedError("기사를 수정 할 권한이 없습니다.");
+    throw new ForbiddenError("기사를 수정 할 권한이 없습니다.");
   }
   const updated = await ArticleRepo.updateArticle(id, data);
   return updated;
@@ -34,7 +34,7 @@ export async function deleteArticle(id, user) {
     throw new NotFoundError("기사를 찾을 수 없습니다.");
   }
   if (existingArticle.userId !== user.id) {
-    throw new UnauthorizedError("기사를 삭제 할 권한이 없습니다.");
+    throw new ForbiddenError("기사를 삭제 할 권한이 없습니다.");
   }
   return await ArticleRepo.deleteArticle(id);
 }

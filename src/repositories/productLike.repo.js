@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
 export function createProductLike(userId, productId) {
   return prisma.productLike.create({

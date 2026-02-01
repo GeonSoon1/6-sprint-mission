@@ -16,15 +16,16 @@ export async function createProduct(req, res) {
 
 export async function getProduct(req, res) {
   const { id } = create(req.params, IdParamsStruct);
-  const product = await productServices.getProduct(id, req.user.id);
+  const userIdOrNull = req.user?.id ?? null;
+  const product = await productServices.getProduct(id, userIdOrNull);
   return res.json(product);
 }
 
 export async function updateProduct(req, res) {
-  const { id } = create(req.params, IdParamsStruct);
+  const { id:productId } = create(req.params, IdParamsStruct);
   const data = create(req.body, UpdateProductBodyStruct);
   const updatedProduct = await productServices.updateProduct(
-    id,
+    productId,
     data,
     req.user
   );

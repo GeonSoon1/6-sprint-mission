@@ -1,6 +1,7 @@
 import express from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { authenticate } from "../middlewares/authenticate.js";
+import { optionalAuthenticate } from "../middlewares/optionalAuthenticate.js";
 import {
   createProduct,
   getProduct,
@@ -8,12 +9,12 @@ import {
   deleteProduct,
   createProductComment,
   getMyProduct,
-} from "../controllers/product.control.js";
+} from "../controllers/product.controller.js";
 import {
   likeProduct,
   unlikeProduct,
   getMyLikedProducts,
-} from "../controllers/like.control.js";
+} from "../controllers/like.controller.js";
 
 const productRouter = express.Router();
 
@@ -28,16 +29,17 @@ productRouter.get(
   asyncHandler(getMyLikedProducts)
 );
 
+// 생성/수정/삭제는 로그인 필요
 productRouter.post(
   "/",
   asyncHandler(authenticate),
   asyncHandler(createProduct)
 );
-productRouter.get(
-  "/:id(\\d+)",
-  asyncHandler(authenticate),
-  asyncHandler(getProduct)
-);
+// productRouter.get(
+//   "/:id(\\d+)",
+//   asyncHandler(authenticate),
+//   asyncHandler(getProduct)
+// );
 productRouter.patch(
   "/:id(\\d+)",
   asyncHandler(authenticate),
@@ -47,6 +49,13 @@ productRouter.delete(
   "/:id(\\d+)",
   asyncHandler(authenticate),
   asyncHandler(deleteProduct)
+);
+
+// 단건 조회는 비로그인도 가능 (토큰이 있으면 isLiked 계산)
+productRouter.get(
+  "/:id(\\d+)",
+  asyncHandler(optionalAuthenticate),
+  asyncHandler(getProduct)
 );
 
 productRouter.post(

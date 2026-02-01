@@ -1,11 +1,11 @@
-import NotFoundError from '../errors/NotFoundError'
-import BadRequestError from '../errors/BadRequestError'
-import UnauthorizedError from '../errors/UnauthorizedError'
-import * as commentRepo from '../repositories/comment.repo'
-import * as productRepo from '../repositories/product.repo'
-import * as articleRepo from '../repositories/article.repo'
-import * as notificationRepo from "../repositories/notification.repo";
-import { getIO } from "../socket";
+import NotFoundError from '../errors/NotFoundError.js'
+import BadRequestError from '../errors/BadRequestError.js'
+import * as commentRepo from '../repositories/comment.repo.js'
+import * as productRepo from '../repositories/product.repo.js'
+import * as articleRepo from '../repositories/article.repo.js'
+import * as notificationRepo from "../repositories/notification.repo.js";
+import { getIO } from "../socket.js";
+import ForbiddenError from '../errors/ForbiddenError.js'
 
 export async function createComment(data, user) {
   if (!data.productId && !data.articleId) {
@@ -16,7 +16,7 @@ export async function createComment(data, user) {
     throw new BadRequestError("productId와 articleId를 동시에 입력 할 수 없습니다.");
   }
 
-  // 1) 대상 존재 확인
+
   if (data.productId) {
     const product = await productRepo.getProductById(data.productId);
     if (!product) {
@@ -48,7 +48,8 @@ export async function createComment(data, user) {
       isRead: false,
     });
 
-    getIO().to(`user:${article.userId}`).emit("notification:new", n);
+    const io = getIO()
+    io.to(`user:${article.userId}`).emit("notification:new", n)
   }
 
   return comment;
@@ -69,7 +70,7 @@ export async function updateComment(commentId, data, user) {
   }
 
   if (existingComment.userId !==user.id) {
-    throw new UnauthorizedError('댓글을 수정 할 권한이 없습니다.')
+    throw new ForbiddenError('댓글을 수정 할 권한이 없습니다.')
   }
 
   const updated = await commentRepo.updateComment(commentId, data)
@@ -83,7 +84,7 @@ export async function deleteComment(commentId, user) {
   }
 
   if (existingComment.userId !== user.id) {
-    throw new UnauthorizedError('댓글을 삭제 할 권한이 없습니다.')
+    throw new ForbiddenError('댓글을 삭제 할 권한이 없습니다.')
   }
 
   return await commentRepo.deleteComment(commentId)

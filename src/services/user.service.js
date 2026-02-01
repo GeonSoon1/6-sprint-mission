@@ -1,6 +1,6 @@
-import * as userRepo from '../repositories/user.repo'
-import NotFoundError from '../errors/NotFoundError'
-import { hashPassword } from '../lib/hash'
+import * as userRepo from '../repositories/user.repo.js'
+import NotFoundError from '../errors/NotFoundError.js'
+import { hashPassword } from '../lib/hash.js'
 
 export async function getUser(user) {
   const existingUser = await userRepo.getUserById(user.id)

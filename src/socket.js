@@ -1,7 +1,8 @@
 import { Server } from "socket.io";
 import cookie from "cookie";
-import { ACCESS_TOKEN_COOKIE_NAME } from "./lib/constants";
-import { verifyAccessToken } from "./lib/token";
+import { ACCESS_TOKEN_COOKIE_NAME } from "./lib/constants.js";
+import { verifyAccessToken } from "./lib/token.js";
+import UnauthorizedError from "./errors/UnauthorizedError.js";
 
 let io;
 
@@ -11,20 +12,20 @@ export function initSocket(httpServer) {
   });
 
   io.use((socket, next) => {
-    try {
+    try { 
       const cookieHeader = socket.handshake.headers.cookie;
-      if (!cookieHeader) return next(new Error("NO_COOKIE"));
+      if (!cookieHeader) return next(new UnauthorizedError("NO_COOKIE"));
 
       const cookies = cookie.parse(cookieHeader);
       const token = cookies[ACCESS_TOKEN_COOKIE_NAME];
-      if (!token) return next(new Error("NO_TOKEN"));
+      if (!token) return next(new UnauthorizedError("NO_TOKEN"));
 
       const { userId } = verifyAccessToken(token);
       socket.userId = userId;
 
       next();
     } catch (e) {
-      next(new Error("INVALID_TOKEN"));
+      next(new UnauthorizedError("INVALID_TOKEN"));
     }
   });
 
@@ -36,6 +37,8 @@ export function initSocket(httpServer) {
 }
 
 export function getIO() {
-  if (!io) throw new Error("Socket.IO not initialized");
+  if (!io) {
+    throw new Error('Socket.IO not initialized')
+  }
   return io;
 }

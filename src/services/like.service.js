@@ -1,7 +1,7 @@
-import NotFoundError from "../errors/NotFoundError";
-import { prisma } from "../lib/prisma";
-import * as productLikeRepo from "../repositories/productLike.repo";
-import * as articleLikeRepo from "../repositories/articleLike.repo";
+import NotFoundError from "../errors/NotFoundError.js";
+import { prisma } from "../lib/prisma.js";
+import * as productLikeRepo from "../repositories/productLike.repo.js";
+import * as articleLikeRepo from "../repositories/articleLike.repo.js";
 
 // 상품 좋아요
 export async function likeProduct(productId, userId) {

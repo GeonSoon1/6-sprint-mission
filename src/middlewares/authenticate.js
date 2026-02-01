@@ -1,7 +1,7 @@
-import { ACCESS_TOKEN_COOKIE_NAME } from "../lib/constants";
-import UnauthorizedError from "../errors/UnauthorizedError";
-import { verifyAccessToken } from "../lib/token";
-import { prisma } from "../lib/prisma";
+import { ACCESS_TOKEN_COOKIE_NAME } from "../lib/constants.js";
+import UnauthorizedError from "../errors/UnauthorizedError.js";
+import { verifyAccessToken } from "../lib/token.js";
+import { prisma } from "../lib/prisma.js";
 
 export async function authenticate(req, res, next) {
   const accessToken = req.cookies[ACCESS_TOKEN_COOKIE_NAME];

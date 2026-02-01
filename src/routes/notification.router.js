@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { asyncHandler } from "../middlewares/asyncHandler";
-import { authenticate } from "../middlewares/authenticate";
+import { asyncHandler } from "../middlewares/asyncHandler.js";
+import { authenticate } from "../middlewares/authenticate.js";
 import {
   getMyNotifications,
   getUnreadCount,
   readNotification,
-} from "../controllers/notification.control";
+} from "../controllers/notification.controller.js";
 
 const notificationRouter = Router();
 

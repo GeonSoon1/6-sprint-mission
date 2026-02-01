@@ -57,7 +57,7 @@ export class ArticleController {
   async delete(req: Request, res: Response) {
     const id = req.validatedId!.id;
     await this.service.delete(id);
-    res.status(204);
+    res.status(204).send();
   }
 }
 

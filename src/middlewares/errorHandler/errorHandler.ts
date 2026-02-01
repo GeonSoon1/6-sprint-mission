@@ -47,7 +47,7 @@ function globalErrorHandler(
     return res.status(404).send({ message: err.message });
   }
   if (err instanceof BadRequestError) {
-    return res.status(404).send({ message: err.message });
+    return res.status(400).send({ message: err.message });
   }
   if (err instanceof ForbiddenError) {
     return res.status(403).send({ message: err.message });

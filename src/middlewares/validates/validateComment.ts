@@ -46,7 +46,7 @@ const cursorSchema = s.refine(
 
 const getListCommentSchema = s.object({
   cursor: cursorSchema,
-  take: s.optional(
+  limit: s.optional(
     s.coerce(s.number(), s.string(), (v) => {
       const n = Number(v);
       return Number.isNaN(n) || n < 1 ? 1 : n;

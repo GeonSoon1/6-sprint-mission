@@ -1,71 +1,39 @@
-import { Server, Socket } from 'socket.io';
-import jwt from 'jsonwebtoken';
-import { AuthPayload, NotificationData } from '../types/notification';
+import { ExtendedError, Server, Socket } from 'socket.io';
+import http from 'http';
+import * as authService from './authService';
+import { Notification } from '../types/Notification';
+import User from '../types/User';
 
-const getJwtSecret = (): string => {
-  const secret = process.env.JWT_ACCESS_TOKEN_SECRET;
-  if (!secret) {
-    throw new Error('❌ 환경변수 JWT_ACCESS_TOKEN_SECRET이 설정되지 않았습니다!');
-  }
-  return secret;
-};
+class SocketService {
+  private io: Server;
 
-export class SocketService {
-  private static instance: SocketService;
-  private io: Server | null = null;
-  private readonly JWT_SECRET = getJwtSecret();
-
-  private constructor() {}
-
-  public static getInstance(): SocketService {
-    if (!SocketService.instance) {
-      SocketService.instance = new SocketService();
-    }
-    return SocketService.instance;
+  constructor() {
+    this.io = new Server();
+    this.io.use(this.authenticate);
   }
 
-  public initialize(io: Server): void {
-    if (this.io) return;
-    this.io = io;
-
-    this.io.use((socket, next) => {
-      const token = socket.handshake.auth.accessToken;
-
-      if (!token) {
-        return next(new Error('Authentication error'));
-      }
-
-      try {
-        const decoded = jwt.verify(token, this.JWT_SECRET) as AuthPayload;
-        socket.data.userId = decoded.id;
-
-        next();
-      } catch (err) {
-        return next(new Error('Invalid token'));
-      }
-    });
-
-    this.io.on('connection', (socket: Socket) => {
-      const userId = socket.data.userId;
-
-      if (userId) {
-        const roomName = `user_${userId}`;
-        socket.join(roomName);
-        console.log(`✅ [Socket] 유저 ${userId}번 연결됨 (Room: ${roomName})`);
-      }
-
-      socket.on('disconnect', () => {
-        console.log(`❌ [Socket] 유저 ${userId}번 나감`);
-      });
-    });
-  }
-
-  public emitToUser(userId: number, event: string, data: NotificationData): void {
-    if (!this.io) {
-      console.error('Socket.IO가 초기화 안 됐다.');
+  private async authenticate(socket: Socket, next: (err?: ExtendedError) => void) {
+    let user: User;
+    try {
+      const accessToken = socket.handshake.auth.accessToken;
+      user = await authService.authenticate(accessToken);
+    } catch (error) {
+      console.log('error', error);
+      next(error as ExtendedError);
       return;
     }
+    socket.join(user.id.toString());
+    next();
+  }
 
-    this.io.to(`user_${userId}`).emit(event, data);
+  initialize(httpServer: http.Server) {
+    this.io.attach(httpServer);
+  }
+
+  sendNotification(notification: Notification) {
+    const userId = notification.userId;
+    this.io.to(userId.toString()).emit('notification', notification);
   }
 }
+
+export default new SocketService();

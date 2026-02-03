@@ -1,4 +1,4 @@
-export interface Comment {
+interface Comment {
   id: number;
   content: string;
   userId: number;
@@ -7,13 +7,5 @@ export interface Comment {
   createdAt: Date;
   updatedAt: Date;
 }
-
-export type CreateCommentData = Omit<
-  Comment,
-  'id' | 'productId' | 'articleId' | 'createdAt' | 'updatedAt'
-> & {
-  productId?: number;
-  articleId?: number;
-};
 
 export default Comment;

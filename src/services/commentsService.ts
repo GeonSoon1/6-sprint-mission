@@ -1,30 +1,40 @@
 import * as articlesRepository from '../repositories/articlesRepository';
 import * as commentsRepository from '../repositories/commentsRepository';
 import * as productsRepository from '../repositories/productsRepository';
+import * as notificationsService from './notificationsService';
 import { CursorPaginationParams, CursorPaginationResult } from '../types/pagination';
 import BadRequestError from '../lib/errors/BadRequestError';
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import NotFoundError from '../lib/errors/NotFoundError';
-import Comment, { CreateCommentData } from '../types/Comment';
-import * as notificationService from './notificationService';
+import Comment from '../types/Comment';
+import Article from '../types/Article';
+import { NotificationType } from '../types/Notification';
+
+type CreateCommentData = Omit<
+  Comment,
+  'id' | 'productId' | 'articleId' | 'createdAt' | 'updatedAt'
+> & {
+  productId?: number;
+  articleId?: number;
+};
 
 export async function createComment(data: CreateCommentData): Promise<Comment> {
   if (!data.articleId && !data.productId) {
     throw new BadRequestError('Either articleId or productId must be provided');
   }
 
-  let receiverId: number | undefined;
-
   if (data.articleId) {
     const article = await articlesRepository.getArticle(data.articleId);
-    if (!article) throw new NotFoundError('article', data.articleId);
-    receiverId = article.userId;
+    if (!article) {
+      throw new NotFoundError('article', data.articleId);
+    }
   }
 
   if (data.productId) {
     const product = await productsRepository.getProduct(data.productId);
-    if (!product) throw new NotFoundError('product', data.productId);
-    receiverId = product.userId;
+    if (!product) {
+      throw new NotFoundError('product', data.productId);
+    }
   }
 
   const comment = await commentsRepository.createComment({
@@ -33,12 +43,21 @@ export async function createComment(data: CreateCommentData): Promise<Comment> {
     productId: data.productId ?? null,
   });
 
-  if (receiverId && receiverId !== data.userId) {
-    notificationService
-      .notifyNewComment(receiverId, data.userId, data.content, data.articleId, data.productId)
-      .catch((err) => console.error('알림 발송 실패:', err));
+  /** New comment notification */
+  if (data.articleId) {
+    const article = (await articlesRepository.getArticle(data.articleId)) as Article;
+    const commentWriterId = data.userId;
+    const articleWriterId = article.userId;
+    if (articleWriterId !== commentWriterId) {
+      await notificationsService.createNotification({
+        userId: articleWriterId,
+        type: NotificationType.NEW_COMMENT,
+        payload: {
+          articleId: data.articleId,
+        },
+      });
+    }
   }
-
   return comment;
 }
 
@@ -59,7 +78,8 @@ export async function getCommentListByArticleId(
     throw new NotFoundError('article', articleId);
   }
 
-  return commentsRepository.getCommentList({ articleId }, params);
+  const result = commentsRepository.getCommentList({ articleId }, params);
+  return result;
 }
 
 export async function getCommentListByProductId(
@@ -71,7 +91,8 @@ export async function getCommentListByProductId(
     throw new NotFoundError('product', productId);
   }
 
-  return commentsRepository.getCommentList({ productId }, params);
+  const result = commentsRepository.getCommentList({ productId }, params);
+  return result;
 }
 
 export async function updateComment(id: number, userId: number, content: string): Promise<Comment> {

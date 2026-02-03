@@ -1,20 +1,53 @@
-# 미션 8
+# Panda Market API
 
-# 목표
+## 환경 변수 설정
+`.env.example` 파일을 참고해서 `.env`와 `.env.test`에 필요한 환경 변수를 설정해 주세요.
 
-- 알림 기능 구현하기
-- 웹소켓 또는 Socket.IO를 사용해 실시간 기능 구현하기
+## 설치
 
-# 요구사항
+의존성 패키지를 설치합니다.
 
-< 알림 >
+```
+npm install
+```
 
-- 사용자는 자신의 알림 목록을 조회할 수 있습니다.
-- 사용자는 자신의 안 읽은 알림의 개수를 조회할 수 있습니다.
-- 사용자는 자신의 알림을 읽음 처리 할 수 있습니다.
-- 클라이언트에서는 실시간으로 알림을 받을 수 있습니다.
+Prisma와 데이터베이스를 준비합니다.
+```
+npx prisma generate
+npx prisma migrate dev
+```
 
-< 알림 전송 >
+## 실행
 
-- 좋아요한 상품의 가격이 변동되었을 때 알림을 보내주세요.
-- 자신이 작성한 게시글에 댓글이 달렸을 때 알림을 보내주세요.
+`npm dev`로 개발 모드로 실행할 수 있습니다.
+
+## 테스트 관련 설명
+
+### 테스트 실행
+
+`npm test`로 테스트를 실행할 수 있습니다.
+
+(해당 명령어에서 `.env.test`에 명시된 데이터베이스에 `prisma migrate`를 실행합니다.)
+
+### 테스트 파일의 위치
+
+테스트 파일은 소스 코드 파일과 동일한 폴더에 있습니다.
+
+- 상품 API 통합 테스트: `src/routers/productsRouter.test.ts`
+- 게시글 API 통합 테스트: `src/routers/articlesRouter.test.ts`
+- 인증 API 통합 테스트: `src/routers/authRouter.test.ts`
+- 상품 API 비즈니스 로직 유닛 테스트: `src/routers/productsService.test.ts`
+- 게시글 API 비즈니스 로직 유닛 테스트: `src/routers/articlesService.test.ts`
+
+### tsconfig.json 설정
+
+테스트 파일은 빌드에서 제외해야하기 때문에 `exclude`로 지정해 주었습니다.
+
+```json
+"include": [
+  "src/**/*.ts"
+],
+"exclude": [
+  "src/**/*.test.ts"
+]
+```

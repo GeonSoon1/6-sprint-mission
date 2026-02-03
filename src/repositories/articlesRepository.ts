@@ -80,6 +80,7 @@ export async function updateArticleWithLikes(id: number, data: Partial<Article>)
   });
   return {
     ...updatedArticle,
+    likes: undefined,
     likeCount: updatedArticle.likes.length,
     isLiked: data.userId
       ? updatedArticle.likes.some((like) => like.userId === data.userId)

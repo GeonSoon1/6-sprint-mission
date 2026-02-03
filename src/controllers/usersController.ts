@@ -5,9 +5,11 @@ import {
   UpdatePasswordBodyStruct,
   GetMyProductListParamsStruct,
   GetMyFavoriteListParamsStruct,
+  GetMyNotificationsParamsStruct,
 } from '../structs/usersStructs';
 import * as usersService from '../services/usersService';
 import * as authService from '../services/authService';
+import * as notificationsService from '../services/notificationsService';
 import userResponseDTO from '../dto/userResponseDTO';
 
 export async function getMe(req: Request, res: Response) {
@@ -53,6 +55,21 @@ export async function getMyFavoriteList(req: Request, res: Response) {
 
   res.send({
     list,
+    totalCount,
+  });
+}
+
+export async function getMyNotifications(req: Request, res: Response) {
+  const { cursor, limit } = create(req.query, GetMyNotificationsParamsStruct);
+  const { list, totalCount, unreadCount, nextCursor } = await notificationsService.getMyNotifications(req.user.id, {
+    cursor,
+    limit,
+  });
+
+  res.send({
+    list,
+    nextCursor,
+    unreadCount,
     totalCount,
   });
 }

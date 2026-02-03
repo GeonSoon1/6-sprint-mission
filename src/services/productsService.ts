@@ -1,9 +1,11 @@
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import NotFoundError from '../lib/errors/NotFoundError';
 import * as productsRepository from '../repositories/productsRepository';
+import * as favoritesRepository from '../repositories/favoritesRepository';
+import * as notificationsService from './notificationsService';
 import { PagePaginationParams, PagePaginationResult } from '../types/pagination';
 import Product from '../types/Product';
-import * as notificationService from './notificationService';
+import { NotificationType } from '../types/Notification';
 
 type CreateProductData = Omit<
   Product,
@@ -41,17 +43,26 @@ export async function updateProduct(id: number, data: UpdateProductData): Promis
   if (!existingProduct) {
     throw new NotFoundError('product', id);
   }
-
   if (existingProduct.userId !== data.userId) {
     throw new ForbiddenError('Should be the owner of the product');
   }
-
   const updatedProduct = await productsRepository.updateProductWithFavorites(id, data);
 
-  if (existingProduct.price !== updatedProduct.price) {
-    notificationService
-      .notifyPriceChange(id, updatedProduct.name, updatedProduct.price)
-      .catch((err) => console.error('가격 변동 알림 발송 실패:', err));
+  /** Price change notification */
+  const previousPrice = existingProduct.price;
+  const updatedPrice = updatedProduct.price;
+  if (previousPrice !== updatedPrice) {
+    const favorites = await favoritesRepository.getFavoritesByProductId(id);
+    const likedUserIds = favorites.map((favorite) => favorite.userId);
+    const notifications = likedUserIds.map((userId) => ({
+      userId,
+      type: NotificationType.PRICE_CHANGED,
+      payload: {
+        productId: id,
+        price: updatedPrice,
+      },
+    }));
+    await notificationsService.createNotifications(notifications);
   }
 
   return updatedProduct;

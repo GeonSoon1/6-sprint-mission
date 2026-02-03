@@ -1,14 +1,10 @@
-import { Router } from 'express';
-import * as notificationController from '../controllers/notificationsController';
+import express from 'express';
 import { withAsync } from '../lib/withAsync';
 import authenticate from '../middlewares/authenticate';
+import { readNotification } from '../controllers/notificationsController';
 
-const router = Router();
+const notificationsRouter = express.Router();
 
-router.use(authenticate());
+notificationsRouter.patch('/:id/read', authenticate(), withAsync(readNotification));
 
-router.get('/', withAsync(notificationController.getNotifications));
-router.get('/unread-count', withAsync(notificationController.getUnreadCount));
-router.patch('/:id/read', withAsync(notificationController.markAsRead));
-
-export default router;
+export default notificationsRouter;

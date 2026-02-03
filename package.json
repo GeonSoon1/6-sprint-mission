@@ -62,6 +62,6 @@
     "@types": "dist/types/index"
   },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.mjs"
   }
 }

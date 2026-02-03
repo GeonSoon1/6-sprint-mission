@@ -2,7 +2,7 @@ import {
   ACCESS_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_COOKIE_NAME,
   NODE_ENV
-} from './constants'
+} from './constants.js'
 
 export function setTokenCookies(res, accessToken, refreshToken) {
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, accessToken, {

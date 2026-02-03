@@ -1,7 +1,7 @@
 import express from 'express'
-import { authenticate } from '../middlewares/authenticate'
-import { asyncHandler } from '../middlewares/asyncHandler'
-import { getUser, updateUser, updatePassword } from '../controllers/user.control'
+import { authenticate } from '../middlewares/authenticate.js'
+import { asyncHandler } from '../middlewares/asyncHandler.js'
+import { getUser, updateUser, updatePassword } from '../controllers/user.controller.js'
 
 const userRouter = express.Router()
 

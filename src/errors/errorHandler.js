@@ -1,10 +1,10 @@
 import { Prisma } from "@prisma/client";
 import { StructError } from "superstruct";
-import BadRequestError from "./BadRequestError";
-import ConflictError from "./ConflictError";
-import ForbiddenError from "./ForbiddenError";
-import NotFoundError from "./NotFoundError";
-import UnauthorizedError from "./UnauthorizedError";
+import BadRequestError from "./BadRequestError.js";
+import ConflictError from "./ConflictError.js";
+import ForbiddenError from "./ForbiddenError.js";
+import NotFoundError from "./NotFoundError.js";
+import UnauthorizedError from "./UnauthorizedError.js";
 
 export function defaultNotFoundHandler(req, res) {
   return res.status(404).json({ message: "Not Found" });

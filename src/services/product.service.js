@@ -1,11 +1,11 @@
-import NotFoundError from "../errors/NotFoundError";
-import ForbiddenError from "../errors/ForbiddenError";
+import NotFoundError from "../errors/NotFoundError.js";
+import ForbiddenError from "../errors/ForbiddenError.js";
 
-import * as productRepo from "../repositories/product.repo";
-import * as userRepo from "../repositories/user.repo";
-import * as productLikeRepo from "../repositories/productLike.repo";
-import * as notificationRepo from "../repositories/notification.repo";
-import { getIO } from "../socket";
+import * as productRepo from "../repositories/product.repo.js";
+import * as userRepo from "../repositories/user.repo.js";
+import * as productLikeRepo from "../repositories/productLike.repo.js";
+import * as notificationRepo from "../repositories/notification.repo.js";
+import { getIO } from "../socket.js";
 
 export async function createProduct(data, user) {
   return productRepo.createProduct(data, user.id);
@@ -26,31 +26,31 @@ export async function getProduct(id, userIdOrNull = null) {
 }
 
 // 상품 수정: 가격이 변동되면 좋아요한 유저에게 알림 저장 + 실시간 전송
-export async function updateProduct(id, data, user) {
-  const existing = await productRepo.getProductById(id);
+export async function updateProduct(productId, data, user) {
+  const existing = await productRepo.getProductById(productId);
   if (!existing) throw new NotFoundError("해당하는 상품이 없습니다.");
   if (existing.userId !== user.id) {
     throw new ForbiddenError("상품을 수정 할 권한이 없습니다.");
   }
 
-  const updated = await productRepo.updateProduct(id, data);
+  const updated = await productRepo.updateProduct(productId, data);
 
   // 가격 변동 알림
   if (typeof data.price === "number" && data.price !== existing.price) {
-    const likers = await productLikeRepo.findLikerUserIds(id);
+    const likers = await productLikeRepo.findLikerUserIds(productId);
 
-    const rows = likers
-      .map((x) => x.userId)
-      .filter((uid) => uid !== user.id)
-      .map((uid) => ({
-        userId: uid,
-        type: "PRODUCT_PRICE_CHANGED",
-        title: "좋아요한 상품의 가격이 변동되었어요",
-        body: `${existing.name} 가격: ${existing.price} → ${data.price}`,
-        productId: id,
-        articleId: null,
-        isRead: false,
-      }));
+    const userIds = likers.map(x => x.userId);
+    const targets = userIds.filter(uid => uid !== user.id);
+
+    const rows = targets.map(uid => ({
+      userId: uid,
+      type: "PRODUCT_PRICE_CHANGED",
+      title: "좋아요한 상품의 가격이 변동되었어요",
+      body: `${existing.name} 가격: ${existing.price} → ${data.price}`,
+      productId: productId,
+      articleId: null,
+      isRead: false,
+    }));
 
     if (rows.length) {
       // DB 저장

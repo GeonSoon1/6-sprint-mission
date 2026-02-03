@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
 export function createNotification(data) {
   return prisma.notification.create({ data });
@@ -8,7 +8,7 @@ export function createManyNotifications(rows) {
   return prisma.notification.createMany({ data: rows });
 }
 
-export function findMyNotifications(userId, take = 20, skip = 0) {
+export function findMyNotifications(userId, take, skip) {
   return prisma.notification.findMany({
     where: { userId },
     orderBy: { createdAt: "desc" },

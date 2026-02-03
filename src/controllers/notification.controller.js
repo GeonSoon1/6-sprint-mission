@@ -3,7 +3,11 @@ import { IdParamsStruct } from "../structs/common.struct.js";
 import * as notificationService from "../services/notification.service.js";
 
 export async function getMyNotifications(req, res) {
-  const list = await notificationService.getMyNotifications(req.user.id);
+
+  const take = req.query.take ? Number(req.query.take) : undefined;
+  const skip = req.query.skip ? Number(req.query.skip) : undefined;
+  
+  const list = await notificationService.getMyNotifications(req.user.id, { take, skip });
   return res.json(list);
 }
 

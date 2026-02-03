@@ -1,8 +1,8 @@
-import * as authRepo from "../repositories/auth.repo";
-import { hashPassword, verifyPassword } from "../lib/hash";
-import { generateTokens } from "../lib/token";
-import ConflictError from '../errors/ConflictError'
-import BadRequestError from '../errors/BadRequestError'
+import * as authRepo from "../repositories/auth.repo.js";
+import { hashPassword, verifyPassword } from "../lib/hash.js";
+import { generateTokens } from "../lib/token.js";
+import ConflictError from '../errors/ConflictError.js'
+import BadRequestError from '../errors/BadRequestError.js'
 
 
 export async function register(data) {

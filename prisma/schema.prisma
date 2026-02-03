@@ -114,11 +114,9 @@ model Notification {
   isRead    Boolean          @default(false)
   createdAt DateTime         @default(now())
 
-  // 수신자
   userId    Int
   user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // 링크용 (둘 중 하나만 채워 사용)
   productId Int?
   product   Product?         @relation(fields: [productId], references: [id], onDelete: Cascade)
 

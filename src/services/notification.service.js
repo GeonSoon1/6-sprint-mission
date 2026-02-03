@@ -1,6 +1,6 @@
-import ForbiddenError from "../errors/ForbiddenError";
-import NotFoundError from "../errors/NotFoundError";
-import * as notificationRepo from "../repositories/notification.repo";
+import ForbiddenError from "../errors/ForbiddenError.js";
+import NotFoundError from "../errors/NotFoundError.js";
+import * as notificationRepo from "../repositories/notification.repo.js";
 
 export async function getMyNotifications(userId, { take = 20, skip = 0 } = {}) {
   return notificationRepo.findMyNotifications(userId, take, skip);

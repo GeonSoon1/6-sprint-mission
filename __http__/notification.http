@@ -1,0 +1,17 @@
+@baseUrl = http://localhost:3000
+
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzY5MjcwNDcyLCJleHAiOjE3NjkzNDI0NzJ9.UgBeShXoVGz9Jdwx2skNtTw_NYo8hZFFB286hWUmNmQ
+
+@refreshToken = 
+
+
+### 내 알림 목록 (페이지네이션: 2페이지=20개)
+GET http://localhost:3000/notifications?take=20&skip=20
+
+
+### 미읽음 알림 개수
+GET http://localhost:3000/notifications/unread-count
+
+
+### 알림 읽음 처리
+PATCH http://localhost:3000/notifications/123/read

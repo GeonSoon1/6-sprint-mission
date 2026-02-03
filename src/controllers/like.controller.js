@@ -1,7 +1,6 @@
 import { create } from "superstruct";
 import { IdParamsStruct } from "../structs/common.struct.js"; 
 import * as likeService from "../services/like.service.js";
-import { Request, Response } from "express";
 
 export async function likeProduct(req, res) {
   const { id: productId } = create(req.params, IdParamsStruct);

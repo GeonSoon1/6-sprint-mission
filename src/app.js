@@ -1,15 +1,15 @@
 import express from "express";
 import cookieParser from "cookie-parser";
-import authRouter from "./routes/auth.router";
-import productRouter from "./routes/product.router";
-import articleRouter from "./routes/article.router";
-import commentRouter from "./routes/comment.router";
-import userRouter from "./routes/user.router"
+import authRouter from "./routes/auth.router.js";
+import productRouter from "./routes/product.router.js";
+import articleRouter from "./routes/article.router.js";
+import commentRouter from "./routes/comment.router.js";
+import userRouter from "./routes/user.router.js"
 import {
   defaultNotFoundHandler,
   globalErrorHandler,
-} from "./errors/errorHandler";
-import notificationRouter from "./routes/notification.router";
+} from "./errors/errorHandler.js";
+import notificationRouter from "./routes/notification.router.js";
 
 const app = express();
 app.use(express.json());

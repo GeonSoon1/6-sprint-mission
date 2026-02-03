@@ -48,7 +48,7 @@ export default class ProductController {
 
     GetProductById: ExpressHandler = async (req, res) => {
         const id = req.params.id;
-        if (!id) throw new CustomError(404, "id Not Found");
+        if (!id) throw new CustomError(400, "id is required");
         const _id = parseInt(id);
         const userId = req.user ? req.user.userId : null;
         if (!userId) throw new CustomError(404, "userId Not Found");
@@ -67,11 +67,11 @@ export default class ProductController {
 
     PatchProductById: ExpressHandler = async (req, res) => {
         const id = req.params.id;
-        if (!id) throw new CustomError(404, "id Not Found");
+        if (!id) throw new CustomError(400, "id is required");
         const _id = parseInt(id);
 
         const userId = req.user ? req.user.userId : null;
-        if (!userId) throw new CustomError(404, "userId Not Found");
+        if (!userId) throw new CustomError(401, "Unauthorized");
 
         assert(req.body, PatchProduct);
         const userFields = removeUndefined(req.body);
@@ -90,7 +90,7 @@ export default class ProductController {
 
     DeleteProductById: ExpressHandler = async (req, res) => {
         const id = req.params.id;
-        if (!id) throw new CustomError(404, "id Not Found");
+        if (!id) throw new CustomError(400, "id is required");
         const _id = parseInt(id);
         const userId = req.user ? req.user.userId : null;
         if (!userId) throw new CustomError(404, "userId Not Found");
@@ -102,7 +102,7 @@ export default class ProductController {
         if (!req.user) throw new CustomError(404, "user Not Found");
         const userId = req.user.userId;
         const productId = req.params.id;
-        if (!productId) throw new CustomError(404, "productId Not Found");
+        if (!productId) throw new CustomError(400, "productId is required");
         const _productId = parseInt(productId);
         const result = await productService.likeProduct(userId, _productId);
         return res.status(200).json(result);

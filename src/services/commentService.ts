@@ -51,7 +51,7 @@ class CommentService {
 
         // 4. 작성자가 본인이 아닐 경우에만 알림 생성
         // (ownerId가 존재하고, 댓글 쓴 사람(userId)과 다를 때)
-        if (ownerId) {//&& ownerId !== userId) {
+        if (ownerId && ownerId !== userId) {
             const message = `작성하신 글 '${targetName}'에 새로운 댓글이 달렸습니다: ${content}`;
 
             // DB에 알림 저장

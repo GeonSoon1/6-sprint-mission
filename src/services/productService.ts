@@ -1,7 +1,7 @@
 import productRepository from '../repositories/productRepository';
 import productLikeRepository from '../repositories/productLikeRepository';
 import { ProductFindOptions, ProductPublicData } from '../libs/interfaces';
-import { Prisma } from '@prisma/client';
+import { Notification } from '@prisma/client';
 
 
 class ProductService {
@@ -39,7 +39,7 @@ class ProductService {
 
         const updatedProduct = await productRepository.update(id, userFields);
         // 3. 알림 로직: 가격이 존재하고, 이전 가격과 다를 때
-        let notifications: any[] = []; // 컨트롤러로 보낼 알림 목록
+        let notifications: Notification[] = []; // 컨트롤러로 보낼 알림 목록
 
         if (oldProduct && userFields.price !== undefined && oldProduct.price !== userFields.price) {
             // 3-1. 찜한 유저들 찾기

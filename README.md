@@ -1,98 +1,71 @@
-# 스프린트 미션 9
+# 스프린트 미션 10
 
-1. **테스트 코드 작성 (Jest, Supertest)**
-2. **단위 테스트 및 통합 테스트 구현**
-3. **테스트 커버리지 80% 이상 달성**
+1. **판다마켓 서비스 AWS 배포**
+2. **AWS S3 적용 (이미지 업로드 스토리지)**
+3. **AWS RDS 적용 (PostgreSQL 데이터베이스)**
+4. **AWS EC2 Express 서버 배포**
+5. **(심화) 프로세스 매니저(PM2) 및 리버스 프록시(Nginx) 적용**
 
 ---
 
-- **Test Environment**: Jest, Supertest 설정 및 Mocking 처리
-- **Coverage**: 전체 라인 커버리지 90% 달성 (주요 모듈 80% 이상)
-- **Stability**: 예외 케이스 및 경계값 테스트 강화 (Validation 등)
+- **Architecture**: EC2 (App/Nginx) -> RDS (Private), S3 (Public Read)
+- **Deployment**: PM2를 이용한 무중단 서비스 관리, Nginx를 이용한 80번 포트 포워딩
+- **Security**: RDS는 Private Subnet(외부 접근 차단), EC2 Security Group을 통해서만 접근 허용
 
 ---
 
 ```
 [디렉토리 구조]
 
-9-sprint-mission
+10-sprint-mission
 
-├─ __http__/
-│ ├─ article.http
-│ ├─ comment.http
-│ ├─ notification-test.http
-│ ├─ notification.http
-│ ├─ product.http
-│ └─ user.http
-├─ .github/
+├─ infra/           <-- [New] 배포 관련 설정 및 스크린샷
+│ ├─ ec2/
+│ │ ├─ ecosystem.config.js
+│ │ ├─ nginx.conf
+│ │ ├─ start.sh
+│ │ ├─ secure-group-inbound.png
+│ │ └─ secure-group-outbound.png
+│ ├─ rds/
+│ │ ├─ secure-group-inbound.png
+│ │ └─ secure-group-outbound.png
+│ └─ s3/
+│   └─ policy.png
 ├─ prisma/
 │ ├─ migrations/
 │ └─ schema.prisma
 ├─ src/
-│ ├─ libs/
+│ ├─ liibs/
 │ ├─ middlewares/
 │ ├─ modules/
-│ │ ├─ articles/
-│ │ ├─ comments/
-│ │ ├─ images/
-│ │ ├─ likes/
-│ │ ├─ notifications/
-│ │ ├─ products/
-│ │ └─ users/
-│ ├─ seeds/
+│ │ ├─ ...
+│ │ └─ images/      <-- [Modified] S3 업로드 로직 적용
 │ ├─ app.ts
 │ ├─ server.ts
-│ └─ socket.ts
-├─ tests/
-│ ├─ unit/
-│ │ ├─ notification.service.test.ts
-│ │ └─ product.service.test.ts
-│ ├─ article.test.ts
-│ ├─ auth.test.ts
-│ ├─ comment.test.ts
-│ ├─ image.test.ts
-│ ├─ like.test.ts
-│ ├─ notification.test.ts
-│ ├─ product.test.ts
-│ ├─ user.test.ts
-│ └─ validation.test.ts
-├─ uploads/
+│ └─ upload.ts      <-- [Modified] multer-s3 적용
 ├─ .env
-├─ .env.test
-├─ jest.config.js
 ├─ package.json
 └─ README.md
 ```
 
-### 실행 방법
+### 배포 정보
 
-```
+- **API Base URL**: `http://ec2-54-180-104-148.ap-northeast-2.compute.amazonaws.com/`
+- **Region**: `ap-northeast-2` (Seoul)
 
-npm install
-npx prisma migrate dev
-npm run dev
+### 주요 구현 내용
 
-# 테스트 실행
-npm test
+1. **AWS S3**
+   - `multer-s3`를 사용하여 프로덕션 환경에서 이미지를 S3 버킷에 직접 업로드
+   - IAM Role 및 Bucket Policy를 사용하여 EC2에서 안전하게 접근
 
-# 커버리지 확인
-npm test -- --coverage
+2. **AWS RDS**
+   - EC2 인스턴스의 보안 그룹에서만 접근 가능한 Private RDS 구축
+   - `prisma migrate`를 EC2 내부에서 실행하여 스키마 동기화
 
-```
-
-### 테스트 방법
-
-```
-
-1. 통합 테스트 (Integration)
-- Product, Article, Comment 등 주요 API 흐름 검증
-- Supertest를 활용한 HTTP 요청/응답 테스트
-
-2. 단위 테스트 (Unit)
-- Service 레이어 비즈니스 로직 검증
-- Repository, Socket 등 외부 의존성 Mocking
-
-```
+3. **AWS EC2 & Nginx**
+   - PM2를 사용하여 Node.js 프로세스 관리 (`ecosystem.config.js`)
+   - Nginx를 리버스 프록시로 설정하여 80번(HTTP) 요청을 3000번(Node.js)으로 연결
 
 ---
 
@@ -103,5 +76,5 @@ npm test -- --coverage
 
 이메일 : wingruni@gmail.com
 
-제출일 : 2026-02-01
+제출일 : 2026-02-03
 ```

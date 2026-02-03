@@ -11,6 +11,7 @@ import { UserService } from '../users/user.service';
 import { NotificationRepository } from '../notifications/notification.repository';
 import { NotificationService } from '../notifications/notification.service';
 import { Request, Response, NextFunction } from 'express';
+import { NODE_ENV } from '../../libs/constants';
 
 export class UserController {
   constructor(
@@ -37,12 +38,12 @@ export class UserController {
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: NODE_ENV === 'production',
       sameSite: 'lax',
     });
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: NODE_ENV === 'production',
       sameSite: 'lax',
     });
 
@@ -60,12 +61,12 @@ export class UserController {
 
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: false,
+      secure: NODE_ENV === 'production',
       sameSite: 'lax',
     });
     res.cookie('refreshToken', newRefreshToken, {
       httpOnly: true,
-      secure: false,
+      secure: NODE_ENV === 'production',
       sameSite: 'lax',
     });
 
@@ -118,19 +119,18 @@ export class UserController {
 
       res.cookie('accessToken', newAccessToken, {
         httpOnly: true,
-        secure: false,
+        secure: NODE_ENV === 'production',
         sameSite: 'lax',
       });
       res.cookie('refreshToken', newRefreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: NODE_ENV === 'production',
         sameSite: 'lax',
       });
     }
 
-    const formattedData = await this.service.filterSensitiveUserData(
-      updatedUser
-    );
+    const formattedData =
+      await this.service.filterSensitiveUserData(updatedUser);
     res.status(200).json(formattedData);
   }
 
@@ -186,7 +186,10 @@ const likeRepository = new LikeRepository();
 const notificationRepo = new NotificationRepository();
 const notificationService = new NotificationService(notificationRepo);
 const userService = new UserService(userRepository);
-const productService = new ProductService(productRepository, notificationService);
+const productService = new ProductService(
+  productRepository,
+  notificationService
+);
 const articleService = new ArticleService(articleRepository);
 const likeService = new LikeService(likeRepository);
 

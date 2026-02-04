@@ -25,13 +25,13 @@ export class CommentController {
   }
 
   async getCommentsByProductId(req: Request, res: Response) {
+    // validatedCommentGetList (limit) -> DTO (take) 매핑
+    const { cursor, limit } = req.validatedCommentGetList as any;
+
     const dto: CommentQueryDto = {
       productId: req.validatedProductId!.productId,
-      ...Object.fromEntries(
-        Object.entries(req.validatedCommentGetList!).filter(
-          ([_, v]) => v !== undefined
-        )
-      ),
+      cursor,
+      take: limit,
     };
 
     const data = await this.service.getCommentsByProduct(dto);
@@ -49,13 +49,12 @@ export class CommentController {
   }
 
   async getCommentsByArticle(req: Request, res: Response) {
+    const { cursor, limit } = req.validatedCommentGetList as any;
+
     const dto: CommentQueryDto = {
       articleId: req.validatedArticleId?.articleId,
-      ...Object.fromEntries(
-        Object.entries(req.validatedCommentGetList!).filter(
-          ([_, v]) => v !== undefined
-        )
-      ),
+      cursor,
+      take: limit,
     };
     const data = await this.service.getCommentsByArticle(dto);
     res.status(200).json(data);
@@ -82,6 +81,9 @@ const commentRepository = new CommentRepository();
 const articleRepository = new ArticleRepogitory();
 const notificationRepo = new NotificationRepository();
 const notificationService = new NotificationService(notificationRepo);
-const commentService = new CommentService(commentRepository, articleRepository, notificationService);
+const commentService = new CommentService(
+  commentRepository,
+  articleRepository,
+  notificationService
+);
 export const commentController = new CommentController(commentService);
-

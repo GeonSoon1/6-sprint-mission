@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 
 // 유저 회원 가입 유효성 스키마
 const createUserSchema = s.object({
-  email: s.size(s.nonempty(s.string()), 1, 30),
+  email: s.pattern(s.string(), /^[^\s@]+@[^\s@]+\.[^\s@]+$/),
   nickname: s.size(s.nonempty(s.string()), 1, 30),
   password: s.size(s.nonempty(s.string()), 8, 20),
 });
@@ -24,7 +24,7 @@ async function validateCreateUser(
 
 // 로그인 유효성 스키마
 const loginUserSchema = s.object({
-  email: s.size(s.nonempty(s.string()), 1, 30),
+  email: s.size(s.nonempty(s.string()), 1, 100),
   password: s.size(s.nonempty(s.string()), 8, 20),
 });
 

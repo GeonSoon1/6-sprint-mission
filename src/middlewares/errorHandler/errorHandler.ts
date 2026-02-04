@@ -28,7 +28,9 @@ function globalErrorHandler(
   res: Response,
   next: NextFunction
 ) {
-  console.log(err);
+  if (process.env.NODE_ENV !== 'test') {
+    console.log(err);
+  }
   if (err instanceof Prisma.PrismaClientKnownRequestError) {
     if (err.code === 'P2002') {
       return res.status(400).json({ message: '이미 존재하는 데이터입니다.' });
@@ -47,7 +49,7 @@ function globalErrorHandler(
     return res.status(404).send({ message: err.message });
   }
   if (err instanceof BadRequestError) {
-    return res.status(404).send({ message: err.message });
+    return res.status(400).send({ message: err.message });
   }
   if (err instanceof ForbiddenError) {
     return res.status(403).send({ message: err.message });

@@ -17,6 +17,11 @@ export async function getUser(userId: number): Promise<User> {
 }
 
 export async function updateUser(userId: number, data: Partial<UpdateUserData>): Promise<User> {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const updatedUser = await usersRepository.updateUser(userId, data);
   return updatedUser;
 }
@@ -25,6 +30,11 @@ export async function getMyProductList(
   userId: number,
   params: PagePaginationParams,
 ): Promise<PagePaginationResult<Product>> {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const result = await productsRepository.getProductListWithFavorites(params, { userId });
   return result;
 }
@@ -33,6 +43,11 @@ export async function getMyFavoriteList(
   userId: number,
   params: PagePaginationParams,
 ): Promise<PagePaginationResult<Product>> {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const result = await productsRepository.getFavoriteProductListByOwnerId(userId, params);
   return result;
 }

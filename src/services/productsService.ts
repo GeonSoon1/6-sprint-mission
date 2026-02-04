@@ -2,6 +2,7 @@ import ForbiddenError from '../lib/errors/ForbiddenError';
 import NotFoundError from '../lib/errors/NotFoundError';
 import * as productsRepository from '../repositories/productsRepository';
 import * as favoritesRepository from '../repositories/favoritesRepository';
+import * as usersRepository from '../repositories/usersRepository';
 import * as notificationsService from './notificationsService';
 import { PagePaginationParams, PagePaginationResult } from '../types/pagination';
 import Product from '../types/Product';
@@ -38,6 +39,11 @@ export async function getProductList(
 }
 
 export async function updateProduct(id: number, data: UpdateProductData): Promise<Product> {
+  const userExists = await usersRepository.userExists(data.userId);
+  if (!userExists) {
+    throw new NotFoundError('user', data.userId);
+  }
+
   const existingProduct = await productsRepository.getProduct(id);
   if (!existingProduct) {
     throw new NotFoundError('product', id);
@@ -60,6 +66,11 @@ export async function updateProduct(id: number, data: UpdateProductData): Promis
 }
 
 export async function deleteProduct(id: number, userId: number): Promise<void> {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const existingProduct = await productsRepository.getProduct(id);
   if (!existingProduct) {
     throw new NotFoundError('product', id);

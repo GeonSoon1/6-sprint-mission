@@ -1,4 +1,5 @@
 import * as articlesRepository from '../repositories/articlesRepository';
+import * as usersRepository from '../repositories/usersRepository';
 import { PagePaginationParams, PagePaginationResult } from '../types/pagination';
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import NotFoundError from '../lib/errors/NotFoundError';
@@ -32,6 +33,11 @@ export async function getArticleList(
 }
 
 export async function updateArticle(id: number, data: UpdateArticleData): Promise<Article> {
+  const userExists = await usersRepository.userExists(data.userId);
+  if (!userExists) {
+    throw new NotFoundError('user', data.userId);
+  }
+
   const existingArticle = await articlesRepository.getArticle(id);
   if (!existingArticle) {
     throw new NotFoundError('article', id);
@@ -46,6 +52,11 @@ export async function updateArticle(id: number, data: UpdateArticleData): Promis
 }
 
 export async function deleteArticle(id: number, userId: number): Promise<void> {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const existingArticle = await articlesRepository.getArticle(id);
   if (!existingArticle) {
     throw new NotFoundError('article', id);

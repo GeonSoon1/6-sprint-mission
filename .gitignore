@@ -7,6 +7,8 @@ build/
 test.http
 .DS_Store
 public/.DS_Store
+coverage/
+dist/
 
 # Uploaded files
 public/*

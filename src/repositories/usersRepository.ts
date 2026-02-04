@@ -35,3 +35,11 @@ export async function deleteUser(id: number) {
     where: { id },
   });
 }
+
+export async function userExists(id: number): Promise<boolean> {
+  const user = await prismaClient.user.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+  return user !== null;
+}

@@ -1,21 +1,31 @@
 {
+  "type": "module",
   "scripts": {
-    "start": "node ./build/main.js",
     "build": "tsc",
-    "dev": "nodemon ./src/main.ts --watch ./src"
+    "start": "node ./dist/main.js",
+    "dev": "tsx watch ./src/main.ts",
+    "dev:nodemon": "nodemon --exec tsx ./src/main.ts",
+    "test": "jest --coverage"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
-    "@types/cookie-parser": "^1.4.8",
+    "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
-    "@types/express": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/multer": "^1.4.12",
-    "nodemon": "^3.1.9",
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/multer": "^1.4.11",
+    "@types/node": "^20.11.24",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^9.0.8",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
     "prettier": "^3.3.2",
     "prisma": "^5.16.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.2"
+    "supertest": "^6.3.4",
+    "ts-jest": "^29.1.2",
+    "tsx": "^4.7.1",
+    "typescript": "^5.4.2"
   },
   "dependencies": {
     "@prisma/client": "^5.16.2",

@@ -1,6 +1,7 @@
 import * as articlesRepository from '../repositories/articlesRepository';
 import * as commentsRepository from '../repositories/commentsRepository';
 import * as productsRepository from '../repositories/productsRepository';
+import * as usersRepository from '../repositories/usersRepository';
 import { CursorPaginationParams, CursorPaginationResult } from '../types/pagination';
 import BadRequestError from '../lib/errors/BadRequestError';
 import ForbiddenError from '../lib/errors/ForbiddenError';
@@ -17,6 +18,11 @@ type CreateCommentData = Omit<
 };
 
 export async function createComment(data: CreateCommentData): Promise<Comment> {
+  const userExists = await usersRepository.userExists(data.userId);
+  if (!userExists) {
+    throw new NotFoundError('user', data.userId);
+  }
+
   if (!data.articleId && !data.productId) {
     throw new BadRequestError('Either articleId or productId must be provided');
   }
@@ -92,6 +98,11 @@ export async function getCommentListByProductId(
 }
 
 export async function updateComment(id: number, userId: number, content: string): Promise<Comment> {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const comment = await commentsRepository.getComment(id);
   if (!comment) {
     throw new NotFoundError('comment', id);
@@ -105,6 +116,11 @@ export async function updateComment(id: number, userId: number, content: string)
 }
 
 export async function deleteComment(id: number, userId: number): Promise<void> {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const comment = await commentsRepository.getComment(id);
   if (!comment) {
     throw new NotFoundError('comment', id);

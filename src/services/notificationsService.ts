@@ -1,6 +1,7 @@
 import NotFoundError from '../lib/errors/NotFoundError';
 import ForbiddenError from '../lib/errors/ForbiddenError';
 import * as notificationsRepository from '../repositories/notificationsRepository';
+import * as usersRepository from '../repositories/usersRepository';
 import { CursorPaginationParams, CursorPaginationResult } from '../types/pagination';
 import { emitToUser } from '../lib/socket';
 import Notification from '../types/notification';
@@ -22,15 +23,30 @@ export async function getMyNotifications(
   userId: number,
   params: CursorPaginationParams,
 ): Promise<CursorPaginationResult<Notification>> {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   return notificationsRepository.getNotificationList(userId, params);
 }
 
 export async function getMyUnreadCount(userId: number) {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const count = await notificationsRepository.getUnreadCount(userId);
   return count;
 }
 
 export async function markAsRead(id: number, userId: number): Promise<Notification> {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const notification = await notificationsRepository.getNotification(id);
   if (!notification) {
     throw new NotFoundError('notification', id);
@@ -54,6 +70,16 @@ export async function notifyPriceChange(
   if (userIds.length === 0) {
     return;
   }
+  
+  // Validate all userIds exist
+  const userExistenceChecks = await Promise.all(
+    userIds.map((userId) => usersRepository.userExists(userId))
+  );
+  const invalidUserIds = userIds.filter((_, index) => !userExistenceChecks[index]);
+  if (invalidUserIds.length > 0) {
+    throw new NotFoundError('user', invalidUserIds[0]);
+  }
+
   const direction = currentPrice > previousPrice ? '상승' : '하락';
   const content = `상품 "${productName}"의 가격이 ${direction}했습니다.`;
   await Promise.all(
@@ -75,6 +101,11 @@ export async function notifyArticleComment(
   articleId: number,
   articleTitle: string,
 ) {
+  const userExists = await usersRepository.userExists(userId);
+  if (!userExists) {
+    throw new NotFoundError('user', userId);
+  }
+
   const content = `내 게시글 "${articleTitle}"에 댓글이 달렸습니다.`;
   await createAndEmit({
     userId,

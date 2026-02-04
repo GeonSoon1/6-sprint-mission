@@ -14,6 +14,9 @@ class AuthRepository {
   findById(id: number) {
     return prisma.user.findUnique({ where: { id } });
   }
+  findByEmail(email: string) {
+    return prisma.user.findFirst({ where: { email } });
+  }
 }
 
 export default new AuthRepository();

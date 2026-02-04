@@ -3,7 +3,6 @@ import cors from 'cors';
 import http from 'http';
 import { initializeSocketServer } from './socket/socketServer';
 import cookieParser from 'cookie-parser';
-import { PORT } from './lib/constants';
 import productRouter from './router/productRouter';
 import articleRouter from './router/articleRouter';
 import { defaultNotFoundHandler, errorHandler } from './middleware/errorHandler';
@@ -52,7 +51,4 @@ app.use('/notifications', notificationRouter);
 app.use(defaultNotFoundHandler);
 app.use(errorHandler);
 
-//app.listen(PORT || 3000, () => console.log('Server started'));
-server.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+export default server;

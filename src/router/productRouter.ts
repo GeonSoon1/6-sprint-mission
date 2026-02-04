@@ -8,9 +8,9 @@ import commentController from '../controller/commentController';
 const productRouter = express.Router();
 
 productRouter
-  .get('/', authenticate, asyncHandler(productController.getProducts))
+  .get('/', asyncHandler(productController.getProducts))
   .post('/', authenticate, asyncHandler(productController.createProduct))
-  .get('/:id', authenticate, asyncHandler(productController.getProductById))
+  .get('/:id', asyncHandler(productController.getProductById))
   .patch('/:id', authenticate, asyncHandler(productController.updateProduct))
   .delete('/:id', authenticate, asyncHandler(productController.deleteProduct))
   .post('/:id/comments', authenticate, asyncHandler(commentController.createProductComment))

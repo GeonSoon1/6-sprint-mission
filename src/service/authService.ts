@@ -24,6 +24,10 @@ class AuthService {
     if (existingUser) {
       throw new ConflictError('이미 존재하는 닉네임입니다.');
     }
+    const existingEmail = await authRepository.findByEmail(email);
+    if (existingEmail) {
+      throw new ConflictError('이미 존재하는 이메일입니다.');
+    }
 
     //비밀번호 해싱 과정
     const salt = await bcrypt.genSalt(10);

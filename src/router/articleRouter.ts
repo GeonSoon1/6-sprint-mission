@@ -8,9 +8,9 @@ import commentController from '../controller/commentController';
 const articleRouter = express.Router();
 
 articleRouter
-  .get('/', authenticate, asyncHandler(articleController.getArticles))
+  .get('/', asyncHandler(articleController.getArticles))
   .post('/', authenticate, asyncHandler(articleController.createArticle))
-  .get('/:id', authenticate, asyncHandler(articleController.getArticleById))
+  .get('/:id', asyncHandler(articleController.getArticleById))
   .patch('/:id', authenticate, asyncHandler(articleController.updateArticle))
   .delete('/:id', authenticate, asyncHandler(articleController.deleteArticle))
   .post('/:id/comments', authenticate, asyncHandler(commentController.createArticleComment))

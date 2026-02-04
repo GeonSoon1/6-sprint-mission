@@ -1,11 +1,11 @@
 import ForbiddenError from '@lib/errors/ForbiddenError';
 import NotFoundError from '@lib/errors/NotFoundError';
-import * as productsRepository from '@/repository/product.repo';
-import * as favoriteRepository from '@/repository/favorite.repo';
-import * as notificationRepository from '@/repository/notification.repo';
+import * as productsRepository from '@repository/product.repo';
+import * as favoriteRepository from '@repository/favorite.repo';
+import * as notificationRepository from '@repository/notification.repo';
 import { PagePaginationParams, PagePaginationResult } from '@app-types/pagination';
 import Product from '@app-types/Product';
-import { notifyToUser } from '@/lib/websocket';
+import { notifyToUser } from '@lib/websocket';
 
 type CreateProductData = Omit<
   Product,
@@ -54,8 +54,10 @@ export async function updateProduct(id: number, data: UpdateProductData): Promis
   const originName = existingProduct.name;
   const cutName = originName.substring(0, 10);
 
-  if (data.price && data.price !== existingProduct.price) {
-    const priceUpdate = data.price > existingProduct.price ? '상승하였습니다' : '하락하였습니다';
+  const isPriceChanged = data.price && data.price !== existingProduct.price;
+
+  if (isPriceChanged) {
+    const priceUpdate = data.price! > existingProduct.price ? '상승하였습니다' : '하락하였습니다';
 
     await Promise.all(
       likeProductMember.map((user) =>

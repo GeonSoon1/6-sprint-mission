@@ -2,9 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
-import http from 'http';
-import { PORT, PUBLIC_PATH, STATIC_PATH } from '@lib/constants';
-import { setupWebSocket } from '@lib/websocket';
+import { PUBLIC_PATH, STATIC_PATH } from '@lib/constants';
 import articlesRouter from '@/routers/article.router';
 import productsRouter from '@/routers/product.router';
 import commentsRouter from '@/routers/comment.router';
@@ -15,8 +13,6 @@ import notificationRouter from '@/routers/notification.router';
 import { defaultNotFoundHandler, globalErrorHandler } from '@/controllers/error.controller';
 
 const app = express();
-const server = http.createServer(app);
-setupWebSocket(server); // 웹소켓 연결
 
 app.use(cors());
 app.use(express.json());
@@ -34,6 +30,4 @@ app.use('/notifications', notificationRouter);
 app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
 
-server.listen(PORT, () => {
-  console.log(`🚀 Server started on port ${PORT} 🚀`);
-});
+export default app;

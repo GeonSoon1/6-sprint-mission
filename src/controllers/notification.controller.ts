@@ -12,7 +12,6 @@ export async function getNotifications(req: Request, res: Response) {
 
 export async function updateNotification(req: Request, res: Response) {
   const { id } = create(req.params, IdParamsStruct);
-  console.log(id);
   const updateNotificationInfo = await notificationService.updateNotificationInfo(id);
 
   res.status(200).send(updateNotificationInfo);

@@ -2,9 +2,7 @@ import { Product } from '@prisma/client';
 import { prismaClient } from '@lib/prismaClient';
 import { PagePaginationParams } from '@app-types/pagination';
 
-export async function createProduct(
-  data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>
-) {
+export async function createProduct(data: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) {
   return prismaClient.product.create({
     data,
   });
@@ -47,10 +45,7 @@ export async function getProductListWithFavorites(
 ) {
   const where = keyword
     ? {
-        OR: [
-          { name: { contains: keyword } },
-          { description: { contains: keyword } },
-        ],
+        OR: [{ name: { contains: keyword } }, { description: { contains: keyword } }],
       }
     : {};
 
@@ -90,10 +85,7 @@ export async function getFavoriteProductListByOwnerId(
 ) {
   const where = keyword
     ? {
-        OR: [
-          { name: { contains: keyword } },
-          { description: { contains: keyword } },
-        ],
+        OR: [{ name: { contains: keyword } }, { description: { contains: keyword } }],
       }
     : {};
   const totalCount = await prismaClient.product.count({
@@ -136,10 +128,7 @@ export async function getFavoriteProductListByOwnerId(
   };
 }
 
-export async function updateProductWithFavorites(
-  id: number,
-  data: Partial<Product>
-) {
+export async function updateProductWithFavorites(id: number, data: Partial<Product>) {
   const product = await prismaClient.product.update({
     where: { id },
     data,

@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# 프로젝트 폴더 이동
-cd 6-sprint-mission
-
 # 의존성 설치
 npm install
 

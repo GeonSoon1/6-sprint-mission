@@ -2,9 +2,11 @@
 
 ## 개요
 
-이 프로젝트는 'Panda Market' 중고 거래 애플리케이션을 위한 API 서버입니다. **Node.js, Express, TypeScript**를 기반으로 구축되었으며, **IoC(Inversion of Control, 제어의 역전)** 원칙을 적용하기 위해 **InversifyJS** 의존성 주입(DI) 프레임워크를 도입하여 아키텍처를 개선했습니다. 이를 통해 각 계층(Controller, Service, Repository) 간의 결합도를 낮추고 코드의 유연성, 테스트 용이성, 유지보수성을 극대화했습니다.
-
-Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통적인 Express 라우팅 방식과 DI 컨테이너를 결합하여 명확하고 확장 가능한 구조를 구현했습니다.
+- 이 프로젝트는 'Panda Market' 중고 거래 애플리케이션을 위한 API 서버입니다.
+- Node.js, Express, TypeScript를 기반으로 구축되었습니다.
+- IoC(Inversion of Control)원칙을 적용하기 위해 'InversifyJS' 프레임워크를 도입하여 아키텍처를 개선하였고,
+- 각 계층(Controller, Service, Repository)간의 결합도를 낮추고 코드의 유연성 높여, 테스트 및 유지보수를 보다 수월하게 진행할 수 있습니다.
+- Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통적인 Express 라우팅 방식과 DI 컨테이너를 결합하여 명확하고 확장 가능한 구조를 구현했습니다.
 
 ### 주요 기술
 
@@ -15,8 +17,9 @@ Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통
 - **DI (Dependency Injection):** InversifyJS, reflect-metadata
 - **인증:** JWT (jsonwebtoken), bcrypt
 - **Validation:** class-validator, class-transformer
-- **파일 업로드:** Multer
+- **파일 업로드:** Multer, AWS S3
 - **WebSocket:** Socket.io
+- **Infrastructure:** AWS (EC2, S3, RDS), Nginx, PM2
 
 ### 주요 라이브러리
 
@@ -30,16 +33,16 @@ Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통
 - **`jsonwebtoken`**: JWT 기반 인증 토큰 생성 및 검증
 - **`bcrypt`**: 비밀번호 해싱
 - **`class-validator`**, **`class-transformer`**: DTO 클래스 기반의 데이터 유효성 검사 및 변환
-- **`multer`**: 파일 업로드(multipart/form-data) 처리
+- **`multer`**, **`multer-s3`**: 파일 업로드 처리 (로컬 및 S3 지원)
 - **`socket.io`**: 실시간 양방향 통신 (알림 기능)
 
 ---
 
 ## 아키텍처 (DI와 Express Router 결합)
 
-본 프로젝트는 **DI 컨테이너**가 계층별 객체 생성을 책임지고, **Express 라우터**가 HTTP 요청을 처리하는 역할을 명확히 분리한 아키텍처를 따릅니다.
+본 프로젝트는 'DI 컨테이너'가 계층별 객체 생성을 책임지고, 'Express 라우터'가 HTTP 요청을 처리하는 역할을 명확히 분리한 아키텍처를 따릅니다.
 
-1.  **DI 컨테이너 설정 (`src/lib/inversify.config.ts`)**
+1.  DI 컨테이너 설정 (`src/lib/inversify.config.ts`)
     - 프로젝트의 모든 서비스, 리포지토리, 컨트롤러 등 각 계층의 구현체를 식별자(`TYPES`)에 바인딩(연결)하는 **설정의 중심**입니다.
     - 애플리케이션에 필요한 모든 객체(인스턴스)는 이곳에서 생성되고 관리됩니다.
 
@@ -138,6 +141,18 @@ Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통
 
 ---
 
+## 인프라 및 배포 (Infrastructure)
+
+이 프로젝트는 **AWS 클라우드 환경**에서 안정적으로 운영되도록 구성되었습니다.
+
+- **AWS EC2**: Linux 기반의 가상 서버에서 Node.js 애플리케이션을 호스팅합니다.
+- **PM2**: 프로세스 매니저를 사용하여 무중단 배포 및 애플리케이션 상태를 관리합니다.
+- **Nginx**: 리버스 프록시 서버로서 80번 포트로 들어오는 요청을 Node.js 애플리케이션(내부 포트)으로 전달합니다.
+- **AWS S3**: 프로덕션 환경에서 이미지 파일(프로필, 상품 사진 등)을 안전하고 확장성 있게 저장합니다.
+- **AWS RDS**: 관리형 PostgreSQL 데이터베이스 서비스를 사용하여 데이터의 안정성과 가용성을 보장합니다.
+
+---
+
 ## 프로젝트 폴더 구조
 
 ```
@@ -200,9 +215,15 @@ Prisma ORM을 통해 PostgreSQL 데이터베이스와 상호작용하며, 전통
 **.env 파일 예시**
 
 ```
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema="
+DATABASE_URL="postgresql://<USER-ID>:<PASSWORD>@<HOST:PORT>/<DATABASE>?schema="
 PORT=3000
-JWT_SECRET_KEY=your_jwt_secret_key
+JWT_SECRET_KEY=<your_jwt_secret_key>
+
+AWS_ACCESS_KEY_ID=<aws-access-key-id>
+AWS_SECRET_ACCESS_KEY=<aws-secret-access-key>
+AWS_REGION=<aws-region>
+AWS_BUCKET_NAME=<aws-bucket-name>
+
 ```
 
 ### 데이터베이스 초기화 및 시드
@@ -210,6 +231,9 @@ JWT_SECRET_KEY=your_jwt_secret_key
 처음 프로젝트를 설정할 때 다음 명령어를 실행하여 데이터베이스 스키마를 적용하고 초기 데이터를 삽입합니다.
 
 ```bash
+# 데이터베이스 코드 생성(업데이트)
+npx prisma generate
+
 # 데이터베이스 스키마를 마이그레이션합니다.
 npx prisma migrate dev
 

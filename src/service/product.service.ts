@@ -2,7 +2,7 @@ import { assert } from 'superstruct';
 import { includedOk } from '../lib/myFuns';
 import productRepo from '../repository/product.repo';
 import { selectFields } from '../lib/selectFields';
-import { LikedProduct2show, Product2show, ProductList2show } from '../types/interfaceType';
+import { ProductListToShow, ProductToShow } from '../types/interfaceType';
 import {
   CreateProductDto,
   UpdateProductDto,
@@ -46,6 +46,7 @@ async function patch(productId: number, data: UpdateProductDto): Promise<Product
   assert(data, PatchProduct);
   const prevPrice = await priceToBeChanged(productId, data);
   let newProduct;
+  let priceRecord;
 
   // 상품 가격 변동이 있는 경우, 가격 변동 기록 생성
   if (Number(prevPrice)) {
@@ -65,54 +66,38 @@ async function patch(productId: number, data: UpdateProductDto): Promise<Product
     const product = await productRepo.findById(productId);
     if (!product) throw new NotFoundError();
 
-    let priceRecord;
-    let notifications = [];
+    [priceRecord, newProduct] = await prisma.$transaction([
+      prisma.productPriceHistory.create({ data: priceDataToRepo }),
+      prisma.product.update({ data, where: { id: productId } })
+    ]);
 
     // 그 상품에 좋아요를 누른 사람이 있는 경우 알림 생성
     if (product.likedUsers.length !== 0) {
       const message = `상품${productId} 가격 변동 알림: (${prevPrice} --> ${data.price})`;
 
-      for (let likedUser of product.likedUsers) {
-        let notificationData = {
+      let notificationData: CreateNotificationDto[] = [];
+      for (const likedUser of product.likedUsers) {
+        // if (likedUser.id === product.userId) continue; //테스트 위해 본인에게도 보냄
+        const tempData: CreateNotificationDto = {
           userId: likedUser.id,
           type: NotificationType.PRODUCT,
           message,
           productId
-        } as CreateNotificationDto;
-        assert(notificationData, CreateNotification);
+        };
+        assert(tempData, CreateNotification);
+        notificationData.push(tempData);
       }
-
-      const notificationQueries = product.likedUsers.map((likedUser) =>
-        prisma.notification.create({
-          data: {
-            user: { connect: { id: likedUser.id } },
-            type: NotificationType.PRODUCT,
-            message: message,
-            product: { connect: { id: productId } }
-          } as Prisma.NotificationCreateInput
-        })
-      );
-
-      [priceRecord, newProduct, ...notifications] = await prisma.$transaction([
-        prisma.productPriceHistory.create({ data: priceDataToRepo }),
-        prisma.product.update({ data, where: { id: productId } }),
-        ...notificationQueries
-      ]);
+      const notifications = await prisma.notification.createMany({ data: notificationData });
 
       const io = getIO();
-      for (const likeUser of product.likedUsers) {
-        io.to(`user:${likeUser.id}`).emit('notification', { message });
+      for (const likedUser of product.likedUsers) {
+        // if (likedUser.id === product.userId) continue; // 테스트 위해 본인에게도 보내기
+        io.to(`user:${likedUser.id}`).emit('notification', { message });
       }
       console.log('');
       console.log('Price changed');
       console.log('ProductPriceHistory updated');
       console.log('Notification sent & stored');
-    } else {
-      // 좋아요를 누른 유저가 없는 상품인 경우 알림 없음
-      [priceRecord, newProduct] = await prisma.$transaction([
-        prisma.productPriceHistory.create({ data: priceDataToRepo }),
-        prisma.product.update({ data, where: { id: productId } })
-      ]);
     }
   } else {
     newProduct = await productRepo.patch(productId, data);
@@ -122,7 +107,7 @@ async function patch(productId: number, data: UpdateProductDto): Promise<Product
   return newProduct;
 }
 
-async function erase(productId: number): Promise<void> {
+async function erase(productId: string): Promise<void> {
   await productRepo.erase(Number(productId));
 }
 
@@ -137,7 +122,7 @@ async function getList(
   orderStr: string,
   nameStr: string | undefined,
   descriptionStr: string | undefined
-): Promise<ProductList2show[]> {
+): Promise<ProductListToShow[]> {
   const orderBy = { createdAt: 'desc' };
   if (orderStr === 'oldest') {
     orderBy.createdAt = 'asc';
@@ -160,17 +145,17 @@ async function getList(
 // 조회 필드: id, name, description, price, tags, createdAt
 async function get(
   userId: number | undefined,
-  productId: number
-): Promise<LikedProduct2show | Product2show> {
+  productId: string
+): Promise<ProductToShow | Product> {
   const product = await productRepo.findById(Number(productId));
   const product2show = selectFields(product);
-  if (!userId) return product2show as Product2show;
+  if (!userId) return product2show;
   const isLiked = includedOk(product.likedUsers, 'id', userId);
-  return { isLiked, ...product2show } as LikedProduct2show;
+  return { isLiked, ...product2show };
 }
 
 // 좋아요와 좋아요취소 토글
-async function likeToggle(userId: number, productId: number): Promise<LikedProduct2show> {
+async function likeToggle(userId: number, productId: string): Promise<ProductToShow> {
   const product = await productRepo.findById(Number(productId));
 
   const isLiked = includedOk(product.likedUsers, 'id', userId);
@@ -186,7 +171,7 @@ async function likeToggle(userId: number, productId: number): Promise<LikedProdu
   return {
     isLiked: !isLiked,
     ...product2show
-  } as LikedProduct2show;
+  };
 }
 
 async function getPriceRecord(id: number): Promise<ProductPriceHistory | null> {

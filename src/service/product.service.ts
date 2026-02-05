@@ -2,7 +2,7 @@ import { assert } from 'superstruct';
 import { includedOk } from '../lib/myFuns';
 import productRepo from '../repository/product.repo';
 import { selectFields } from '../lib/selectFields';
-import { ProductListToShow, ProductToShow } from '../types/interfaceType';
+import { LikedProduct2show, Product2show, ProductList2show } from '../types/interfaceType';
 import {
   CreateProductDto,
   UpdateProductDto,
@@ -107,7 +107,7 @@ async function patch(productId: number, data: UpdateProductDto): Promise<Product
   return newProduct;
 }
 
-async function erase(productId: string): Promise<void> {
+async function erase(productId: number): Promise<void> {
   await productRepo.erase(Number(productId));
 }
 
@@ -122,7 +122,7 @@ async function getList(
   orderStr: string,
   nameStr: string | undefined,
   descriptionStr: string | undefined
-): Promise<ProductListToShow[]> {
+): Promise<ProductList2show[]> {
   const orderBy = { createdAt: 'desc' };
   if (orderStr === 'oldest') {
     orderBy.createdAt = 'asc';
@@ -145,24 +145,24 @@ async function getList(
 // 조회 필드: id, name, description, price, tags, createdAt
 async function get(
   userId: number | undefined,
-  productId: string
-): Promise<ProductToShow | Product> {
-  const product = await productRepo.findById(Number(productId));
+  productId: number
+): Promise<LikedProduct2show | Product2show> {
+  const product = await productRepo.findById(productId);
   const product2show = selectFields(product);
-  if (!userId) return product2show;
+  if (!userId) return product2show as Product2show;
   const isLiked = includedOk(product.likedUsers, 'id', userId);
-  return { isLiked, ...product2show };
+  return { isLiked, ...product2show } as LikedProduct2show;
 }
 
 // 좋아요와 좋아요취소 토글
-async function likeToggle(userId: number, productId: string): Promise<ProductToShow> {
-  const product = await productRepo.findById(Number(productId));
+async function likeToggle(userId: number, productId: number): Promise<LikedProduct2show> {
+  const product = await productRepo.findById(productId);
 
   const isLiked = includedOk(product.likedUsers, 'id', userId);
 
   const updated = isLiked
-    ? await productRepo.cancelLike(Number(productId), userId)
-    : await productRepo.like(Number(productId), userId);
+    ? await productRepo.cancelLike(productId, userId)
+    : await productRepo.like(productId, userId);
 
   console.log(isLiked ? 'Now, not your favorite product' : 'Now, your favorite product');
 
@@ -171,7 +171,7 @@ async function likeToggle(userId: number, productId: string): Promise<ProductToS
   return {
     isLiked: !isLiked,
     ...product2show
-  };
+  } as LikedProduct2show;
 }
 
 async function getPriceRecord(id: number): Promise<ProductPriceHistory | null> {

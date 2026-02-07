@@ -8,7 +8,7 @@ import { PUBLIC_PATH, STATIC_PATH } from '@lib/constants';
 import BadRequestError from '@lib/errors/BadRequestError';
 
 const ALLOWED_MIME_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
-const FILE_SIZE_LIMIT = 5 * 1024 * 1024;
+const FILE_SIZE_LIMIT = 10 * 1024 * 1024;
 
 // [S3 전용 설정]
 const s3Params = {

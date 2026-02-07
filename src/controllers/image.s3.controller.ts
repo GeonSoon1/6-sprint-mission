@@ -27,7 +27,6 @@ const storage =
     ? multerS3({ // multerS3 설정
         s3: s3,
         bucket: process.env.AWS_BUCKET_NAME!,
-        acl: 'public-read',
         contentType: multerS3.AUTO_CONTENT_TYPE,
         key: function (req: any, file: any, cb: any) {
           const ext = path.extname(file.originalname);

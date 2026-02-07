@@ -17,11 +17,12 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./src/types", "./node_modules/@types"],
-    "types": ["node"],
+    "types": ["node", "jest"],
 
     /* === 🏗️ 빌드 성능 & 개발 편의 === */
     "incremental": true,
     "tsBuildInfoFile": "./node_modules/.cache/.tsbuildinfo",
+    "isolatedModules": true,
 
     /* ===  📝 빌드 Output 설정 === */
     "sourceMap": true,

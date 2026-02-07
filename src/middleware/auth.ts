@@ -16,7 +16,7 @@ export function requireAuth(
   // 2-1) Authorization 헤더 파싱
   const auth = req.headers.authorization || '';
   const [type, token] = auth.split(' ');
-  
+
   // 2-2) Bearer 토큰 검증
   if (type !== 'Bearer' || !token) {
     return next(

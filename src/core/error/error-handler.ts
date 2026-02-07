@@ -83,7 +83,6 @@ export const errorHandler = (
 
   // 8-A) winston 로깅 출력
   logger.error('⚠️ 글로벌 에러 발생', {
-    message: err.message,
     stack: err.stack,
     path: req.path,
     method: req.method,

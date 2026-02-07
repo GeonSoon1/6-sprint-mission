@@ -63,8 +63,12 @@ app.use(errorHandler);
 // ?) 서버 실행 진입
 initSocket(server);
 
-server.listen(PORT, () => {
-  console.log(`🚀 Server is running on port http://localhost:${PORT}`);
-  debugLog('Debug mode is enabled');
-  debugLog(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(PORT, () => {
+    console.log(`🚀 Server is running on port http://localhost:${PORT}`);
+    debugLog('Debug mode is enabled');
+    debugLog(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  });
+}
+
+export { app, server };

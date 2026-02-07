@@ -5,7 +5,8 @@ import { articleCommentService } from '../services/article-comment-service.js';
 export const articleCommentController = {
   // 1) 댓글 목록 조회
   async list(req: Request, res: Response) {
-    const comments = await articleCommentService.list(req.params.articleId);
+    const articleId = Number(req.params.articleId);
+    const comments = await articleCommentService.list(articleId);
 
     res.status(200).json({
       success: true,
@@ -27,8 +28,9 @@ export const articleCommentController = {
 
   // 3) 댓글 수정
   async update(req: Request, res: Response) {
+    const commentId = Number(req.params.id);
     const comment = await articleCommentService.update(
-      req.params.id,
+      commentId,
       req.body.content,
       req.user!.id
     );
@@ -42,7 +44,8 @@ export const articleCommentController = {
 
   // 4) 댓글 삭제
   async remove(req: Request, res: Response) {
-    await articleCommentService.remove(req.params.id, req.user!.id);
+    const commentId = Number(req.params.id);
+    await articleCommentService.remove(commentId, req.user!.id);
 
     res.status(200).json({
       success: true,

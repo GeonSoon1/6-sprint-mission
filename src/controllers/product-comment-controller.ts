@@ -5,7 +5,8 @@ import { productCommentService } from '../services/product-comment-service.js';
 export const productCommentController = {
   // 1) 댓글 목록 조회
   async list(req: Request, res: Response) {
-    const comments = await productCommentService.list(req.params.productId);
+    const productId = Number(req.params.productId);
+    const comments = await productCommentService.list(productId);
 
     res.status(200).json({
       success: true,
@@ -27,8 +28,9 @@ export const productCommentController = {
 
   // 3) 댓글 수정
   async update(req: Request, res: Response) {
+    const commentId = Number(req.params.id);
     const comment = await productCommentService.update(
-      req.params.id,
+      commentId,
       req.body.content,
       req.user!.id
     );
@@ -42,7 +44,8 @@ export const productCommentController = {
 
   // 4) 댓글 삭제
   async remove(req: Request, res: Response) {
-    await productCommentService.remove(req.params.id, req.user!.id);
+    const commentId = Number(req.params.id);
+    await productCommentService.remove(commentId, req.user!.id);
 
     res.status(200).json({
       success: true,

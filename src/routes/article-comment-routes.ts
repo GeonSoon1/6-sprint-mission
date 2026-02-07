@@ -3,8 +3,10 @@ import { Router } from 'express';
 import asyncHandler from '../core/error/async-handler.js';
 import { requireAuth } from '../middleware/auth.js';
 
-import validate from '../validator/validate.js';
+import validate, { validateParams } from '../validator/validate.js';
 import {
+  ArticleCommentIdParams,
+  ArticleCommentParams,
   CreateArticleComment,
   PatchArticleComment,
 } from '../validator/article-comment-validator.js';
@@ -14,7 +16,11 @@ import { articleCommentController } from '../controllers/article-comment-control
 const router = Router();
 
 // 1) 댓글 목록 조회
-router.get('/:articleId', asyncHandler(articleCommentController.list));
+router.get(
+  '/:articleId',
+  validateParams(ArticleCommentParams),
+  asyncHandler(articleCommentController.list)
+);
 
 // 2) 댓글 생성
 router.post(
@@ -28,6 +34,7 @@ router.post(
 router.patch(
   '/:id',
   requireAuth,
+  validateParams(ArticleCommentIdParams),
   validate(PatchArticleComment),
   asyncHandler(articleCommentController.update)
 );
@@ -36,6 +43,7 @@ router.patch(
 router.delete(
   '/:id',
   requireAuth,
+  validateParams(ArticleCommentIdParams),
   asyncHandler(articleCommentController.remove)
 );
 

@@ -1,4 +1,4 @@
-// TODO) Article-Service: 비즈니스 로직
+// TODO) Article-Service: 비즈니스 로직 처리
 import type { Prisma } from '@prisma/client';
 import {
   NotFoundError,
@@ -58,12 +58,9 @@ export const articleService = {
   },
 
   // 2) 게시글 조회
-  async getOrThrow(id: unknown) {
-    // 2-1) 타입 number 변환
-    const articleId = toIntOrThrow(id, 'id');
-
-    // 2-2) 게시글 조회
-    const article = await articleRepo.findArticleById(articleId);
+  async getOrThrow(id: number) {
+    // 2-1) 게시글 조회
+    const article = await articleRepo.findArticleById(id);
 
     // 2-3) 게시글 검증
     if (!article) {
@@ -79,12 +76,9 @@ export const articleService = {
   },
 
   // 4) 게시글 수정
-  async update(id: unknown, data: Prisma.ArticleUpdateInput, userId: number) {
-    // 4-1) 타입 number 변환
-    const articleId = toIntOrThrow(id, 'id');
-
-    // 4-2) 게시글 조회
-    const article = await articleRepo.findArticleById(articleId);
+  async update(id: number, data: Prisma.ArticleUpdateInput, userId: number) {
+    // 4-1) 게시글 조회
+    const article = await articleRepo.findArticleById(id);
 
     // 4-3) 게시글 검증
     if (!article) throw new NotFoundError('게시글을 찾을 수 없습니다');
@@ -94,16 +88,13 @@ export const articleService = {
       throw new ForbiddenError('게시글 수정 권한이 없습니다.');
     }
 
-    return articleRepo.updateArticle(articleId, data);
+    return articleRepo.updateArticle(id, data);
   },
 
   // 5) 게시글 삭제
-  async remove(id: unknown, userId: number) {
-    // 5-1) 타입 number 변환
-    const articleId = toIntOrThrow(id, 'id');
-
-    // 5-2) 게시글 조회
-    const article = await articleRepo.findArticleById(articleId);
+  async remove(id: number, userId: number) {
+    // 5-1) 게시글 조회
+    const article = await articleRepo.findArticleById(id);
 
     // 5-3) 게시글 검증
     if (!article) throw new NotFoundError('게시글을 찾을 수 없습니다');
@@ -113,7 +104,7 @@ export const articleService = {
       throw new ForbiddenError('게시글 삭제 권한이 없습니다.');
     }
 
-    return articleRepo.deleteArticle(articleId);
+    return articleRepo.deleteArticle(id);
   },
 
   // 6) 좋아요 여부 확인

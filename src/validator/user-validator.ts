@@ -1,6 +1,5 @@
 // TODO) User-Validator: 유효성 검사
 import * as s from 'superstruct';
-import { tr } from 'zod/locales';
 
 // 1) 이메일 스키마 정의
 const Email = s.refine(s.string(), 'emailPattern', (v: string) => {

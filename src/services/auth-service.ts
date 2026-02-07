@@ -1,4 +1,4 @@
-// TODO) Auth-Service: 비즈니스 로직
+// TODO) Auth-Service: 비즈니스 로직 처리
 import jwt, { type JwtPayload, type Secret } from 'jsonwebtoken';
 
 /**

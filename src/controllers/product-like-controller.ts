@@ -5,7 +5,8 @@ import { productLikeService } from '../services/product-like-service.js';
 export const productLikeController = {
   // 1) 상품 좋아요 등록
   async like(req: Request, res: Response) {
-    const result = await productLikeService.like(req.user!.id, req.params.id);
+    const productId = Number(req.params.id);
+    const result = await productLikeService.like(req.user!.id, productId);
 
     res.status(201).json({
       success: true,
@@ -16,7 +17,8 @@ export const productLikeController = {
 
   // 2) 상품 좋아요 취소
   async unlike(req: Request, res: Response) {
-    const result = await productLikeService.unlike(req.user!.id, req.params.id);
+    const productId = Number(req.params.id);
+    const result = await productLikeService.unlike(req.user!.id, productId);
 
     res.status(200).json({
       success: true,

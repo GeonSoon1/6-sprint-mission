@@ -16,7 +16,8 @@ export const productController = {
 
   // 2) 상품 조회
   async detail(req: Request, res: Response) {
-    const product = await productService.getOrThrow(req.params.id);
+    const productId = Number(req.params.id);
+    const product = await productService.getOrThrow(productId);
     const userId = req.user?.id;
     const liked = userId
       ? await productService.isLiked(userId, product.id)
@@ -42,8 +43,9 @@ export const productController = {
 
   // 4) 상품 수정
   async update(req: Request, res: Response) {
+    const productId = Number(req.params.id);
     const product = await productService.update(
-      req.params.id,
+      productId,
       req.body,
       req.user!.id
     );
@@ -57,7 +59,8 @@ export const productController = {
 
   // 5) 상품 삭제
   async remove(req: Request, res: Response) {
-    await productService.remove(req.params.id, req.user!.id);
+    const productId = Number(req.params.id);
+    await productService.remove(productId, req.user!.id);
 
     res.status(200).json({
       success: true,

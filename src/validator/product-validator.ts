@@ -2,6 +2,8 @@
 import * as s from 'superstruct';
 import { Tag } from '@prisma/client';
 
+const IdFromParams = s.coerce(s.integer(), s.string(), Number);
+
 // 1) enum에서 허용 태그 목록 추출
 const TAGS = Object.values(Tag);
 
@@ -26,3 +28,8 @@ export const CreateProduct = s.object({
 
 // 4) 상품 수정 스키마 정의
 export const PatchProduct = s.partial(CreateProduct);
+
+// 5) path params 스키마 정의
+export const ProductParams = s.object({
+  id: IdFromParams,
+});

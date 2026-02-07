@@ -1,15 +1,19 @@
 // TODO) Validate: 공통 유효성 검사
 // ?) Superstruct 기반 공통 바디 검증 미들웨어
 import type { NextFunction, Request, Response } from 'express';
-import { assert, type Failure, type Struct, StructError } from 'superstruct';
+import { create, type Failure, type Struct, StructError } from 'superstruct';
 import { ValidationError } from '../core/error/error-handler.js';
 
-// 1) 스키마 검증 미들웨어 함수
-export default function validate(schema: Struct<any, any>) {
-  return (req: Request, _res: Response, next: NextFunction) => {
+type PayloadKey = 'body' | 'params' | 'query';
+
+// 1) 공통 스키마 검증 미들웨어 팩토리
+const validatePayload =
+  (schema: Struct<any, any>, payloadKey: PayloadKey) =>
+  (req: Request, _res: Response, next: NextFunction) => {
     try {
-      // 1-1) 요청 바디 스키마 검증
-      assert(req.body, schema);
+      // 1-1) 요청 데이터 스키마 검증 및 변환 결과 재할당
+      const validated = create(req[payloadKey as keyof Request], schema);
+      (req as any)[payloadKey] = validated;
 
       next();
     } catch (error) {
@@ -37,17 +41,27 @@ export default function validate(schema: Struct<any, any>) {
       throw new ValidationError(path, message);
     }
   };
-}
 
-// 2) 필드/타입별 커스텀 메시지
+// 2) 바디 검증 (기존 기본값)
+const validate = (schema: Struct<any, any>) => validatePayload(schema, 'body');
+
+// 3) params/query 검증
+export const validateParams = (schema: Struct<any, any>) =>
+  validatePayload(schema, 'params');
+export const validateQuery = (schema: Struct<any, any>) =>
+  validatePayload(schema, 'query');
+
+export default validate;
+
+// 4) 필드/타입별 커스텀 메시지
 const resolveCustomMessage = (
   path: string | null,
   failure?: Failure
 ): string | null => {
-  // 2-1) 실패 경로가 없으면 메시지 생성 불가
+  // 4-1) 실패 경로가 없으면 메시지 생성 불가
   if (!path) return null;
 
-  // 2-2) 필드명별 기본 에러 메시지
+  // 4-2) 필드명별 기본 에러 메시지
   const map: Record<string, string> = {
     email: '이메일 형식이 올바르지 않습니다',
     password: '비밀번호는 8~64자여야 합니다',

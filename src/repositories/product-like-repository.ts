@@ -38,4 +38,12 @@ export const productLikeRepo = {
       },
     });
   },
+
+  // 5) 상품 좋아요 유저 목록 조회
+  listUserIdsByProduct(productId: number) {
+    return prisma.productLike.findMany({
+      where: { productId },
+      select: { userId: true },
+    });
+  },
 };

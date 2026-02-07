@@ -19,6 +19,12 @@ enum Tag {
   KITCHENWARE
 }
 
+// 알림 타입
+enum NotificationType {
+  PRODUCT_PRICE_CHANGED
+  ARTICLE_COMMENTED
+}
+
 // 상품 
 model Product {
   id          Int     @id @default(autoincrement())
@@ -35,6 +41,7 @@ model Product {
   purchase       Purchase[]
   productComment ProductComment[]
   productLike    ProductLike[]
+  notifications  Notification[]
 
   // 타임스탬프
   createdAt DateTime @default(now())
@@ -52,6 +59,7 @@ model Article {
   userId      Int
   comment     ArticleComment[]
   articleLike ArticleLike[]
+  notifications Notification[]
 
   // 타임스탬프 =
   createdAt DateTime @default(now())
@@ -119,6 +127,7 @@ model User {
   articleComments ArticleComment[]
   productLikes    ProductLike[]
   articleLikes    ArticleLike[]
+  notifications   Notification[]
 
   // 타임스탬프
   createdAt DateTime @default(now())
@@ -151,4 +160,19 @@ model ArticleLike {
 
   // 복합유니크
   @@unique([userId, articleId])
+}
+
+// 알림
+model Notification {
+  id        Int              @id @default(autoincrement())
+  type      NotificationType
+  message   String
+  isRead    Boolean          @default(false)
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    Int
+  product   Product?         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId Int?
+  article   Article?         @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  articleId Int?
+  createdAt DateTime         @default(now())
 }

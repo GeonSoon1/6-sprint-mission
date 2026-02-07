@@ -3,8 +3,12 @@ import { Router } from 'express';
 import asyncHandler from '../core/error/async-handler.js';
 import { requireAuth } from '../middleware/auth.js';
 
-import validate from '../validator/validate.js';
-import { CreateArticle, PatchArticle } from '../validator/article-validator.js';
+import validate, { validateParams } from '../validator/validate.js';
+import {
+  ArticleParams,
+  CreateArticle,
+  PatchArticle,
+} from '../validator/article-validator.js';
 
 import { articleController } from '../controllers/article-controller.js';
 
@@ -14,7 +18,11 @@ const router = Router();
 router.get('/', asyncHandler(articleController.list));
 
 // 2) 게시글 조회
-router.get('/:id', asyncHandler(articleController.detail));
+router.get(
+  '/:id',
+  validateParams(ArticleParams),
+  asyncHandler(articleController.detail)
+);
 
 // 3) 게시글 생성
 router.post(
@@ -28,11 +36,17 @@ router.post(
 router.patch(
   '/:id',
   requireAuth,
+  validateParams(ArticleParams),
   validate(PatchArticle),
   asyncHandler(articleController.update)
 );
 
 // 5) 게시글 삭제
-router.delete('/:id', requireAuth, asyncHandler(articleController.remove));
+router.delete(
+  '/:id',
+  requireAuth,
+  validateParams(ArticleParams),
+  asyncHandler(articleController.remove)
+);
 
 export default router;

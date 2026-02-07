@@ -5,7 +5,8 @@ import { articleLikeService } from '../services/article-like-service.js';
 export const articleLikeController = {
   // 1) 게시글 좋아요 등록
   async like(req: Request, res: Response) {
-    const result = await articleLikeService.like(req.user!.id, req.params.id);
+    const articleId = Number(req.params.id);
+    const result = await articleLikeService.like(req.user!.id, articleId);
 
     res.status(201).json({
       success: true,
@@ -16,7 +17,8 @@ export const articleLikeController = {
 
   // 2) 게시글 좋아요 취소
   async unlike(req: Request, res: Response) {
-    const result = await articleLikeService.unlike(req.user!.id, req.params.id);
+    const articleId = Number(req.params.id);
+    const result = await articleLikeService.unlike(req.user!.id, articleId);
 
     res.status(200).json({
       success: true,

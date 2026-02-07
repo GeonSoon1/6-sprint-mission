@@ -5,6 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import cookieParser from 'cookie-parser';
+import http from 'http';
 
 // &) Core Import
 import { debugLog } from './core/error/debug.js';
@@ -20,12 +21,15 @@ import articleCommentsRoutes from './routes/article-comment-routes.js';
 import userRoutes from './routes/user-routes.js';
 import productLikeRoutes from './routes/product-like-routes.js';
 import articleLikeRoutes from './routes/article-like-routes.js';
+import notificationRoutes from './routes/notification-routes.js';
+import { initSocket } from './socket/io.js';
 
 // ?) 환경 변수
 const PORT = Number(process.env.PORT ?? 4000);
 
 // ?) Express 진입
 const app = express();
+const server = http.createServer(app);
 
 // ?) 미들 웨어 진입
 app.use(cors());
@@ -48,6 +52,7 @@ app.use('/article-comments', articleCommentsRoutes); // 게시글 댓글
 app.use('/users', userRoutes); // 유저
 app.use('/product-likes', productLikeRoutes); // 상품 좋아요
 app.use('/article-likes', articleLikeRoutes); // 게시글 좋아요
+app.use('/notifications', notificationRoutes); // 알림
 
 // ?) 404 핸들러 진입
 app.use(notFoundHandler);
@@ -56,7 +61,9 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // ?) 서버 실행 진입
-app.listen(PORT, () => {
+initSocket(server);
+
+server.listen(PORT, () => {
   console.log(`🚀 Server is running on port http://localhost:${PORT}`);
   debugLog('Debug mode is enabled');
   debugLog(`Environment: ${process.env.NODE_ENV || 'development'}`);

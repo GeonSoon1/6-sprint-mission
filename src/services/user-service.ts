@@ -1,4 +1,4 @@
-// TODO) User-Service: 비즈니스 로직
+// TODO) User-Service: 비즈니스 로직 처리
 import type { Prisma } from '@prisma/client';
 import {
   ConflictError,

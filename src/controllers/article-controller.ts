@@ -16,7 +16,8 @@ export const articleController = {
 
   // 2) 게시글 조회
   async detail(req: Request, res: Response) {
-    const article = await articleService.getOrThrow(req.params.id);
+    const articleId = Number(req.params.id);
+    const article = await articleService.getOrThrow(articleId);
     const userId = req.user?.id;
     const liked = userId
       ? await articleService.isLiked(userId, article.id)
@@ -42,8 +43,9 @@ export const articleController = {
 
   // 4) 게시글 수정
   async update(req: Request, res: Response) {
+    const articleId = Number(req.params.id);
     const article = await articleService.update(
-      req.params.id,
+      articleId,
       req.body,
       req.user!.id
     );
@@ -57,7 +59,8 @@ export const articleController = {
 
   // 5) 게시글 삭제
   async remove(req: Request, res: Response) {
-    await articleService.remove(req.params.id, req.user!.id);
+    const articleId = Number(req.params.id);
+    await articleService.remove(articleId, req.user!.id);
 
     res.status(200).json({
       success: true,

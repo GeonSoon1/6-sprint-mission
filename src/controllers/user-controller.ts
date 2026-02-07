@@ -114,9 +114,9 @@ export const userController = {
 
   // 4) 로그아웃
   async logout(req: Request, res: Response) {
+    // 4-1) 사용자 ID 추출 및 검증
     const userId = req.user?.id;
 
-    // 4-1) 아이디 검증
     if (!userId) {
       return res.status(401).json({
         success: false,

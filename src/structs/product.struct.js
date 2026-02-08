@@ -1,3 +1,4 @@
+// structs/product.struct.js
 import * as s from "superstruct";
 
 const TrimmedNonEmptyString = s.nonempty(
@@ -12,7 +13,8 @@ export const CreateProductBodyStruct = s.object({
     0
   ),
   tags: s.size(s.array(s.size(TrimmedNonEmptyString, 1, 30)), 0, 10),
-  image: s.optional(s.size(s.array(TrimmedNonEmptyString), 0, 10)),
+  // S3 업로드 후 저장될 이미지 URL
+  imageUrl: s.optional(s.size(TrimmedNonEmptyString, 1, 2048)),
 });
 
 export const UpdateProductBodyStruct = s.partial(CreateProductBodyStruct);

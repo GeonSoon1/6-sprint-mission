@@ -1,7 +1,7 @@
 #@baseUrl = http://3.34.97.118
 @baseUrl = http://localhost:3000
-@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzcwNzEzMDU1LCJleHAiOjE3NzA3MTY2NTV9.ViTVxr3EqPXi2aA4fByOJSIqaV1kyyMhMhYyZAHr86I
-@refreshToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzcwNzEzMDU1LCJleHAiOjE3NzA3OTk0NTV9.LRnpXtcmiU5Rsdi1JbfURsNnUN6JZDb9Xl9rD8HJbJw
+@accessToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzcwNzIyNDA4LCJleHAiOjE3NzA3MjYwMDh9.MxMhHnhdrHVDLs23Sglv-FOSUgJzmShQRplrp5H_84Q
+@refreshToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzcwNzIyNDA4LCJleHAiOjE3NzA4MDg4MDh9.UsDouuszhUcfwpJ2GfW01RQj8jXtQ2NmBjs9ttNSxsE
 
 ###
 POST {{baseUrl}}/auth/register

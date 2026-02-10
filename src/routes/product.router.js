@@ -15,6 +15,10 @@ import {
   unlikeProduct,
   getMyLikedProducts,
 } from "../controllers/like.controller.js";
+import {
+  uploadProductImage,
+  attachProductImageUrl,
+} from "../middlewares/uploadProductImage.js";
 
 const productRouter = express.Router();
 
@@ -29,22 +33,38 @@ productRouter.get(
   asyncHandler(getMyLikedProducts)
 );
 
-// 생성/수정/삭제는 로그인 필요
+// 생성
 productRouter.post(
   "/",
   asyncHandler(authenticate),
+  uploadProductImage,
+  asyncHandler(attachProductImageUrl),
   asyncHandler(createProduct)
 );
+
+// 생성/수정/삭제는 로그인 필요
+// productRouter.post(
+//   "/",
+//   asyncHandler(authenticate),
+//   asyncHandler(createProduct)
+// );
 // productRouter.get(
 //   "/:id(\\d+)",
 //   asyncHandler(authenticate),
 //   asyncHandler(getProduct)
 // );
+
+
+// 수정도 이미지 교체 가능하게
 productRouter.patch(
   "/:id(\\d+)",
   asyncHandler(authenticate),
+  uploadProductImage,
+  asyncHandler(attachProductImageUrl),
   asyncHandler(updateProduct)
 );
+
+
 productRouter.delete(
   "/:id(\\d+)",
   asyncHandler(authenticate),

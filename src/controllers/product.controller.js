@@ -9,6 +9,16 @@ import { CreateCommentBodyStruct } from '../structs/comment.struct.js'
 import * as commentServices from '../services/comment.service.js'
 
 export async function createProduct(req, res) {
+  if (typeof req.body.tags === "string") {
+    const raw = req.body.tags;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) req.body.tags = parsed;
+    } catch {
+      req.body.tags = raw.split(",").map(v => v.trim()).filter(Boolean);
+    }
+  }
+
   const data = create(req.body, CreateProductBodyStruct);
   const product = await productServices.createProduct(data, req.user);
   return res.json(product);
@@ -22,13 +32,19 @@ export async function getProduct(req, res) {
 }
 
 export async function updateProduct(req, res) {
-  const { id:productId } = create(req.params, IdParamsStruct);
+  if (typeof req.body.tags === "string") {
+    const raw = req.body.tags;
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) req.body.tags = parsed;
+    } catch {
+      req.body.tags = raw.split(",").map(v => v.trim()).filter(Boolean);
+    }
+  }
+
+  const { id: productId } = create(req.params, IdParamsStruct);
   const data = create(req.body, UpdateProductBodyStruct);
-  const updatedProduct = await productServices.updateProduct(
-    productId,
-    data,
-    req.user
-  );
+  const updatedProduct = await productServices.updateProduct(productId, data, req.user);
   return res.json(updatedProduct);
 }
 

@@ -3,18 +3,6 @@ import app from '../../app';
 import prisma from '../../lib/prisma';
 
 describe('상품 API 인증 불필요', () => {
-  beforeAll(async () => {
-    await prisma.product.deleteMany();
-    await prisma.user.deleteMany();
-  });
-  beforeEach(async () => {
-    await prisma.product.deleteMany();
-    await prisma.user.deleteMany();
-  });
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
-
   test('GET /products - 상품이 없을 때 빈 배열 조회', async () => {
     const response = await request(app).get('/products');
     expect(response.status).toBe(200);

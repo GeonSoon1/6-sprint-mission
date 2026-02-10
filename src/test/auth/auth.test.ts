@@ -9,9 +9,6 @@ describe('로그인 및 회원가입 API', () => {
     await prisma.user.deleteMany();
   });
 
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
   test('POST /auth/register - 회원가입', async () => {
     const response = await request(app).post('/auth/register').send({
       nickname: 'testuser2',

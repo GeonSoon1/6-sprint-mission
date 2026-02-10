@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">88.88% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>3/9</span>
+                <span class='fraction'>8/9</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">50% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>5/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/1</span>
+                <span class='fraction'>1/1</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">33.33% </span>
+                <span class="strong">88.88% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>3/9</span>
+                <span class='fraction'>8/9</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -96,22 +96,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -123,25 +123,25 @@
 import ValidationError from '../lib/errors/ValidationError';
 &nbsp;
 class LikeService {
-  async <span class="fstat-no" title="function not covered" >toggleLike(</span>userId: number, targetId: number, baseUrl: string) {
-<span class="cstat-no" title="statement not covered" >    if (!targetId) {</span>
+  async toggleLike(userId: number, targetId: number, baseUrl: string) {
+    <span class="missing-if-branch" title="if path not taken" >I</span>if (!targetId) {
 <span class="cstat-no" title="statement not covered" >      throw new ValidationError('유효하지 않은 targetId입니다.');</span>
     }
 &nbsp;
-    const type: LikeTargetType = <span class="cstat-no" title="statement not covered" >baseUrl.includes('/products') ? 'Product' : 'Article';</span>
+    const type: LikeTargetType = baseUrl.includes('/products') ? 'Product' : <span class="branch-1 cbranch-no" title="branch not covered" >'Article';</span>
 &nbsp;
-    const existing = <span class="cstat-no" title="statement not covered" >await likeRepository.findExistingLike(type, userId, targetId);</span>
+    const existing = await likeRepository.findExistingLike(type, userId, targetId);
 &nbsp;
-    const isLiked = <span class="cstat-no" title="statement not covered" >await likeRepository.toggleLikeTransaction(</span>
+    const isLiked = await likeRepository.toggleLikeTransaction(
       type,
       userId,
       targetId,
-      existing?.id,
+<span class="branch-1 cbranch-no" title="branch not covered" ><span class="branch-1 cbranch-no" title="branch not covered" >      existing?.i</span>d,</span>
     );
 &nbsp;
-<span class="cstat-no" title="statement not covered" >    return {</span>
+    return {
       isLiked,
-      message: isLiked ? '좋아요 등록됨' : '좋아요 해제됨',
+      message: isLiked ? '좋아요 등록됨' : <span class="branch-1 cbranch-no" title="branch not covered" >'좋아요 해제됨',</span>
     };
   }
 }
@@ -154,7 +154,7 @@ export default new LikeService();
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-31T02:31:23.850Z
+                at 2026-02-10T03:00:03.968Z
             </div>
         <script src="prettify.js"></script>
         <script>

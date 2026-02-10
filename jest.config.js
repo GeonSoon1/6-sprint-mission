@@ -5,6 +5,7 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
+  setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   collectCoverage: true,
   collectCoverageFrom: [
     'src/service/**/*.ts', // 비즈니스 로직만

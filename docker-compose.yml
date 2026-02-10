@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - '3000:3000'
+    environment:
+      # 중요: 도커 내부에서 다른 컨테이너(db)를 부를 땐 서비스 이름(db)을 호스트로 씁니다.
+      - DATABASE_URL=postgresql://unzzang:sadqueen81!@db:5432/panda_market
+      - PORT=3000
+    depends_on:
+      - db
+    volumes:
+      # 호스트의 uploads 폴더와 컨테이너 내부 uploads 폴더 동기화
+      - ./uploads:/usr/src/app/uploads
+
+  db:
+    image: postgres:14
+    restart: always
+    environment:
+      POSTGRES_USER: unzzang
+      POSTGRES_PASSWORD: sadqueen81!
+      POSTGRES_DB: panda_market
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

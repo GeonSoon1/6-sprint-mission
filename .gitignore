@@ -1,12 +1,13 @@
 .DS_Store
 node_modules/
 __http__
-__test__
+# __test__
 dist/
 .vscode
 .env
 panda_market.pem
 
+#스프린트 진행 관련 문서
 GEMINI.md
 README_backup.md
 Sprint_Mission_8.md

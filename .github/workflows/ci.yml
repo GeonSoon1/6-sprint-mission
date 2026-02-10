@@ -1,0 +1,45 @@
+name: CI Pipeline
+
+on:
+  pull_request:
+    branches: ['main', 'dev']
+
+jobs:
+  test-job:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: unzzang
+          POSTGRES_PASSWORD: sadqueen81!
+          POSTGRES_DB: panda_market
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run Tests
+        env:
+          DATABASE_URL: 'postgresql://unzzang:sadqueen81!@panda-market.cfq6i420kwgx.ap-northeast-2.rds.amazonaws.com/panda_market?schema=public'
+          JWT_SECRET: test_secret_key
+        run: npm run test

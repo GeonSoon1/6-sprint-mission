@@ -8,7 +8,6 @@ import {
   CompleteUser,
   ImagePostInput
 } from '../types/interfaceType';
-import { Prisma } from '@prisma/client';
 
 import {
   PutObjectCommand,
@@ -17,7 +16,6 @@ import {
   DeleteObjectCommand,
   DeleteObjectsCommand
 } from '@aws-sdk/client-s3';
-import fs from 'fs';
 import { s3Client } from '../lib/s3Client';
 import { BUCKETNAME, REGION, ACCESS_KEY_ID, SECRET_ACCESS_KEY } from '../lib/constants';
 import path from 'path';
@@ -57,6 +55,7 @@ async function getList(path: string, id: number) {
 
 async function get(type: string, filename: string, id: number) {
   const key = `images/${type}/${id}/${filename}`;
+
   try {
     const imgObj = await s3Client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
     return imgObj;
@@ -83,7 +82,7 @@ async function post(input: ImagePostInput) {
   try {
     await s3Client.send(command);
   } catch (err) {
-    throw new InternalServerError('S3 업로드 실패');
+    throw new InternalServerError('AWS S3 upload failure');
   }
 
   // DB에 새 imageUrl 저장
@@ -118,8 +117,9 @@ async function del(type: string, filename: string, id: number) {
   const i = imageUrls.indexOf(delImgUrl);
   if (i !== -1) imageUrls.splice(i, 1);
 
-  await repo.patch(id, { imageUrls });
-  return imageUrls;
+  const item = await repo.patch(id, { imageUrls });
+  if (type === 'users') return selectUserFields(item as CompleteUser, 'core');
+  else return selectFields(item as CompleteProduct | CompleteArticle);
 }
 
 async function delList(type: string, id: number) {

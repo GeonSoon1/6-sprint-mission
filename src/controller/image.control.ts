@@ -16,6 +16,7 @@ async function getList(req: Request, res: Response, next: NextFunction): Promise
 
 async function get(req: Request, res: Response, next: NextFunction): Promise<void> {
   const type = req.path.split('/')[1];
+  console.log(type, req.params.id, req.params.filename);
   const imgObj = await imageService.get(type, req.params.filename, Number(req.params.id));
   if (!imgObj.Body) throw new Error('Image body not found');
 
@@ -48,7 +49,7 @@ async function post(req: Request, res: Response, next: NextFunction): Promise<vo
   if (!item) throw new NotFoundError();
 
   if (NODE_ENV == 'development') {
-    console.log('Image uploaded. ImgUrls in DB updated.');
+    console.log('Image uploaded in AWS S3. ImgUrls in DB updated.');
     console.log(item.imageUrls);
     console.log('');
   }
@@ -59,14 +60,20 @@ async function post(req: Request, res: Response, next: NextFunction): Promise<vo
 async function delList(req: Request, res: Response, next: NextFunction): Promise<void> {
   const type = req.path.split('/')[1];
   const item = await imageService.delList(type, Number(req.params.id));
-  if (NODE_ENV == 'development') console.log('ImageUrls deleted');
-  res.status(200).json(item); // json/send?
+  if (NODE_ENV == 'development') {
+    console.log(item);
+    console.log('ImageUrls deleted');
+  }
+  res.status(204).send({ message: '이미지가 삭제되었습니다' });
 }
 
 async function del(req: Request, res: Response, next: NextFunction): Promise<void> {
   const type = req.path.split('/')[1];
   const item = await imageService.del(type, req.params.filename, Number(req.params.id));
-  if (NODE_ENV == 'development') console.log('ImageUrls deleted');
+  if (NODE_ENV == 'development') {
+    console.log(item);
+    console.log('ImageUrls deleted');
+  }
   res.status(204).send({ message: '이미지가 삭제되었습니다' });
 }
 

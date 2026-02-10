@@ -8,7 +8,8 @@ import upload from '../middleware/multer';
 const imageRouter = express.Router();
 
 // 사용자
-imageRouter.get('/users/:id', withTryCatch(imageControl.getList));
+imageRouter.get('/users/:id', authenticate, withTryCatch(imageControl.getList));
+imageRouter.get('/users/:id/:filename', authenticate, withTryCatch(imageControl.get));
 imageRouter.post(
   '/users/:id',
   authenticate,
@@ -17,9 +18,11 @@ imageRouter.post(
   withTryCatch(imageControl.post)
 );
 imageRouter.delete('/users/:id', authenticate, authorize, withTryCatch(imageControl.delList));
+imageRouter.delete('/users/:id/:filename', authenticate, authorize, withTryCatch(imageControl.del));
 
 // 상품
-imageRouter.get('/products/:id', withTryCatch(imageControl.getList));
+imageRouter.get('/products/:id', authenticate, withTryCatch(imageControl.getList));
+imageRouter.get('/products/:id/:filename', authenticate, withTryCatch(imageControl.get));
 imageRouter.post(
   '/products/:id',
   authenticate,
@@ -28,10 +31,16 @@ imageRouter.post(
   withTryCatch(imageControl.post)
 );
 imageRouter.delete('/products/:id', authenticate, authorize, withTryCatch(imageControl.delList));
+imageRouter.delete(
+  '/products/:id/:filename',
+  authenticate,
+  authorize,
+  withTryCatch(imageControl.del)
+);
 
 // 게시글
-imageRouter.get('/articles/:id', withTryCatch(imageControl.getList));
-imageRouter.delete('/articles/:articleId/:filename', withTryCatch(imageControl.del));
+imageRouter.get('/articles/:id', authenticate, withTryCatch(imageControl.getList));
+imageRouter.get('/articles/:id/:filename', authenticate, withTryCatch(imageControl.get));
 imageRouter.post(
   '/articles/:id',
   authenticate,
@@ -40,6 +49,13 @@ imageRouter.post(
   withTryCatch(imageControl.post)
 );
 imageRouter.delete('/articles/:id', authenticate, authorize, withTryCatch(imageControl.delList));
+imageRouter.delete(
+  '/articles/:id/:filename',
+  authenticate,
+  authorize,
+  withTryCatch(imageControl.del)
+);
+
 export default imageRouter;
 
 // imageUrls String[]? 로 스키마에 정의되어 있어

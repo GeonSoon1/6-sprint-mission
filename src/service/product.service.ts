@@ -49,7 +49,6 @@ export async function updateProduct(id: number, data: UpdateProductData): Promis
   const updatedProduct = await productsRepository.updateProductWithFavorites(id, data);
 
   const productId = existingProduct.id;
-  const likeProductMember = await favoriteRepository.getFavoriteMember(productId);
 
   const originName = existingProduct.name;
   const cutName = originName.substring(0, 10);
@@ -58,6 +57,8 @@ export async function updateProduct(id: number, data: UpdateProductData): Promis
 
   if (isPriceChanged) {
     const priceUpdate = data.price! > existingProduct.price ? '상승하였습니다' : '하락하였습니다';
+    
+  const likeProductMember = await favoriteRepository.getFavoriteMember(productId);
 
     await Promise.all(
       likeProductMember.map((user) =>

@@ -107,7 +107,7 @@ describe('인증이 필요한 게시글 API 통합 테스트', () => {
     });
 
     test('게시글이 있는 경우, 전체 목록 조회', async () => {
-      await createArticlesWithUsers(userSample, articleSample);
+      await createArticlesWithUsers();
 
       const getResponse = await agent1.get('/articles');
 

@@ -1,6 +1,7 @@
 import { prismaClient } from '@lib/prismaClient';
+import { userSample, productSample } from './mockdata';
 
-export async function createProductsWithUsers(userSample: any[], productSample: any[]) {
+export async function createProductsWithUsers() {
   // 관계형 FK 유저 등록 진행
   await prismaClient.user.createMany({ data: userSample });
 

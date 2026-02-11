@@ -1,0 +1,34 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const product_router_1 = __importDefault(require("./modules/products/product.router"));
+const article_router_1 = __importDefault(require("./modules/articles/article.router"));
+const comment_router_1 = __importDefault(require("./modules/comments/comment.router"));
+const user_router_1 = __importDefault(require("./modules/users/user.router"));
+const image_router_1 = __importDefault(require("./modules/images/image.router"));
+const notification_router_1 = __importDefault(require("./modules/notifications/notification.router"));
+const errorHandler_1 = require("./middlewares/errorHandler/errorHandler");
+const auth_1 = require("./middlewares/auth");
+const constants_1 = require("./libs/constants");
+const app = (0, express_1.default)();
+app.use((0, cors_1.default)());
+app.use((0, cookie_parser_1.default)());
+app.use(express_1.default.json());
+app.use('/uploads', express_1.default.static('uploads'));
+app.use(constants_1.STATIC_PATH, express_1.default.static('src/public'));
+app.use(auth_1.optionalAuth);
+app.use('/products', product_router_1.default);
+app.use('/articles', article_router_1.default);
+app.use('/comments', comment_router_1.default);
+app.use('/users', user_router_1.default);
+app.use('/images', image_router_1.default);
+app.use('/notifications', notification_router_1.default);
+app.use(errorHandler_1.defaultNotFoundHandler);
+app.use(errorHandler_1.globalErrorHandler);
+exports.default = app;
+//# sourceMappingURL=app.js.map

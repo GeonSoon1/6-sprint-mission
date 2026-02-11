@@ -54,7 +54,7 @@ async function authorizeProduct(
   const userId = req.user!.id; // user 가 ? 이기 때문에 확정을 시켜줘야 하는 것
   const { id } = req.params;
   const product = await prisma.product.findUniqueOrThrow({
-    where: { id: id! },
+    where: { id: id as string },
   });
   if (userId !== product.userId) next(new AuthorizeError());
   next();
@@ -69,7 +69,7 @@ async function authorizeArticle(
   const userId = req.user!.id;
   const { id } = req.params;
   const article = await prisma.article.findUniqueOrThrow({
-    where: { id: id! },
+    where: { id: id as string },
   });
   if (userId !== article.userId) next(new AuthorizeError());
   next();
@@ -84,7 +84,7 @@ async function authorizeComment(
   const userId = req.user!.id;
   const { id } = req.params;
   const comment = await prisma.comment.findUniqueOrThrow({
-    where: { id: id! },
+    where: { id: id as string },
   });
   if (userId !== comment.userId) next(new AuthorizeError());
   next();

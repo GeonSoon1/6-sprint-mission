@@ -2,7 +2,7 @@ name: Deploy to EC2
 on:
   push:
     branches:
-      - main # push 발생 시 AWS 배포
+      - 김선영 # push 발생 시 AWS 배포
 
 jobs:
   deploy:
@@ -18,8 +18,6 @@ jobs:
           port: 22
           script: |
             cd /home/ec2-user/6-sprint-mission
-            git pull origin main 
-            npm install 
-            npm run build 
-            npx prisma migrate deploy 
-            pm2 reload all
+            git pull origin 김선영 
+            docker compose down
+            docker compose up -d --build

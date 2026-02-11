@@ -1,5 +1,6 @@
 import prisma from '../lib/prismaClient';
 import { Prisma, User, Product, Article } from '@prisma/client';
+import NotFoundError from '../middleware/errors/NotFoundError';
 
 async function getList(): Promise<User[]> {
   return await prisma.user.findMany({
@@ -42,6 +43,14 @@ async function findById(id: number): Promise<
   });
 }
 
+async function findImgUrls(id: number): Promise<string[]> {
+  const result = await prisma.user.findUniqueOrThrow({
+    where: { id },
+    select: { imageUrls: true }
+  });
+  return result.imageUrls;
+}
+
 async function patch(id: number, userData: Prisma.UserUpdateInput): Promise<User> {
   return prisma.user.update({
     where: { id },
@@ -67,6 +76,7 @@ export default {
   patch,
   findByEmail,
   findById,
+  findImgUrls,
   getProducts,
   getArticles
 };

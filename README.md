@@ -1,59 +1,28 @@
 # 미션 목표
 
-Jest와 Supertest를 사용하여 유닛 테스트, 통합 테스트 작성하기
+- GitHub Actions로 테스트, 배포 자동화
+- Docker 이미지 만들기
 
 ## 요구사항
 
-### 기본 요구사항: /test/api.test.ts
+### GitHub Actions 활용
 
-- [x] Jest의 테스트 커버리지 도구를 사용하도록 설정
-- [x] 인증이 필요하지 않은 상품 API에 대한 통합 테스트 작성
-- [x] 인증이 필요하지 않은 게시글 API에 대한 통합 테스트 작성
-- [x] 로그인, 회원가입 API에 대한 통합 테스트 작성
-- [x] 인증이 필요한 상품 API에 대한 통합 테스트 작성
-- [x] 인증이 필요한 상품 API에 대한 통합 테스트 작성
+- [x] 브랜치에 pull request가 발생하면 테스트를 실행하는 액션 구현
+- [x] main 브랜치에 push가 발생하면 AWS 배포를 진행하는 액션 구현
+- [x] 개인 Github 리포지터리에서 Actions 동작 확인
 
-### 심화 요구사항: /test/productService_likeToggle.test.ts (spy 사용)
+#### Docker 이미지 만들기: 다음을 만족하는 Dockerfile과 docker-compose.yaml 작성
 
-- [x] 상품 API의 비즈니스 로직에 대하여 Mock, Spy를 활용한 유닛 테스트 작성
+- [x] Express 서버를 실행하는 Dockerfile 작성
+- [x] Express 서버가 파일 업로드를 처리하는 폴더는 Docker의 Volume을 활용하도록 구현
+- [x] 데이터베이스는 Postgres 이미지를 사용해 연결하도록 구현
+- [x] 실행된 Express 서버 컨테이너는 호스트 머신에서 3000번 포트로 접근 가능하도록 구현
 
-### 추가 구현한 심화 기능: /test/middlewarae_authorize.test.ts (mock 사용)
+## 제출
 
-- [x] 인가 로직에 대하여 Mock을 활용한 유닛 테스트 작성: authorize.test.ts
-
-## 스크린샷: /test/result_snapshots
-
-jest_endPointAPI_test
-<img width="898" height="1093" alt="image" src="https://github.com/user-attachments/assets/c7efdc78-625d-4f1c-9ac4-ea1a95c3d221" />
-
-jest_authorize_mockTest
-<img width="685" height="446" alt="image" src="https://github.com/user-attachments/assets/9982551d-184b-41f8-a90d-384219016600" />
-
-jest_likeToggle_spyTest
-<img width="689" height="281" alt="image" src="https://github.com/user-attachments/assets/6695d519-00f5-4ba8-ad0b-7866460fe4ad" />
-
-## 폴더 구조
-
-```
-6-sprint-mission
-├── src
-├── test
-│   ├── result_snapshots
-│   │   ├── jest_authorize_mockTest.png
-│   │   ├── jest_endPointAPI_test.png
-│   │   └── jest_likeToggle_spyTest.png
-│   ├── api.test.ts
-│   ├── dummyArticleData.ts
-│   ├── dummyPriceData.ts
-│   ├── dummyProductData.ts
-│   ├── dummyUserData.ts
-│   ├── middleware_authorize.test.ts
-│   └── productService_likeToggle.test.ts
-└── README.md
-```
+- Github actions는 .github/workflows/ 폴더에 저장해서 제출
+- Docker 관련 파일들은 프로젝트 폴더 최상위에 저장
 
 ## 멘토에게
 
-- 미션 8 제출본에 작성하였습니다. PR 리뷰 받기 전 버전입니다.
-- 엔드포인트 테스트는 그럭저럭 할 만 했지만, mock과 spy를 사용한 유닛 테스트는 힘들었습니다. 테스트 하고자 하는 코드는 커버리지에 포함되었습니다.
-- product 서비스 단의 로직에 spy를 사용한 test를 작성하면서, 타입 정의가 잘못 되어 있음을 발견하고 몇가지 수정을 헀습니다. 제대로 하고자 한다면, 대대적으로 타입 정의를 다시해야 할 곳이 많지만, 일단은 이것으로 제출합니다.
+- 감이 안 잡히지만 해보겠습니다.

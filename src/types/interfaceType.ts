@@ -35,7 +35,16 @@ export type Article2show = Omit<Article, 'comments' | 'likedUsers'> & {
 
 export type LikedArticle2show = { isLiked: boolean } & Article2show;
 
-export type CommentWithNextCursor = { comments: Comment[]; nextCursor: number | null };
+type CommentWithoutNull = {
+  id: number;
+  content: string;
+  userId: number;
+  productId?: number;
+  articleId?: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+export type CommentWithNextCursor = { comments: CommentWithoutNull[]; nextCursor: number | null };
 
 type CommentBase = Pick<Comment, 'id' | 'content' | 'createdAt' | 'userId'>;
 
@@ -44,3 +53,29 @@ export type Comment2show =
   | (CommentBase & { productId: number | null });
 
 export type TokenType = { accessToken: string | undefined; refreshToken: string | undefined };
+
+interface ImageFile {
+  buffer: Buffer;
+  mimetype: string;
+  originalname: string;
+  size: number;
+}
+
+// 이미지 관련
+import userRepo from '../repository/user.repo';
+import articleRepo from '../repository/article.repo';
+import productRepo from '../repository/product.repo';
+
+export const RepoMap = {
+  products: productRepo,
+  articles: articleRepo,
+  users: userRepo
+} as const;
+
+export type ImgSourceType = keyof typeof RepoMap;
+
+export interface ImagePostInput {
+  type: ImgSourceType;
+  id: number;
+  file: ImageFile;
+}

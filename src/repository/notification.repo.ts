@@ -1,4 +1,4 @@
-import { Notification } from '@prisma/client';
+import { Prisma, Notification } from '@prisma/client';
 import prisma from '../lib/prismaClient';
 
 async function findById(id: number, type: string): Promise<Notification | null> {
@@ -8,10 +8,20 @@ async function findById(id: number, type: string): Promise<Notification | null> 
 async function findMany(userId: number, type: string): Promise<Notification[]> {
   let notifications;
   if (type === 'unread')
-    notifications = await prisma.notification.findMany({ where: { userId, isRead: false } });
+    notifications = await prisma.notification.findMany({
+      where: { userId, isRead: false },
+      orderBy: { createdAt: 'desc' }
+    });
   else if (type === 'read')
-    notifications = await prisma.notification.findMany({ where: { userId, isRead: true } });
-  else notifications = await prisma.notification.findMany({ where: { userId } });
+    notifications = await prisma.notification.findMany({
+      where: { userId, isRead: true },
+      orderBy: { createdAt: 'desc' }
+    });
+  else
+    notifications = await prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' }
+    });
   return notifications;
 }
 
@@ -26,9 +36,14 @@ async function patch(id: number): Promise<Notification> {
   });
 }
 
+async function post(data: Prisma.NotificationCreateInput): Promise<Notification> {
+  return prisma.notification.create({ data });
+}
+
 export default {
   findById,
   findMany,
   countUnread,
-  patch
+  patch,
+  post
 };

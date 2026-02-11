@@ -1,6 +1,7 @@
 import { CreateProductDto } from '../types/dto';
 import prisma from '../lib/prismaClient';
 import { Prisma, Product, ProductPriceHistory } from '@prisma/client';
+import NotFoundError from '../middleware/errors/NotFoundError';
 
 async function post(data: CreateProductDto): Promise<Product> {
   return await prisma.product.create({ data });
@@ -64,10 +65,18 @@ async function getList(
 async function findById(
   id: number
 ): Promise<Prisma.ProductGetPayload<{ include: { comments: true; likedUsers: true } }>> {
-  return await prisma.product.findFirstOrThrow({
+  return await prisma.product.findUniqueOrThrow({
     where: { id },
     include: { comments: true, likedUsers: true } // 관계형 필드도 일단 가져온다
   });
+}
+
+async function findImgUrls(id: number): Promise<string[]> {
+  const result = await prisma.product.findUniqueOrThrow({
+    where: { id },
+    select: { imageUrls: true }
+  });
+  return result.imageUrls;
 }
 
 async function createPriceRecord(
@@ -94,6 +103,7 @@ export default {
   cancelLike,
   erase,
   findById,
+  findImgUrls,
   countById,
   getList,
   createPriceRecord,

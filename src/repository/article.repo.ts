@@ -36,15 +36,9 @@ export async function getArticleWithLikes(id: number, { userId }: { userId?: num
 
 export async function getArticleListWithLikes(
   { page, pageSize, orderBy, keyword }: PagePaginationParams,
-  {
-    userId,
-  }: {
-    userId?: number;
-  } = {}
+  { userId, }: { userId?: number; } = {}
 ) {
-  const where = {
-    title: keyword ? { contains: keyword } : undefined,
-  };
+  const where = { title: keyword ? { contains: keyword } : undefined, };
 
   const totalCount = await prismaClient.article.count({ where });
   const articles = await prismaClient.article.findMany({

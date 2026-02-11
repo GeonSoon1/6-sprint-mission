@@ -26,8 +26,8 @@ export async function getProductWithFavorites(id: number, userId?: number) {
 
   const mappedProduct = {
     ...product,
-    favorites: undefined,
-    favoriteCount: product.favorites.length,
+    favorites: undefined, // 필요하지 않는 favorites 리스트 제거
+    favoriteCount: product.favorites.length, // 필요한 favorite count 계산
     isFavorited: userId
       ? product.favorites.some((favorite) => favorite.userId === userId)
       : undefined,
@@ -37,16 +37,10 @@ export async function getProductWithFavorites(id: number, userId?: number) {
 
 export async function getProductListWithFavorites(
   { page, pageSize, orderBy, keyword }: PagePaginationParams,
-  {
-    userId,
-  }: {
-    userId?: number;
-  } = {}
+  { userId, }: { userId?: number; } = {}
 ) {
   const where = keyword
-    ? {
-        OR: [{ name: { contains: keyword } }, { description: { contains: keyword } }],
-      }
+    ? { OR: [{ name: { contains: keyword } }, { description: { contains: keyword } }], }
     : {};
 
   const totalCount = await prismaClient.product.count({
@@ -84,9 +78,7 @@ export async function getFavoriteProductListByOwnerId(
   { page, pageSize, orderBy, keyword }: PagePaginationParams
 ) {
   const where = keyword
-    ? {
-        OR: [{ name: { contains: keyword } }, { description: { contains: keyword } }],
-      }
+    ? { OR: [{ name: { contains: keyword } }, { description: { contains: keyword } }], }
     : {};
   const totalCount = await prismaClient.product.count({
     where: {

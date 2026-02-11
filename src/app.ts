@@ -30,7 +30,7 @@ app.use("/comments", commentsRouter);
 app.use("/images", imagesRouter);
 app.use("/auth", authRouter);
 
-app.get("/config", (req, res) => {
+app.get("/config", (_req, res) => {
   res.json({ serverUrl: `http://localhost:${PORT}` });
 });
 
@@ -38,9 +38,5 @@ app.use(defaultNotFoundHandler);
 app.use(globalErrorHandler);
 
 setupWebSocket(server, app);
-
-server.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-});
 
 export default app;

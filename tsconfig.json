@@ -1,44 +1,44 @@
 {
   "compilerOptions": {
-    "rootDir": "src",
+    //=== 📂 파일 구조 ===
+    "rootDir": "./src",
     "outDir": "./dist",
-    "target": "ES2022",
-    "module": "ES2022",
-    "moduleResolution": "NodeNext",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "typeRoots": [
-      "./src/types",
-      "./node_modules/@types"
-    ],
-    "types": [
-      "node",
-      "jest"
-    ],
-    "incremental": true,
-    "tsBuildInfoFile": "./node_modules/.cache/.tsbuildinfo",
+
+    /* === ⚙️ 실행 환경 설정 === */
+    // See also https://aka.ms/tsconfig/module
+    "module": "nodenext",
+    "target": "esnext",
+
+    // For nodejs:
+    "lib": ["esnext"],
+    "types": ["node", "jest"],
+    // and npm install -D @types/node
+
+    /* ===  📝 빌드 Output 설정 === */
     "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
+
+    /* ===  📜 엄격한 타입 검사 옵션 === */
     "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": false,
+    "exactOptionalPropertyTypes": true,
+
+    // Style Options
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noPropertyAccessFromIndexSignature": true,
+
+    /* === 🧩 타입 관련 옵션 === */
+    "strict": true,
+    "jsx": "react-jsx",
     "isolatedModules": true,
-    "allowJs": true,
-    "paths": {
-      "@prisma/client": ["./node_modules/@prisma/client"]
-    }
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
   },
-  "include": [
-    "src/**/*.ts",
-    "tests/**/*.ts"
-  ],
-  "exclude": [
-    "prisma",
-    "node_modules",
-    "dist"
-  ]
+  "exclude": ["node_modules", "tests", "jest.config.cjs", "src/__tests__", "dist"]
 }
+

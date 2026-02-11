@@ -119,6 +119,7 @@ model Purchase {
   articleComments ArticleComment[]
   productLikes    ProductLike[]
   articleLikes    ArticleLike[]
+  notifications   Notification[]
 
   // 타임스탬프
   createdAt DateTime @default(now())
@@ -151,6 +152,11 @@ model ArticleLike {
 
   // 복합유니크
   @@unique([userId, articleId])
+}
+
+enum NotificationType {
+  PRICE_CHANGED
+  NEW_COMMENT
 }
 
   // 알림 설정

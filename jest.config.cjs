@@ -1,14 +1,7 @@
-const { pathsToModuleNameMapper } = require('ts-jest');
-const { compilerOptions } = require('./tsconfig');
-
 module.exports = {
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
-  rootDir: '.',
-  moduleDirectories: ['node_modules', 'src'],
-  testMatch: [
-    '<rootDir>/tests/**/*.test.ts',
-  ],
+  testMatch: ['**/__tests__/**/*.test.ts'],
   collectCoverage: true,
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -20,14 +13,14 @@ module.exports = {
     '!src/types/*.ts',
     '!src/validators/*.ts',
   ],
-  coverageDirectory: './coverage',
+  coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov'],
-  transform: {
-    '^.+\\.ts$': ['ts-jest', { tsconfig: { module: 'NodeNext' } }],
+  globals: {
+    'ts-jest': {
+      useESM: true,
+    },
   },
   moduleNameMapper: {
-    ...pathsToModuleNameMapper(compilerOptions.paths || {}, { prefix: '<rootDir>/' }),
-    '\\.(css|less)$': 'identity-obj-proxy',
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
 };

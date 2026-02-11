@@ -1,5 +1,5 @@
 import express from "express";
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import prisma from "../lib/prisma-client.js";
 import { generateTokens, verifyRefreshToken } from "../utils/token.js";
@@ -11,10 +11,10 @@ import {
 
 const router = express.Router();
 
-router.post("/auth/register", register);
-router.post("/auth/login", login);
-router.post("/auth/refresh", refreshTokens);
-router.post("/auth/logout", logout);
+router.post("/register", register);
+router.post("/login", login);
+router.post("/refresh", refreshTokens);
+router.post("/logout", logout);
 
 async function register(req: Request, res: Response) {
   try {
@@ -147,7 +147,7 @@ async function refreshTokens(req: Request, res: Response) {
   }
 }
 
-async function logout(req: Request, res: Response) {
+async function logout(_req: Request, res: Response) {
   try {
     clearTokenCookies(res);
     return res.status(200).json({ message: "Logged out successfully" });

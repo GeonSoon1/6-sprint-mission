@@ -1,8 +1,8 @@
-'build/main.js',module.exports = {
+module.exports = {
   apps: [
     {
       name: 'sprint-mission',
-      script: 'build/main.js', 
+      script: 'build/main.js',
       instances: 1,
       exec_mode: 'fork',
       env: {

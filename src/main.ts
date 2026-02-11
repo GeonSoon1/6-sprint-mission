@@ -1,3 +1,4 @@
+import 'module-alias/register';
 import 'reflect-metadata';
 import http from 'http';
 import { PORT, initSocket } from '@lib';

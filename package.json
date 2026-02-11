@@ -8,7 +8,8 @@
   "scripts": {
     "build": "clear; tsc",
     "start": "node dist/main.js",
-    "dev": "clear; nodemon --watch 'src/**/*.ts' --exec ts-node -r tsconfig-paths/register src/main.ts"
+    "dev": "clear; nodemon --watch 'src/**/*.ts' --exec ts-node -r tsconfig-paths/register src/main.ts",
+    "test": "jest"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.1.0",
@@ -20,6 +21,7 @@
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
+    "@types/multer-s3": "^3.0.3",
     "@types/supertest": "^6.0.3",
     "jest": "^30.2.0",
     "nodemon": "^3.1.11",
@@ -31,6 +33,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.978.0",
     "@prisma/client": "^5.22.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",
@@ -42,11 +45,24 @@
     "express-validator": "^7.3.1",
     "inversify": "^7.10.6",
     "jsonwebtoken": "^9.0.3",
+    "module-alias": "^2.2.3",
     "multer": "^2.0.2",
+    "multer-s3": "^3.0.1",
     "reflect-metadata": "^0.2.2",
     "socket.io": "^4.8.3"
   },
+  "_moduleAliases": {
+    "@": "dist",
+    "@controllers": "dist/controllers/index",
+    "@dto": "dist/dto",
+    "@lib": "dist/lib/index",
+    "@middlewares": "dist/middlewares/index",
+    "@repositories": "dist/repositories/index",
+    "@routers": "dist/routers/index",
+    "@services": "dist/services/index",
+    "@types": "dist/types/index"
+  },
   "prisma": {
-    "seed": "node prisma/seed.js"
+    "seed": "node prisma/seed.mjs"
   }
 }

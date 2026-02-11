@@ -1,4 +1,5 @@
 node_modules/
-prisma/
 .env
 __http__/
+dist/
+coverage/

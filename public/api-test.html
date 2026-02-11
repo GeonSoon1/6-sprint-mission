@@ -289,6 +289,25 @@
           </div>
         </div>
 
+        <!-- Image Upload -->
+        <div class="panel">
+          <h3>🖼️ Image Upload (이미지)</h3>
+          <div class="input-group">
+            <input type="file" id="upload-file" accept="image/*" />
+            <button onclick="uploadImage()">Upload</button>
+          </div>
+          <h4>Uploaded URL</h4>
+          <div class="input-group">
+            <input
+              type="text"
+              id="uploaded-url"
+              readonly
+              placeholder="URL will appear here..."
+            />
+            <button class="secondary" onclick="copyUrl()">Copy</button>
+          </div>
+        </div>
+
         <!-- Notifications -->
         <div class="panel">
           <h3>🔔 Notifications (알림)</h3>
@@ -319,7 +338,8 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-      const API_URL = "http://localhost:3000";
+      // 현재 브라우저가 접속한 주소(Origin)를 API 서버 주소로 사용
+      const API_URL = window.location.origin;
       let socket;
 
       function log(data, type = "info", title = "") {
@@ -478,6 +498,47 @@
         else if (type === "product") body.productId = Number(id);
         req("/comments", "POST", body);
       };
+
+      // Image Upload
+      async function uploadImage() {
+        const fileInput = document.getElementById("upload-file");
+        const file = fileInput.files[0];
+        if (!file) {
+          log("No file selected", "error", "Upload");
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append("attachment", file); // 서버 라우터 설정(upload.single('attachment'))과 일치해야 함
+
+        const token = document.getElementById("access-token").value;
+        const headers = {};
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        log(`POST /upload (${file.name})`, "info", "Request");
+
+        try {
+          const res = await fetch(API_URL + "/files", {
+            method: "POST",
+            headers, // FormData 전송 시 Content-Type은 브라우저가 자동으로 설정함
+            body: formData,
+          });
+          const data = await res.json();
+          log(data, res.ok ? "success" : "error", `Response (${res.status})`);
+          if (res.ok && data.url) {
+            document.getElementById("uploaded-url").value = data.url;
+          }
+        } catch (err) {
+          log(err.message, "error", "Network Error");
+        }
+      }
+
+      function copyUrl() {
+        const urlInput = document.getElementById("uploaded-url");
+        urlInput.select();
+        document.execCommand("copy");
+        log("URL copied to clipboard", "success", "System");
+      }
 
       // Notifications
       const getNotifications = () => req("/notifications");

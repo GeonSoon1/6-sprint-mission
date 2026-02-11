@@ -45,7 +45,8 @@ const errorHandler = (err: any
 
     // 4. CustomError 및 기타 에러 처리
     // any 타입이므로 안전하게 접근하기 위해 || 연산자 활용
-    const statusCode = err.statusCode || 500;
+    // express-jwt 등 일부 라이브러리는 statusCode 대신 status를 사용하므로 이를 확인합니다.
+    const statusCode = err.statusCode || err.status || 500;
     const message = err.message || '서버 오류가 발생했습니다.';
 
     // path가 없는 에러 객체도 많으므로 안전하게 처리
@@ -85,7 +86,7 @@ export class CustomError extends Error {
 export const globalErrorHandler = (err: any
     , req: ExpressRequest, res: ExpressResponse, next: ExpressNextFunction) => {
     // CustomError가 아닌 경우 (예: 서버 내부 오류), 500 상태 코드와 일반 메시지를 사용합니다.
-    const statusCode = err.statusCode || 500;
+    const statusCode = err.statusCode || err.status || 500;
     const message = err.message || 'Internal Server Error';
 
     // 에러를 콘솔에 기록

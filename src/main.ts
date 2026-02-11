@@ -1,6 +1,7 @@
+import 'dotenv/config';
 import { PORT, EXPRESS } from './libs/constants';
 import cors from 'cors';
-import { RouterManager } from './Routers/routerManager';
+import { RouterManager } from './routerManager';
 import { getCorsOrigin } from './libs/corsSetUp';
 import errorHandler from './libs/Handler/errorHandler';
 import { expressjwt } from 'express-jwt';
@@ -69,8 +70,10 @@ io.on('connection', (socket) => {
     }
 });
 
-httpServer.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+    httpServer.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
 
 export default app;

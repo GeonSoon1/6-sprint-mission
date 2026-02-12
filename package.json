@@ -10,6 +10,7 @@
     "build": "tsc && tsc-alias",
     "test": "dotenv -e .env.test -- npm run prisma:migrate && dotenv -e .env.test -- jest --coverage --runInBand",
     "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "npx prisma migrate deploy && npx prisma generate",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

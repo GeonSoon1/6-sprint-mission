@@ -10,7 +10,7 @@
     "build": "tsc && tsc-alias",
     "test": "dotenv -e .env.test -- npm run prisma:migrate && dotenv -e .env.test -- jest --coverage --runInBand",
     "prisma:migrate": "prisma migrate dev",
-    "typeCheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.980.0",

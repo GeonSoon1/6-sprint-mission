@@ -37,7 +37,7 @@ describe('인증이 필요하지 않은 게시글 API 통합 테스트', () => {
     });
 
     test('게시글이 있고, query가 없는 경우 모든 데이터 반환', async () => {
-      await createArticlesWithUsers(userSample, articleSample);
+      await createArticlesWithUsers();
 
       const response = await request(app).get('/articles');
 
@@ -48,7 +48,7 @@ describe('인증이 필요하지 않은 게시글 API 통합 테스트', () => {
     });
 
     test('query : Page / PageSize 테스트', async () => {
-      await createArticlesWithUsers(userSample, articleSample);
+      await createArticlesWithUsers();
 
       const response = await request(app).get('/articles').query({ page: 2, pageSize: 3 });
 
@@ -58,7 +58,7 @@ describe('인증이 필요하지 않은 게시글 API 통합 테스트', () => {
     });
 
     test('query : orderBy 테스트', async () => {
-      await createArticlesWithUsers(userSample, articleSample);
+      await createArticlesWithUsers();
 
       const response = await request(app).get('/articles').query({ orderBy: 'oldest' });
 
@@ -67,7 +67,7 @@ describe('인증이 필요하지 않은 게시글 API 통합 테스트', () => {
     });
 
     test('query : keyword 테스트', async () => {
-      await createArticlesWithUsers(userSample, articleSample);
+      await createArticlesWithUsers();
 
       const response1 = await request(app).get('/articles').query({ keyword: '판다마켓' });
 

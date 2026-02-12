@@ -1,5 +1,5 @@
 # 자동화 작업 이름
-name : panda-market-cicd
+name : Panda Market CI/CD Test
 
 # 작업 시점
 on: 
@@ -26,9 +26,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: ${{ secrets.DB_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.DB_NAME }}
+          POSTGRES_USER: ${{ secrets.TEST_DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.TEST_DB_NAME }}
         ports:
           - 5432:5432
         options: >-
@@ -40,7 +40,7 @@ jobs:
     # 공통 환경변수
     env:
       # 테스트용 DB : 정보는 git secrets 저장
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
       NODE_ENV: test
 
       # 테스트용 임시 키 설정

@@ -26,9 +26,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: test_pw_kjsnd6
-          POSTGRES_DB: panda_action_test
+          POSTGRES_USER: ${{ secrets.DB_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.DB_NAME }}
         ports:
           - 5432:5432
         options: >-
@@ -70,6 +70,6 @@ jobs:
         run: npm run typecheck
 
       - name: Run Tests
-        run: 
+        run: |
           npx prisma migrate deploy
           npm run test

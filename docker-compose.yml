@@ -1,0 +1,53 @@
+name: sprint-mission
+services:
+  server:
+    image: sprint-mission
+    build:
+      tags:
+        - sprint-mission
+      args:
+        - NODE_VERSION=24.13.0
+      dockerfile: Dockerfile
+      pull: true
+      context: .
+    container_name: sprint-mission
+    environment:
+      - SERVER_PORT=3000
+      # Prisma 마이그레이션 및 앱에서 사용 (db 서비스 호스트명 사용)
+      - DATABASE_URL=postgresql://postgres:password@db:5432/sprint-mission
+    ports:
+      - '3000:3000'
+    networks:
+      - network-a
+    volumes:
+      - volume-a:/app/logs:rw
+      - ./uploads:/app/uploads:rw
+      # - uploads:/app/uploads:rw의 named volume 형식이 아닌 로컬과 연결하는 바인드 마운트 형식을 사용해 봄 -> 이미 존재하던 파일도 docker에서 확인 가능
+      # named volume은 운영 환경에서 바인드 마운트 형식은 개발 환경에서 사용 용이
+    depends_on:
+      db:
+        condition: service_healthy
+    # DB 기동 후 마이그레이션 실행 → 앱 시작 (컨테이너용)
+    command: sh -c "npm run prisma:deploy && npm run prisma:seed && npm run start"
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sprint-mission
+    ports:
+      - '5434:5432'
+    networks:
+      - network-a
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 2s
+      timeout: 5s
+      retries: 5
+
+networks:
+  network-a:
+
+volumes:
+  volume-a:
+  uploads:

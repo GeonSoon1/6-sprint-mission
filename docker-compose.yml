@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  express:
+    build: .
+    container_name: express-container
+    ports:
+      - "3000:3000"  # 호스트 3000번 포트를 컨테이너의 3000번 포트와 연결
+    volumes:
+      - ./uploads:/app/uploads  # 파일 업로드 폴더를 볼륨으로 연결
+    depends_on:
+      - postgres  # Postgres 서비스가 먼저 시작된 후 Express 서버 실행
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=testdb  # Postgres 데이터베이스 이름
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:15
+    container_name: postgres-container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: testdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # 데이터 지속성을 위해 Postgres 데이터베이스를 볼륨으로 연결
+    ports:
+      - "5432:5432"  # 호스트에서 Postgres에 접근 가능하도록 5432 포트 개방
+    networks:
+      - backend
+
+volumes:
+  postgres_data:  # Postgres 데이터베이스 볼륨 설정
+  uploads:  # Express 파일 업로드 볼륨 설정
+
+networks:
+  backend:  # 서비스가 연결될 네트워크 설정

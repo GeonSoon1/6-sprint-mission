@@ -1,7 +1,7 @@
 import { assert } from 'superstruct';
 import { CustomError } from '../libs/Handler/errorHandler';
-import userRepository from '../repositories/userRepository';
-import productRepository from '../repositories/productRepository';
+import userRepository from './userRepository';
+import productRepository from '../product/productRepository';
 import productLikeRepository from '../product/productLikeRepository';
 import bcrypt from 'bcrypt';
 import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';

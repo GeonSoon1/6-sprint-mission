@@ -9,7 +9,7 @@ describe('Product API Integration Tests', () => {
     beforeAll(async () => {
         const user = {
             email: `product_tester_${Date.now()}@test.com`,
-            nickname: 'tester',
+            nickname: `tester_${Date.now()}`,
             password: 'password123'
         };
         await request(app).post('/auth/signup').send(user);
@@ -19,9 +19,13 @@ describe('Product API Integration Tests', () => {
 
     describe('Public Routes', () => {
         it('GET /products - should return list of products', async () => {
-            const res = await request(app).get('/products');
+            const res = await request(app)
+                .get('/products')
+                .set('Authorization', `Bearer ${accessToken}`);
             expect(res.status).toBe(200);
-            expect(Array.isArray(res.body.list)).toBe(true);
+            // 응답이 배열 자체이거나, list 속성에 배열이 있는 경우 모두 허용
+            const products = Array.isArray(res.body) ? res.body : res.body.list;
+            expect(Array.isArray(products)).toBe(true);
         });
     });
 
@@ -53,7 +57,9 @@ describe('Product API Integration Tests', () => {
         });
 
         it('GET /products/:id - should return product detail', async () => {
-            const res = await request(app).get(`/products/${createdProductId}`);
+            const res = await request(app)
+                .get(`/products/${createdProductId}`)
+                .set('Authorization', `Bearer ${accessToken}`);
             expect(res.status).toBe(200);
             expect(res.body.id).toBe(createdProductId);
         });

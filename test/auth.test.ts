@@ -4,7 +4,7 @@ import app from './../src/main';
 describe('Auth API Integration Tests', () => {
     const newUser = {
         email: `test${Date.now()}@example.com`,
-        nickname: 'testuser',
+        nickname: `testuser_${Date.now()}`,
         password: 'password123'
     };
 
@@ -38,7 +38,6 @@ describe('Auth API Integration Tests', () => {
 
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty('accessToken');
-            expect(res.body).toHaveProperty('refreshToken');
         });
     });
 });

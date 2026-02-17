@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  # 1. 데이터베이스 컨테이너 (과제 요구사항 만족)
+  db:
+    image: postgres:15-alpine
+    container_name: pandamarket-db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pandamarket
+    ports:
+      - "5432:5432"
+    volumes:
+      # 컨테이너가 꺼져도 DB 데이터가 날아가지 않도록 영구 저장
+      - pgdata:/var/lib/postgresql/data 
+
+  # 2. Express 서버 컨테이너
+  app:
+    build: . # 현재 폴더에 있는 Dockerfile을 읽어서 이미지를 굽겠다는 뜻!
+    container_name: pandamarket-app
+    restart: always
+    # 과제 요구사항: 호스트 머신에서 3000번 포트로 접근 가능하도록 구현
+    ports:
+      - "3000:3000"
+    
+    environment:
+      # 🚨 중요: 도커 환경에서는 DB 주소를 'localhost' 대신 서비스 이름인 'db'로 써야 해!
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/pandamarket?schema=public"
+      
+    volumes:
+      # 과제 요구사항: 파일 업로드 폴더는 Docker의 Volume 활용
+      # 내 컴퓨터의 ./uploads 폴더와 도커 안의 /app/uploads 폴더를 연결 (폴더명은 실제 사용하는 경로에 맞게 수정해!)
+      - ./uploads:/app/uploads
+      
+    depends_on:
+      - db # db 컨테이너가 먼저 켜진 후에 app 컨테이너를 켬
+
+volumes:
+  pgdata:

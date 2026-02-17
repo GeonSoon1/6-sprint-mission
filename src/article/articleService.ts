@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
-import articleLikeRepository from '../article/articleLikeRepository';
-import articleRepository from '../article/articleRepository';
+import articleLikeRepository from './articleLikeRepository';
+import articleRepository from './articleRepository';
 import { ArticleFindOptions, ArticlePublicData, UpdateArticleData } from './../libs/interfaces';
 import { CustomError } from '../libs/Handler/errorHandler';
 

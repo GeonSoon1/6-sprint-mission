@@ -1,8 +1,8 @@
-import { productService } from '../src/services/productService';
-import productRepository from '../src/repositories/productRepository';
+import { productService } from '../src/product/productService';
+import productRepository from '../src/product/productRepository';
 
 // Repository 모듈 전체를 Mocking
-jest.mock('../src/repositories/productRepository');
+jest.mock('../src/product/productRepository');
 
 // Mock 객체에 대한 타입 정의 (타입 안전성 및 자동완성 지원)
 const mockProductRepository = productRepository as jest.Mocked<typeof productRepository>;

@@ -3,12 +3,12 @@ name : Panda Market CI/CD Test
 
 # 작업 시점
 on: 
-  push :
+  push : # 브랜치에 코드가 푸시될 때
     branches : # 1차 : "김지선" 브랜치 / 2차(최종) : "main" 브랜치 설정 
       - 김지선-sprint11 # action test용
       - 김지선
       - main
-  pull_request :
+  pull_request : # 브랜치에 코드가 머지될 때
     branches :
       - 김지선-sprint11 # action test용
       - 김지선
@@ -26,9 +26,9 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_USER: ${{ secrets.TEST_DB_USER }}
-          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.TEST_DB_NAME }}
+          POSTGRES_USER: ${{ secrets.TEST_DB_USER || 'postgres' }}
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD || 'passwordnd6!' }}
+          POSTGRES_DB: ${{ secrets.TEST_DB_NAME || 'panda_market' }}
         ports:
           - 5432:5432
         options: >-
@@ -39,8 +39,9 @@ jobs:
 
     # 공통 환경변수
     env:
-      # 테스트용 DB : 정보는 git secrets 저장
-      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      # 테스트용 DB : 정보는 git secrets 저장 
+      # PR 전송을 위해 테스트용 DB 연결 정보 추가
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL || 'postgresql://postgres:passwordnd6!@localhost:5432/panda_market?schema=public' }}
       NODE_ENV: test
 
       # 테스트용 임시 키 설정

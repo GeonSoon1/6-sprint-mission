@@ -3,22 +3,20 @@ name : Deploy to EC2 panda-market
 
 # 작업 시점
 on: 
-  push :
+  push : 
     branches : 
-      - 김지선-sprint11 # 1차 현재 브랜치
-      - 김지선 # 2차 : 상위 브랜치
-      - main  # 3차 : 최종 브랜치
-  pull_request :
-    branches :
-      - 김지선-sprint11 
-      - 김지선
-      - main
+      - 김지선 # 1차 : 상위 브랜치
+      - main  # 2차 : 최종 브랜치
+  # pull_request : 
+  #   branches :
+  #     - main
 
 # 작업 내용
 jobs:
 
   deploy:
     # run 환경
+    if: github.repository == 'KimDay366/6-sprint-mission' # 현재 개인 레포지토리에만 secret 설정이 되어있어 해당 조건을 추가하였습니다
     runs-on: ubuntu-latest
 
     # 환경변수

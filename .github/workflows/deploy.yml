@@ -1,0 +1,40 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    env:
+      NODE_ENV: production
+      DATABASE_URL: "${{ secrets.DATABASE_URL }}"
+      JWT_ACCESS_TOKEN_SECRET: "${{ secrets.JWT_ACCESS_TOKEN_SECRET }}"
+      JWT_REFRESH_TOKEN_SECRET: "${{ secrets.JWT_REFRESH_TOKEN_SECRET }}"
+      NODE_OPTIONS: "--max-old-space-size=512"
+
+    defaults:
+      run:
+        working-directory: mission9-10-11
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install deps
+        run: npm ci --include=dev --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
+
+      - name: Migrate
+        run: npm run prisma:migrate:deploy
+
+      - name: Restart app
+        run: |
+          pm2 reload panda-market || pm2 start dist/src/main.js --name panda-market
+          pm2 save
+
+      - name: Done
+        run: echo "Deployment successful!"

@@ -1,6 +1,7 @@
 import { prismaClient } from '@lib/prismaClient';
+import { userSample, articleSample } from './mockdata';
 
-export async function createArticlesWithUsers(userSample: any[], articleSample: any[]) {
+export async function createArticlesWithUsers() {
   // 관계형 USER 먼저 등록
   await prismaClient.user.createMany({ data: userSample });
 

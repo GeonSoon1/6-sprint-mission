@@ -1,8 +1,6 @@
-# node modules 제외
 node_modules/
 **/node_modules/
 
-# .github/**
 files/**
 dist/**
 coverage/**
@@ -11,3 +9,7 @@ REST API test/**
 .env
 .env.test
 
+README.md
+.gitignore
+.dockerignore
+.github/**

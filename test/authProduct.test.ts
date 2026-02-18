@@ -127,7 +127,7 @@ describe('인증이 필요한 상품 API 통합 테스트', () => {
     });
 
     test('상품이 있는 경우, 전체 목록 조회', async () => {
-      await createProductsWithUsers(userSample, productSample);
+      await createProductsWithUsers();
 
       const getResponse = await agent1.get('/products');
 

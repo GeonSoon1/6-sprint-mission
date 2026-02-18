@@ -1,0 +1,46 @@
+name : panda-market
+
+services:
+  app: 
+    image: panda-market-app 
+    build:
+      dockerfile: ./Dockerfile
+      context: .
+    container_name: panda-market-app
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:pandaNd6@db:5432/panda_market_docker
+    volumes:
+      - ./files:/app/public # 생성된 volume에 저장할 파일을 호스트의 ./files 폴더에도 저장
+    networks:
+      - panda-market-net
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+  db:
+    image: postgres:15-alpine
+    container_name: panda-market-db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=pandaNd6
+      - POSTGRES_DB=panda_market_docker
+    volumes:
+      - db_data:/var/lib/postgresql/data # 생성된 volume에 db 데이터 저장
+    networks:
+      - panda-market-net
+    ports:
+      - "5432:5432"
+
+networks:
+  panda-market-net:
+    driver: bridge
+
+volumes:
+  db_data:
+  
+  
+      
+    
+    

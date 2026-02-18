@@ -40,7 +40,7 @@ describe('인증이 필요하지 않은 상품 API 통합 테스트', () => {
 
     test('상품이 있고, query가 없는 경우 모든 데이터 반환', async () => {
       // 상품 등록 로직 실행
-      await createProductsWithUsers(userSample, productSample);
+      await createProductsWithUsers();
 
       const response = await request(app).get('/products');
       expect(response.status).toBe(200);
@@ -51,7 +51,7 @@ describe('인증이 필요하지 않은 상품 API 통합 테스트', () => {
 
     test('query : Page / PageSize 테스트', async () => {
       // 상품 등록 로직 실행
-      await createProductsWithUsers(userSample, productSample);
+      await createProductsWithUsers();
 
       const response = await request(app).get('/products').query({ page: 2, pageSize: 5 });
       expect(response.status).toBe(200);
@@ -61,7 +61,7 @@ describe('인증이 필요하지 않은 상품 API 통합 테스트', () => {
 
     test('query : orderBy 테스트', async () => {
       // 상품 등록 로직 실행
-      await createProductsWithUsers(userSample, productSample);
+      await createProductsWithUsers();
 
       const response = await request(app).get('/products').query({ orderBy: 'oldest' });
       expect(response.status).toBe(200);
@@ -70,7 +70,7 @@ describe('인증이 필요하지 않은 상품 API 통합 테스트', () => {
 
     test('query : keyword 테스트', async () => {
       // 상품 등록 로직 실행
-      await createProductsWithUsers(userSample, productSample);
+      await createProductsWithUsers();
 
       // 키워드가 상품명에 있는 경우
       const response1 = await request(app).get('/products').query({ keyword: '미니' });

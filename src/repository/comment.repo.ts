@@ -28,6 +28,17 @@ export async function getCommentList(
     where,
     orderBy: { createdAt: 'desc' },
   });
+
+  // 다음 페이지가 있는지 확인
+  const hasNextPage = commentsWithCursor.length > limit;
+
+  if (!hasNextPage) {
+    return {
+      list: commentsWithCursor,
+      nextCursor: null,
+    };
+  }
+
   const comments = commentsWithCursor.slice(0, limit);
   const cursorComment = commentsWithCursor[commentsWithCursor.length - 1];
   const nextCursor = cursorComment ? cursorComment.id : null;

@@ -4,38 +4,32 @@ import prisma from '../../lib/prisma';
 import bcrypt from 'bcrypt';
 
 describe('게시글 API 인증 필요', () => {
-  const agent = request.agent(app); // 상태 유지를 위한 agent 사용
-  beforeAll(async () => {
-    await prisma.productLike.deleteMany();
-    await prisma.product.deleteMany();
-    await prisma.notification.deleteMany();
-    await prisma.user.deleteMany();
-    // 테스트용 유저 생성
+  const loginAndGetAgent = async () => {
+    const agent = request.agent(app);
+
     const hashedPassword = await bcrypt.hash('password123', 10);
-    // 먼저 유저 생성
+
     await prisma.user.create({
       data: {
         nickname: 'testuser',
-        email: 'test@example.com',
+        email: `test_${Date.now()}@example.com`,
         password: hashedPassword,
       },
     });
-    await agent.post('/auth/login').send({
+
+    const loginRes = await agent.post('/auth/login').send({
       nickname: 'testuser',
       password: 'password123',
     });
-  });
 
-  afterEach(async () => {
-    await prisma.article.deleteMany();
-  });
+    expect(loginRes.status).toBe(200); // 🔥 중요
 
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+    return agent;
+  };
 
   // 인증된 상태에서 게시글 생성 테스트
   test('POST /articles - 인증된 상태에서 게시글 생성', async () => {
+    const agent = await loginAndGetAgent();
     const response = await agent.post('/articles').send({
       title: 'New Article',
       content: 'This is a new article.',
@@ -47,6 +41,7 @@ describe('게시글 API 인증 필요', () => {
   });
   // 인증된 상태에서 게시글 수정 테스트
   test('PATCH /articles/:id - 인증된 상태에서 게시글 수정', async () => {
+    const agent = await loginAndGetAgent();
     // 먼저 게시글 생성
     const article = await agent.post('/articles').send({
       title: 'Article',
@@ -64,6 +59,7 @@ describe('게시글 API 인증 필요', () => {
   });
   // 인증된 상태에서 게시글 삭제 테스트
   test('DELETE /articles/:id - 인증된 상태에서 게시글 삭제', async () => {
+    const agent = await loginAndGetAgent();
     // 먼저 게시글 생성
     const article = await agent.post('/articles').send({
       title: 'Article to be deleted',
@@ -83,6 +79,7 @@ describe('게시글 API 인증 필요', () => {
   // 인증되지 않은 상태에서 게시글 수정 테스트
   test('PATCH /articles/:id - 인증되지 않은 상태에서 게시글 수정 시도', async () => {
     // 먼저 게시글 생성
+    const agent = await loginAndGetAgent();
     const article = await agent.post('/articles').send({
       title: 'Article',
       content: 'This article will be updated.',
@@ -95,6 +92,7 @@ describe('게시글 API 인증 필요', () => {
   });
   // 인증되지 않은 상태에서 게시글 삭제 테스트
   test('DELETE /articles/:id - 인증되지 않은 상태에서 게시글 삭제 시도', async () => {
+    const agent = await loginAndGetAgent();
     // 먼저 게시글 생성
     const article = await agent.post('/articles').send({
       title: 'Article to be deleted',
@@ -105,8 +103,9 @@ describe('게시글 API 인증 필요', () => {
   });
   // 다른 사용자의 게시글 수정 시도 테스트
   test('PATCH /articles/:id - 다른 사용자의 게시글 수정 시도', async () => {
+    const agent = await loginAndGetAgent();
     // 다른 유저 생성
-    const otherUser = await prisma.user.create({
+    const user2 = await prisma.user.create({
       data: {
         nickname: 'user2',
         email: 'user2@example.com',
@@ -135,6 +134,7 @@ describe('게시글 API 인증 필요', () => {
   });
   // 다른 사용자의 게시글 삭제 시도 테스트
   test('DELETE /articles/:id - 다른 사용자의 게시글 삭제 시도', async () => {
+    const agent = await loginAndGetAgent();
     // 다른 유저 생성
     const user3 = await prisma.user.create({
       data: {
@@ -162,6 +162,7 @@ describe('게시글 API 인증 필요', () => {
   });
   // 존재하지 않는 게시글 수정 시도 테스트
   test('PATCH /articles/:id - 존재하지 않는 게시글 수정 시도', async () => {
+    const agent = await loginAndGetAgent();
     const response = await agent.patch('/articles/9999').send({
       title: 'Non-existent Title',
       content: 'Non-existent content.',
@@ -171,12 +172,14 @@ describe('게시글 API 인증 필요', () => {
   });
   // 존재하지 않는 게시글 삭제 시도 테스트
   test('DELETE /articles/:id - 존재하지 않는 게시글 삭제 시도', async () => {
+    const agent = await loginAndGetAgent();
     const response = await agent.delete('/articles/9999');
     expect(response.status).toBe(404);
     expect(response.body.message).toBe('게시글이 존재하지 않습니다.');
   });
   // 필드 일부분만 수정 테스트
   test('PATCH /articles/:id - 필드 일부분만 수정', async () => {
+    const agent = await loginAndGetAgent();
     // 먼저 게시글 생성
     const article = await agent.post('/articles').send({
       title: 'Partial Update Article',

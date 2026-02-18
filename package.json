@@ -16,10 +16,13 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
-    "test": "dotenv -e .env.test -- npm run prisma:migrate && dotenv -e .env.test -- jest",
+    "typecheck": "tsc --noEmit",
+    "test:local": "dotenv -e .env.test -- npm run prisma:migrate && dotenv -e .env.test -- jest",
+    "test:ci": "jest",
     "dev": "nodemon --watch src --exec ts-node src/main.ts",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",
+    "prisma:deploy": "prisma migrate deploy",
     "prisma:seed": "node prisma/seed.js",
     "test:coverage": "dotenv -e .env.test -- jest --coverage"
   },

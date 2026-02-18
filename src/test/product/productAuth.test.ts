@@ -4,38 +4,32 @@ import prisma from '../../lib/prisma';
 import bcrypt from 'bcrypt';
 
 describe('상품 API 인증 필요', () => {
-  const agent = request.agent(app); // 상태 유지를 위한 agent 사용
-  beforeAll(async () => {
-    await prisma.productLike.deleteMany();
-    await prisma.product.deleteMany();
-    await prisma.notification.deleteMany();
-    await prisma.user.deleteMany();
-    // 테스트용 유저 생성
+  const loginAndGetAgent = async () => {
+    const agent = request.agent(app);
+
     const hashedPassword = await bcrypt.hash('password123', 10);
-    // 먼저 유저 생성
+
     await prisma.user.create({
       data: {
-        nickname: 'testuser',
-        email: 'test@example.com',
+        nickname: 'testuser2',
+        email: `test_${Date.now()}@example.com`,
         password: hashedPassword,
       },
     });
-    await agent.post('/auth/login').send({
-      nickname: 'testuser',
+
+    const loginRes = await agent.post('/auth/login').send({
+      nickname: 'testuser2',
       password: 'password123',
     });
-  });
-  afterEach(async () => {
-    await prisma.productLike.deleteMany();
-    await prisma.product.deleteMany();
-  });
 
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+    expect(loginRes.status).toBe(200); // 🔥 중요
+
+    return agent;
+  };
 
   // 인증된 상태에서 상품 생성 테스트
   test('POST /products - 인증된 상태에서 상품 생성', async () => {
+    const agent = await loginAndGetAgent();
     const response = await agent.post('/products').send({
       name: 'New Product',
       description: 'This is a new product.',
@@ -51,6 +45,7 @@ describe('상품 API 인증 필요', () => {
   });
   // 인증된 상태에서 상품 수정 테스트
   test('PATCH /products/:id - 인증된 상태에서 상품 수정', async () => {
+    const agent = await loginAndGetAgent();
     // 먼저 상품 생성
     const product = await agent.post('/products').send({
       name: 'Product',
@@ -74,6 +69,7 @@ describe('상품 API 인증 필요', () => {
   });
   // 인증된 상태에서 상품 삭제 테스트
   test('DELETE /products/:id - 인증된 상태에서 상품 삭제', async () => {
+    const agent = await loginAndGetAgent();
     // 먼저 상품 생성
     const product = await agent.post('/products').send({
       name: 'Product to be deleted',
@@ -101,6 +97,7 @@ describe('상품 API 인증 필요', () => {
   // 인증되지 않은 상태에서 상품 수정 테스트
   test('PATCH /products/:id - 인증되지 않은 상태에서 상품 수정 시도', async () => {
     // 먼저 상품 생성
+    const agent = await loginAndGetAgent();
     const product = await agent.post('/products').send({
       name: 'Product',
       description: 'This product will be updated.',
@@ -121,6 +118,7 @@ describe('상품 API 인증 필요', () => {
   });
   // 인증되지 않은 상태에서 상품 삭제 테스트
   test('DELETE /products/:id - 인증되지 않은 상태에서 상품 삭제 시도', async () => {
+    const agent = await loginAndGetAgent();
     // 먼저 상품 생성
     const product = await agent.post('/products').send({
       name: 'Product to be deleted',
@@ -135,6 +133,7 @@ describe('상품 API 인증 필요', () => {
   });
   // 다른 사용자의 상품 수정 시도 테스트
   test('PATCH /products/:id - 다른 사용자의 상품 수정 시도', async () => {
+    const agent = await loginAndGetAgent();
     // 다른 사용자 생성
     const user2 = await prisma.user.create({
       data: {
@@ -171,6 +170,7 @@ describe('상품 API 인증 필요', () => {
   });
   // 다른 사용자의 상품 삭제 시도 테스트
   test('DELETE /products/:id - 다른 사용자의 상품 삭제 시도', async () => {
+    const agent = await loginAndGetAgent();
     // 다른 사용자 생성
     const user3 = await prisma.user.create({
       data: {
@@ -200,6 +200,7 @@ describe('상품 API 인증 필요', () => {
   });
   // 존재하지 않는 상품 수정 시도 테스트
   test('PATCH /products/:id - 존재하지 않는 상품 수정 시도', async () => {
+    const agent = await loginAndGetAgent();
     const response = await agent.patch('/products/9999').send({
       name: 'Non-existent Product',
       description: 'This product does not exist.',
@@ -213,12 +214,14 @@ describe('상품 API 인증 필요', () => {
   });
   // 존재하지 않는 상품 삭제 시도 테스트
   test('DELETE /products/:id - 존재하지 않는 상품 삭제 시도', async () => {
+    const agent = await loginAndGetAgent();
     const response = await agent.delete('/products/9999');
     expect(response.status).toBe(404);
     expect(response.body.message).toBe('해당 상품이 없습니다.');
   });
   // 가격이 음수
   test('POST /products - 가격이 음수인 상품 생성 시도', async () => {
+    const agent = await loginAndGetAgent();
     const response = await agent.post('/products').send({
       name: 'Invalid Product',
       description: 'This product has a negative price.',
@@ -231,6 +234,7 @@ describe('상품 API 인증 필요', () => {
   });
   // 필드 일부만 수정
   test('PATCH /products/:id - 필드 일부만 수정', async () => {
+    const agent = await loginAndGetAgent();
     // 먼저 상품 생성
     const product = await agent.post('/products').send({
       name: 'Partial Update Product',
@@ -249,6 +253,7 @@ describe('상품 API 인증 필요', () => {
   });
   // 좋아요 한 상품 가격 변경 시 알림 메시지 확인
   test('PATCH /products/:id - 가격 변경 시 알림 메시지 확인', async () => {
+    const agent = await loginAndGetAgent();
     // 좋아요 할 상품을 생성할 유저 생성
     const user2 = await prisma.user.create({
       data: {
@@ -280,7 +285,7 @@ describe('상품 API 인증 필요', () => {
     expect(response.status).toBe(200);
     // 좋아요 누른 유저
     const liker = await prisma.user.findUnique({
-      where: { nickname: 'testuser' },
+      where: { nickname: 'testuser2' },
     });
     // 가격 변경 확인
     expect(response.body).toHaveProperty('price', 350);

@@ -3,18 +3,6 @@ import app from '../../app';
 import prisma from '../../lib/prisma';
 
 describe('게시글 API 인증 불필요', () => {
-  beforeAll(async () => {
-    await prisma.article.deleteMany();
-    await prisma.user.deleteMany();
-  });
-  beforeEach(async () => {
-    await prisma.article.deleteMany();
-    await prisma.user.deleteMany();
-  });
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
-
   test('GET /articles - 게시글이 없을 때 빈 배열 조회', async () => {
     const response = await request(app).get('/articles');
     expect(response.status).toBe(200);

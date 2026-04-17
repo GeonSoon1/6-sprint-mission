@@ -82,3 +82,32 @@ function partition(arr, left, right) {
   return i;
 }
 
+
+// 추가
+function heapsort(array) {
+  let n = array.length;
+
+  const heapify = (arr, size, i) => {
+    let largest = i;
+    let left = 2 * i + 1;
+    let right = 2 * i + 2;
+
+    if (left < size && arr[left] > arr[largest]) largest = left;
+    if (right < size && arr[right] > arr[largest]) largest = right;
+
+    if (largest !== i) {
+      [arr[i], arr[largest]] = [arr[largest], arr[i]];
+      heapify(arr, size, largest);
+    }
+  };
+
+  // Build Max Heap
+  for (let i = Math.floor(n / 2) - 1; i >= 0; i--) heapify(array, n, i);
+
+  // Extract elements from heap
+  for (let i = n - 1; i > 0; i--) {
+    [array[0], array[i]] = [array[i], array[0]];
+    heapify(array, i, 0);
+  }
+  return array;
+}
